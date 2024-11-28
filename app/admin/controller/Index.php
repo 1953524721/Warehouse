@@ -43,10 +43,10 @@ class Index extends BaseController
              return false;
          }
      }
-    public function show(): string
+    public function add(): string
     {
         $appName   = env('APP_NAME');
-        return View::fetch("show",[
+        return View::fetch("add",[
             'appName' => $appName
         ]);
     }
