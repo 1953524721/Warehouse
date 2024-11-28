@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        body {
+            display: flex;
+            justify-content: center; /* 水平居中 */
+            align-items: center;
+            height: 100vh;
+            background: radial-gradient(circle, #ADD8E6 0%, #ADD8E6 50%, #0000ff 100%);
+
+        }
+        .login-pages {
+            //display: flex;
+            //justify-content: center; /* 水平居中 */
+            //align-items: center;
+            //height: 100vh;
+            border: 1px solid #000; /* 可选，用于展示容器边界 */
+            box-shadow: 0 2px 4px rgba(0, 140, 255, 0.3);
+            background-color: #fbfdff;
+            width: 1080px;
+            height: 480px;
+        }
+
+        .right {
+            //background-color: #00ff00;
+            width: 519px;
+            height: 480px;
+            justify-content: center; /* 水平居中 */
+            align-items: center;
+            float: right;
+            //position: relative;
+            //left: 100px;
+        }
+        .login-pages-left{
+            position: relative;
+            top: 1px;
+            left: 7px;
+            float: left;
+        }
+
+        input{
+            border: 0.1rem solid #F6F8FB;
+            box-shadow: none;
+            width: 280px;
+            height: 40px;
+        }
+
+        .login-pages-left-login{
+            width: 561px;
+            height: 480px;
+            //background-color: red;
+            position: relative;
+            top: -1px;
+            left: -7px;
+        }
+
+        .login{
+            position: relative;
+            top: 72px;
+            right: -110px;
+        }
+        .error-message {
+            color: red;
+        }
+        .button {
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            background-color: #ff7b83;
+        }
+    </style>
+    <title>Document</title>
+</head>
+<body>
+<div class="app">
+    <div class="login-pages">
+        <div class="login-pages-left">
+            <img src="/{$appName}/public/static/images/1.png" alt="123456789" class="login-pages-left-login">
+        </div>
+        <div class="right">
+            <div class="login">
+                <h1>登录</h1>
+                <p>
+                    <input type="text" placeholder="请输入用户名" class="userName" name="name">
+                </p>
+                <p>
+                    <input type="password" placeholder="请输入密码" class="userPwd" name="password">
+                </p>
+
+                <p>
+                    <input type="button" value="登录" class="button">
+                </p>
+                <p>
+                    <span class="error-message"></span>
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
+<script type="text/javascript">
+    // alert($)
+    // 设置全局AJAX选项
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            // 获取CSRF令牌
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            // 如果CSRF令牌存在，则将其添加到请求头中
+            if (csrfToken) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            }
+        }
+    });
+
+    // 为按钮点击事件添加处理函数
+    $('.button').click(function () {
+        // 获取用户名和密码输入框的值
+        const userName = $('.userName').val();
+        const userPwd  = $('.userPwd').val();
+
+        // 检查用户名和密码是否为空
+        if (userName.length===0||userPwd.length===0)
+        {
+            // 如果用户名或密码为空，显示错误消息
+            $('.error-message').text("用户名或者密码不能为空");
+        }
+        else
+        {
+            // 调用登录函数
+            performLogin(userName, userPwd);
+        }
+
+    });
+
+    /**
+     * 执行登录操作
+     * @param {string} userName - 用户名
+     * @param {string} userPwd - 用户密码
+     */
+    function performLogin(userName, userPwd) {
+        // 发起登录请求
+        $.ajax({
+            url: 'loginDo',
+            data: {
+                name: userName,
+                pwd: userPwd
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (res) {
+                // 根据响应结果进行处理
+                if (res.status === 'success') {
+                    // 登录成功，弹出提示信息并跳转到新页面
+                    alert(res.message);
+                    window.location.href = res.urls;
+                } else {
+                    // 登录失败，将响应结果输出到控制台
+                    console.log(res);
+                    //显示错误提示
+                    $('.error-message').text(res.message);
+
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // 请求失败，输出错误信息并弹出提示信息
+                console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
+                alert('请求失败，请稍后再试。');
+            }
+        });
+    }
+</script>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/{$appName}/node_modules/element-theme-chalk/lib/index.css">
+
+    <style>
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+
+        .el-aside {
+            color: #333;
+        }
+
+    </style>
+    <title>Document</title>
+</head>
+<body>
+<div id="app">
+    <el-container style="height: 800px; border: 1px solid #eee">
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+            <el-menu :default-openeds="['1', '3']">
+                <el-submenu index="1">
+                    <template slot="title"><i class="el-icon-message"></i>导航一</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="1-1" @click="left1">选项1</el-menu-item>
+                        <el-menu-item index="1-2">选项2</el-menu-item>
+                    </el-menu-item-group>
+                        <el-menu-item index="1-3">选项3</el-menu-item>
+                </el-submenu>
+            </el-menu>
+        </el-aside>
+
+        <el-container>
+            <el-header style="text-align: right; font-size: 12px">
+                <span>欢迎：{$user}</span>
+            </el-header>
+            <el-main>
+                <component :is="currentComponent" class="currentComponent"></component>
+                    <h1 style="text-align: center" class="welcome" v-if="showWelcome">
+                        欢迎 {$user}
+                    </h1>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+
+</body>
+<script src="/{$appName}/public/static/vue2.js"></script>
+<script src="/{$appName}/public/static/element-ui/element-ui-index.js"></script>
+<script src="/{$appName}/node_modules/element-ui/lib/element-ui.common.js"></script>
+<script src="/{$appName}/node_modules/axios/dist/axios.min.js"></script>
+<script>
+
+    const Page1 = {
+        render(h) {
+            return h('div', { domProps: { innerHTML: this.template } });
+        },
+        data() {
+            return {
+                template: ''
+            };
+        },
+        created() {
+            axios.get('http://127.0.0.1/Warehouse/public/index.php/admin/Index/show')
+                .then(response => {
+                    this.template = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching template:', error);
+                });
+        }
+    };
+
+    const Page2 = {
+        template: `<div><h1>这是页面2</h1></div>`
+    };
+
+    const Main = {
+        data() {
+            return {
+                 currentComponent: 'null',
+                 showWelcome: true
+            }
+        },
+        methods: {
+            left1() {
+                console.log('left1')
+                this.currentComponent = 'Page1';
+                this.showWelcome=false
+            }
+        },
+        components: {
+            Page1,
+            Page2
+        }
+    };
+    const Ctor = Vue.extend(Main);
+    new Ctor().$mount('#app')
+</script>
