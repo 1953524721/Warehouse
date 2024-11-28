@@ -19,18 +19,26 @@
         }
 
     </style>
-    <title>Document</title>
+    <title>管理页面</title>
 </head>
 <body>
 <div id="app">
-    <el-container style="height: 800px; border: 1px solid #eee">
+    <el-container style="height: 1080px; border: 1px solid #eee">
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
             <el-menu :default-openeds="['1', '3']">
                 <el-submenu index="1">
-                    <template slot="title"><i class="el-icon-message"></i>导航一</template>
+                    <template slot="title"><i class="el-icon-message"></i>商品管理</template>
                     <el-menu-item-group>
-                        <el-menu-item index="1-1" @click="left1">商品管理</el-menu-item>
+                        <el-menu-item index="1-1" @click="left1">新增</el-menu-item>
                         <el-menu-item index="1-2">添加商品</el-menu-item>
+                    </el-menu-item-group>
+                        <el-menu-item index="1-3">选项3</el-menu-item>
+                </el-submenu>
+                <el-submenu index="2">
+                    <template slot="title"><i class="el-icon-message"></i>系统管理</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="1-1" @click="">用户管理</el-menu-item>
+                        <el-menu-item index="1-2">操作审计</el-menu-item>
                     </el-menu-item-group>
                         <el-menu-item index="1-3">选项3</el-menu-item>
                 </el-submenu>
@@ -54,7 +62,6 @@
 </body>
 <script src="/{$appName}/public/static/vue2.js"></script>
 <script src="/{$appName}/public/static/element-ui/element-ui-index.js"></script>
-<script src="/{$appName}/node_modules/element-ui/lib/element-ui.common.js"></script>
 <script src="/{$appName}/node_modules/axios/dist/axios.min.js"></script>
 <script>
 

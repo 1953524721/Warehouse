@@ -1,12 +1,102 @@
-<div>
-    <label>
-        名称：<input type="text">
-    </label><br>
-    <label>
-        名称：<input type="text">
-    </label><br>
-    <label>
-        名称：<input type="text">
-    </label>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <form id="productForm">
+        <table>
+            <tr>
+                <td>商品名称:</td>
+                <td><input type="text" class="name" name="name"></td>
+            </tr>
+            <tr>
+                <td>商品描述:</td>
+                <td><input type="text" class="describe" name="describe"></td>
+            </tr>
+            <tr>
+                <td>商品型号:</td>
+                <td><input type="text" class="models" name="models"></td>
+            </tr>
+            <tr>
+                <td>品牌</td>
+                <td><input type="text" class="brand" name="brand"></td>
+            </tr>
+            <tr>
+                <td>生产地:</td>
+                <td><input type="text" class="production" name="production"></td>
+            </tr>
+            <tr>
+                <td>数量:</td>
+                <td><input type="tel" class="num" name="num"></td>
+            </tr>
+            <tr>
+                <td>库存单位:</td>
+                <td><input type="text" class="unit" name="unit"></td>
+            </tr>
+            <tr>
+                <td>封面</td>
+                <td><input type="file" class="flier" name="flier"></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="提交" class="submit"></td>
+                <td><input type="reset" value="重置"></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <span class="error-message"></span>
+                </td>
+            </tr>
+        </table>
+    </form>
+</body>
+<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
+<script type="text/javascript">
+    // 设置全局AJAX选项
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            // 获取CSRF令牌
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            // 如果CSRF令牌存在，则将其添加到请求头中
+            if (csrfToken) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            }
+        }
+    });
 
-</div>
+    // 为按钮点击事件添加处理函数
+    $('.submit').click(function () {
+        // 创建 FormData 对象
+        const formData = new FormData($('#productForm')[0]);
+        // 发起 AJAX 请求
+        $.ajax({
+            url: 'addProduct',  // 你的后端接口地址
+            data: formData,
+            type: 'post',
+            processData: false,  // 不处理数据
+            contentType: false,  // 不设置内容类型
+            dataType: 'json',
+            success: function (res) {
+                console.log(res);
+                // 根据响应结果进行处理
+                if (res.status === 'success') {
+                    // 操作成功，弹出提示信息并跳转到新页面
+                    $('.error-message').text(res.message);
+                } else {
+                    // 操作失败，显示错误提示
+                    $('.error-message').text(res.message);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // 请求失败，输出错误信息并弹出提示信息
+                console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
+                alert('请求失败，请稍后再试。');
+            }
+        });
+    });
+</script>
+</html>
