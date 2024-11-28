@@ -2,10 +2,15 @@
 
 namespace app\admin\controller;
 
+use app\admin\model\product;
+use app\admin\model\User;
 use app\BaseController;
 use think\App;
+use think\facade\Filesystem;
 use think\facade\Session;
 use think\facade\View;
+use think\Request;
+use think\response\Json;
 use think\response\Redirect;
 
 class Index extends BaseController
@@ -50,7 +55,46 @@ class Index extends BaseController
             'appName' => $appName
         ]);
     }
-     /**
+    public function adds(): string
+    {
+        $appName   = env('APP_NAME');
+        return View::fetch("adds",[
+            'appName' => $appName
+        ]);
+    }
+    public function addProduct(Request $request): Json
+    {
+        // 获取表单数据
+        $names = $request->post('name');
+        $describe = $request->post('describe');
+        $models = $request->post('models');
+        $brand = $request->post('brand');
+        $num = $request->post('num');
+        $production = $request->post('production');
+        $unit = $request->post('unit');
+
+        // 获取上传的文件
+        $file = $request->file('flier');
+
+        if ($file) {
+            $saveName = \think\facade\Filesystem::putFile( 'topic', $file);
+            $productionModel = new product();
+            $data = $productionModel->saveProduct($names, $describe, $models, $brand, $production, $num,$unit, $saveName);
+//            return json($data);
+            if (!$data)
+            {
+                return json(['status' => 'error', 'message' => '添加失败']);
+            }
+            else
+            {
+                return json(['status' => 'success', 'message' => '添加成功','data'=>$data]);
+            }
+        }
+    }
+
+
+
+       /**
       * 重定向用户到登录页面
       *
       * @return Redirect 生成重定向到登录页面的响应
