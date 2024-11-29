@@ -3,10 +3,9 @@
 namespace app\admin\controller;
 
 use app\admin\model\product;
-use app\admin\model\User;
 use app\BaseController;
 use think\App;
-use think\facade\Filesystem;
+use think\facade\Log;
 use think\facade\Session;
 use think\facade\View;
 use think\Request;
@@ -48,39 +47,54 @@ class Index extends BaseController
              return false;
          }
      }
+    /**
+     * 显示添加产品页面
+     *
+     * 该方法负责渲染并返回添加产品页面，同时传递应用名称到视图
+     *
+     * @return string 渲染后的页面内容
+     */
     public function add(): string
     {
+        // 获取应用名称
         $appName   = env('APP_NAME');
+        // 渲染并返回 "add" 视图，同时传递应用名称
         return View::fetch("add",[
             'appName' => $appName
         ]);
     }
-    public function adds(): string
-    {
-        $appName   = env('APP_NAME');
-        return View::fetch("adds",[
-            'appName' => $appName
-        ]);
-    }
+
+    /**
+     * 处理产品添加请求
+     *
+     * 该方法接收一个请求对象，提取产品信息并保存到数据库
+     * 如果产品成功添加，返回成功信息和数据，否则返回错误信息
+     *
+     * @param Request $request 用户请求对象，包含产品信息和可能的文件上传
+     * @return Json 包含操作结果和数据的JSON响应
+     */
     public function addProduct(Request $request): Json
     {
         // 获取表单数据
-        $names = $request->post('name');
-        $describe = $request->post('describe');
-        $models = $request->post('models');
-        $brand = $request->post('brand');
-        $num = $request->post('num');
+        $names      = $request->post('name');
+        $describe   = $request->post('describe');
+        $models     = $request->post('models');
+        $brand      = $request->post('brand');
+        $num        = $request->post('num');
         $production = $request->post('production');
-        $unit = $request->post('unit');
+        $unit       = $request->post('unit');
+        $date       = date('Y-m-d H:i:s');
 
         // 获取上传的文件
         $file = $request->file('flier');
 
+        // 如果文件上传成功，进行保存并调用模型方法保存产品信息
         if ($file) {
             $saveName = \think\facade\Filesystem::putFile( 'topic', $file);
             $productionModel = new product();
-            $data = $productionModel->saveProduct($names, $describe, $models, $brand, $production, $num,$unit, $saveName);
-//            return json($data);
+            $data = $productionModel->createProduct($names, $describe, $models, $brand, $production, $num,$unit, $saveName,$date);
+
+            // 根据产品保存结果，返回相应的JSON响应
             if (!$data)
             {
                 return json(['status' => 'error', 'message' => '添加失败']);
@@ -123,18 +137,56 @@ class Index extends BaseController
          {
              //return '您好！这是一个[index]示例应用';
              $appName = env("APP_NAME");
+             $serverIp  = $_SERVER['SERVER_ADDR'];
              // 获取用户信息，用于在页面中显示
              $user = Session::get('user')['name'];
              return View::fetch("index",[
                  'user' => $user,
-                 'appName' => $appName
+                 'appName' => $appName,
+                 'serverIp' => $serverIp
              ]);
          } else {
              return $this->redirectToLogin();
          }
      }
-    public function test(): mixed
-    {
-        return env("APP_NAME");
-    }
+     public function show(Request $request): \think\response\View
+     {
+         $page      = $request->param('page', 1);
+         $pageSize      = $request->param('pageSize', 10);
+         $serverIp  = $_SERVER['SERVER_ADDR'];
+         $appName   = env('APP_NAME');
+         $productionModel = new product();
+         $list = $productionModel->getProductsALL($page,$pageSize);
+         $list = json_encode($list);
+         $list = json_decode($list,true);
+//         print_r($list);die();
+         $response = [
+             'data' => $list,
+             'total' => count($list) // 这里假设每页返回的数据量是固定的
+         ];
+
+         $response = json_encode($response);
+         Log::info($response);
+         print_r($response);die();
+         return view("show",[
+             'appName' => $appName,
+             'serverIp' => $serverIp,
+             'response'=>$response
+         ]);
+     }
+     public function configAll(): void
+     {
+         echo "当前应用目录：".app_path()."<br>";
+         echo "应用基础目录：".base_path()."<br>";
+         echo "应用配置目录：".config_path()."<br>";
+         echo "web根目录：".public_path()."<br>";
+         echo "应用根目录：".root_path()."<br>";
+         echo "应用运行时目录：".runtime_path()."<br>";
+     }
+     public function test(): void
+     {
+         $productionModel = new product();
+         $list = $productionModel->getProductsALL();
+         print_r($list);
+     }
 }

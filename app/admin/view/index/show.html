@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        table tr:nth-child(odd) {
+            background-color: #f2f2f2; /* 奇数行的背景颜色 */
+        }
+
+        table tr:nth-child(even) {
+            background-color: #ffffff; /* 偶数行的背景颜色 */
+        }
+
+        /* 固定表头 */
+        th {
+            position: sticky;
+            top: 0;
+            background-color: #7EB6FD; /* 表头背景颜色 */
+            color: white; /* 表头文字颜色 */
+            z-index: 1; /* 确保表头在其他内容之上 */
+        }
+        .page ul {
+            list-style-type: none; /* 去掉默认的列表样式 */
+            padding: 0; /* 去掉默认的内边距 */
+            margin: 0; /* 去掉默认的外边距 */
+        }
+
+        .page li {
+            display: inline-block; /* 水平排列 */
+            margin-right: 10px; /* 右侧间距 */
+        }
+        td{
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>简述</th>
+            <th>型号</th>
+            <th>品牌</th>
+            <th>产地</th>
+            <th>数量</th>
+            <th>单位</th>
+            <th>简略图</th>
+            <th>添加日期</th>
+        </tr>
+
+        <tbody id="data-table">
+            <!-- 数据将在这里动态插入 -->
+        </tbody>
+
+        <tr>
+            <td colspan="10" class="page">
+                <input type="button" value="首页" class="one">
+                <input type="button" value="上一页" class="up">
+                <input type="button" value="下一页" class="down">
+                <input type="button" value="尾页" class="last">
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
+<script type="text/javascript">
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            // 获取CSRF令牌
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            // 如果CSRF令牌存在，则将其添加到请求头中
+            if (csrfToken) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            }
+        }
+    });
+    $(document).ready(function() {
+    let currentPage = 1;
+    const pageSize = 10; // 每页显示的记录数
+        function fetchData(page) {
+            $.ajax({
+                url: 'show', // 替换为你的API端点
+                method: 'GET',
+                data: {
+                    page: page,
+                    pageSize: pageSize
+                },
+                dataType: 'json',
+                success: function(response)
+                {
+                    console.log('Response:', response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+
+    // 初始化加载第一页数据
+    fetchData(currentPage);
+
+    // 绑定分页按钮事件
+    $('.one').click(function() {
+        currentPage = 1;
+        fetchData(currentPage);
+    });
+
+    $('.up').click(function() {
+        if (currentPage > 1) {
+            currentPage--;
+            fetchData(currentPage);
+        }
+    });
+
+    $('.down').click(function() {
+        currentPage++;
+        fetchData(currentPage);
+    });
+
+    $('.last').click(function() {
+        // 获取总页数
+        $.ajax({
+            url: 'show', // 替换为你的API端点
+            method: 'GET',
+            data: {
+                page: 1,
+                pageSize: pageSize
+            },
+            success: function(response) {
+                const total = response.total;
+                currentPage = Math.ceil(total / pageSize);
+                fetchData(currentPage);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching total pages:', error);
+            }
+        });
+    });
+});
+</script>
+</html>

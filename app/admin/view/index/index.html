@@ -1,113 +1,220 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="/{$appName}/node_modules/element-theme-chalk/lib/index.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>侧边导航栏示例</title>
     <style>
-        .el-header {
-            background-color: #B3C0D1;
-            color: #333;
-            line-height: 60px;
+        /* styles.css */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
         }
 
-        .el-aside {
-            color: #333;
+        #sidebar {
+            width: 250px;
+            background-color: #333;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
         }
 
+        #sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #sidebar li {
+            position: relative;
+        }
+
+        #sidebar li a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: white;
+        }
+
+        #sidebar li a:hover {
+            background-color: #555;
+        }
+
+        #sidebar .sub-menu {
+            display: none;
+            background-color: #444;
+            padding-left: 20px;
+        }
+
+        #sidebar .sub-menu li a {
+            padding: 8px 15px;
+        }
+
+        #sidebar .sub-menu li a:hover {
+            background-color: #666;
+        }
+
+        #content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        #content section {
+            margin: 20px 0;
+        }
+
+        #welcome-bar {
+            height: 100px;
+            background-color: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            width: calc(100% - 250px);
+        }
+
+        #welcome-left, #welcome-right {
+            font-size: 18px;
+            color: #333;
+        }
+        .top
+        {
+            height: 50px;
+            width: 86%;
+            background-color: red;
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: -1;
+        }
+        #service-content {
+            margin-top: 50px; /* 添加这行代码 */
+        }
     </style>
-    <title>管理页面</title>
 </head>
 <body>
-<div id="app">
-    <el-container style="height: 1080px; border: 1px solid #eee">
-        <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-            <el-menu :default-openeds="['1', '3']">
-                <el-submenu index="1">
-                    <template slot="title"><i class="el-icon-message"></i>商品管理</template>
-                    <el-menu-item-group>
-                        <el-menu-item index="1-1" @click="left1">添加商品</el-menu-item>
-                        <el-menu-item index="1-2">无能啊</el-menu-item>
-                    </el-menu-item-group>
-
-                </el-submenu>
-                <el-submenu index="2">
-                    <template slot="title"><i class="el-icon-message"></i>系统管理</template>
-                    <el-menu-item-group>
-                        <el-menu-item index="1-1" @click="">用户管理</el-menu-item>
-                        <el-menu-item index="1-2">操作审计</el-menu-item>
-                    </el-menu-item-group>
-                        <el-menu-item index="1-3">选项3</el-menu-item>
-                </el-submenu>
-            </el-menu>
-        </el-aside>
-
-        <el-container>
-            <el-header style="text-align: right; font-size: 12px">
-                <span>欢迎：{$user}</span>
-            </el-header>
-            <el-main>
-                <component :is="currentComponent" class="currentComponent"></component>
-                    <h1 style="text-align: center" class="welcome" v-if="showWelcome">
-                        欢迎 {$user}
-                    </h1>
-            </el-main>
-        </el-container>
-    </el-container>
+<div id="sidebar">
+    <ul>
+        <li>
+            <a href="javascript:">服务</a>
+            <ul class="sub-menu">
+                <li><a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Index/add">服务1</a></li>
+                <li><a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Index/show">服务2</a></li>
+                <li><a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Index/service3">服务3</a></li>
+            </ul>
+        </li>
+    </ul>
 </div>
-
-</body>
-<script src="/{$appName}/public/static/vue2.js"></script>
-<script src="/{$appName}/public/static/element-ui/element-ui-index.js"></script>
-<script src="/{$appName}/node_modules/axios/dist/axios.min.js"></script>
+<div class="top">
+    <div id="welcome-left">欢迎</div>
+    <div id="welcome-right">{$user}</div>
+</div>
+<div id="content"></div>
+<div id="service-content"></div>
+<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
 <script>
+    $(document).ready(function() {
+        // 缓存 DOM 元素
+        const $sidebarLinks = $('#sidebar > ul > li > a');
+        const $sidebarSubMenu = $('.sub-menu');
+        const $contentSections = $('#content section');
+        const $window = $(window);
 
-    const Page1 = {
-        render(h) {
-            return h('div', { domProps: { innerHTML: this.template } });
-        },
-        data() {
-            return {
-                template: ''
-            };
-        },
-        created() {
-            axios.get('http://127.0.0.1/Warehouse/public/index.php/admin/Index/adds')
-                .then(response => {
-                    this.template = response.data;
-                })
-                .catch(error => {
-                    console.error('Error fetching template:', error);
+        // 配置对象
+        const config = {
+            validUrlPattern: /^https?:\/\/(localhost|127\.0\.0\.1)/
+        };
+
+        // 阻止默认行为并获取目标 URL
+        function preventDefaultAndGetHref(event) {
+            event.preventDefault();
+            return $(event.target).attr('href');
+        }
+
+        // 展开和折叠子菜单
+        $sidebarLinks.click(function(e) {
+            const subMenu = $(this).next('.sub-menu');
+
+            if (subMenu.is(':visible')) {
+                subMenu.slideUp();
+            } else {
+                subMenu.slideDown();
+            }
+        });
+
+        // 导航栏链接点击事件
+        $('#sidebar ul li a').click(function(e) {
+            const href = preventDefaultAndGetHref(e);  // 获取目标 URL
+
+            if ($(this).hasClass('ajax-link')) {
+                // 处理 AJAX 链接
+                handleAjaxLink(href);
+            } else {
+                // 处理普通链接
+                handleRegularLink(href);
+            }
+        });
+
+        // 导航栏高亮当前活动项
+        $window.scroll(function() {
+            const scrollPosition = $window.scrollTop();
+
+            $contentSections.each(function() {
+                var sectionTop = $(this).offset().top;
+                var sectionBottom = sectionTop + $(this).outerHeight();
+
+                if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                    var id = $(this).attr('id');
+                    $('#sidebar ul li a').removeClass('active');
+                    $('#sidebar ul li a[href="#' + id + '"]').addClass('active');
+                }
+            });
+        });
+
+        // 处理带有 ajax-link 类的链接点击事件
+        function handleAjaxLink(url) {
+            // 验证 URL 是否合法
+            if (!config.validUrlPattern.test(url)) {
+                console.error('无效的 URL:', url);
+                return;
+            }
+
+            // 使用 AJAX 请求页面内容
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    // 直接将响应内容插入到 #service-content 中
+                    $('#service-content').empty();
+                    $('#service-content').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('请求失败:', error);
+                }
+            });
+        }
+
+        // 处理普通链接点击事件
+        function handleRegularLink(target) {
+            const targetElement = $(target);
+
+            if (targetElement.length) {
+                const targetPosition = targetElement.offset().top;  // 获取目标元素的顶部位置
+
+                // 平滑滚动到目标位置
+                requestAnimationFrame(function() {
+                    $('html, body').animate({
+                        scrollTop: targetPosition
+                    }, 1000);
                 });
-        }
-    };
-
-    const Page2 = {
-        template: `<div><h1>这是页面2</h1></div>`
-    };
-
-    const Main = {
-        data() {
-            return {
-                 currentComponent: 'null',
-                 showWelcome: true
             }
-        },
-        methods: {
-            left1() {
-                console.log('left1')
-                this.currentComponent = 'Page1';
-                this.showWelcome=false
-            }
-        },
-        components: {
-            Page1,
-            Page2
         }
-    };
-    const Ctor = Vue.extend(Main);
-    new Ctor().$mount('#app')
+    });
 </script>
+</body>
+</html>

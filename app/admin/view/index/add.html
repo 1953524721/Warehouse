@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>添加商品</title>
 </head>
 <body>
     <form id="productForm">
@@ -70,6 +70,7 @@
 
     // 为按钮点击事件添加处理函数
     $('.submit').click(function () {
+        console.log('Submit button clicked');
         // 创建 FormData 对象
         const formData = new FormData($('#productForm')[0]);
         // 发起 AJAX 请求
