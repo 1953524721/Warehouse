@@ -27,14 +27,15 @@ class product extends Model
     public function createProduct(string $names, string $describe, string $models, string $brand, string $production, int $num, string $unit, string $filePath, string $date): int
     {
         // 对输入进行基本的验证和过滤
-        $names      = filter_var($names, FILTER_SANITIZE_STRING);
-        $describe   = filter_var($describe, FILTER_SANITIZE_STRING);
-        $models     = filter_var($models, FILTER_SANITIZE_STRING);
-        $brand      = filter_var($brand, FILTER_SANITIZE_STRING);
-        $production = filter_var($production, FILTER_SANITIZE_STRING);
-        $unit       = filter_var($unit, FILTER_SANITIZE_STRING);
-        $filePath   = filter_var($filePath, FILTER_SANITIZE_STRING);
-        $date       = filter_var($date, FILTER_SANITIZE_STRING);
+
+        $names      = htmlspecialchars($names);
+        $describe   = htmlspecialchars($describe);
+        $models     = htmlspecialchars($models);
+        $brand      = htmlspecialchars($brand);
+        $production = htmlspecialchars($production);
+        $unit       = htmlspecialchars($unit);
+        $filePath   = htmlspecialchars($filePath);
+        $date       = htmlspecialchars($date);
 
         // 验证数字类型
         if (!is_numeric($num)) {
@@ -53,7 +54,7 @@ class product extends Model
             // 将文件路径保存为产品宣传册的路径
             $this->flier        = $filePath;
             // 保存产品入库日期
-            $this->date         = $date;
+            $this->add_date        = $date;
 
             // 保存数据到数据库
             $this->save();
@@ -70,9 +71,45 @@ class product extends Model
     {
         $list = Db::table($this->table)
                   ->order('id', 'desc')
-                  ->limit($page,$pageSize)
+                  ->page($page,$pageSize)
                  ->select();
         return $list;
     }
 
+    public function getTotalProducts(): int
+    {
+        return $this->count();
+    }
+    public function findProduct($id)
+    {
+        // table方法必须指定完整的数据表名
+       return Db::table($this->table)->where('id', $id)->find();
+    }
+    public function updateProduct($id,string $names, string $describe, string $models, string $brand, string $production, int $num, string $unit, string $filePath, string $date): int
+    {
+        $names      = htmlspecialchars($names);
+        $describe   = htmlspecialchars($describe);
+        $models     = htmlspecialchars($models);
+        $brand      = htmlspecialchars($brand);
+        $production = htmlspecialchars($production);
+        $unit       = htmlspecialchars($unit);
+        $filePath   = htmlspecialchars($filePath);
+        $date       = htmlspecialchars($date);
+
+        // 验证数字类型
+        if (!is_numeric($num)) {
+            throw new \InvalidArgumentException("产品数量必须是数字");
+        }
+        return Db::name($this->table)->where('id', $id)->update([
+            'names'      => $names,
+            'describe'   => $describe,
+            'models'     => $models,
+            'brand'      => $brand,
+            'production' => $production,
+            'num'        => $num,
+            'unit'       => $unit,
+            'flier'      => $filePath,
+            'date'       => $date
+        ]);
+    }
 }
