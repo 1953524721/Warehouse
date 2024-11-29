@@ -96,7 +96,7 @@
         </tbody>
 
         <tr>
-            <td colspan="11" class="page">
+            <td colspan="10" class="page">
                 <input type="button" value="首页" class="one">
                 <input type="button" value="上一页" class="up">
                 <input type="button" value="下一页" class="down">
@@ -110,7 +110,7 @@
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <form id="edit-form" method="post" enctype="multipart/form-data">
+        <form id="productForm" method="post" enctype="multipart/form-data">
             <input type="hidden" id="id" name="id" value="">
             <label for="names">名称:</label>
             <input type="text" id="names" name="names" value=""><br>
@@ -129,7 +129,8 @@
             <label for="flier">简略图:</label>
             <input type="file" id="flier" name="flier" value="">
             <br>
-            <input type="submit" value="保存">
+            <input type="button" value="提交" class="submit">
+            <span class="error-message"></span>
         </form>
     </div>
 </div>
@@ -265,25 +266,7 @@ $(document).ready(function() {
         $('#myModal').hide();
     });
 
-    // 绑定表单提交事件
-    $('#edit-form').submit(function(event) {
-        event.preventDefault();
-        const formData = $(this).serialize();
-        $.ajax({
-            url: 'updateItem', // 替换为你的API端点
-            method: 'POST',
-            data: formData,
-            dataType: 'json',
-            success: function(response) {
-                console.log('Item updated successfully:', response);
-                $('#myModal').hide(); // 关闭模态对话框
-                fetchData(currentPage); // 刷新当前页面数据
-            },
-            error: function(xhr, status, error) {
-                console.error('Error updating item:', error);
-            }
-        });
-    });
+
 
     // 绑定删除按钮事件
     $(document).on('click', '.delete-btn', function() {
@@ -308,7 +291,49 @@ $(document).ready(function() {
             }
         });
     });
+    // 绑定表单提交事件
+    $('.submit').click(function () {
+        console.log('Submit button clicked');
+        // 创建 FormData 对象
+        const formData = new FormData($('#productForm')[0]);
+        // 发起 AJAX 请求
+        $.ajax({
+            url: 'updateItem',  // 你的后端接口地址
+            data: formData,
+            type: 'post',
+            processData: false,  // 不处理数据
+            contentType: false,  // 不设置内容类型
+            dataType: 'json',
+            success: function (res) {
+                console.log(res);
+                // 根据响应结果进行处理
+                if (res.status === 'success') {
+                    // 操作成功，弹出提示信息并跳转到新页面
+                    $('.error-message').text(res.message);
+                    // 等待3秒后关闭模态对话框并刷新当前页面数据
+                    setTimeout(function() {
+                        $('#myModal').hide(); // 关闭模态对话框
+                        fetchData(currentPage); // 刷新当前页面数据
+                    }, 3000); // 3000毫秒 = 3秒
+
+                } else {
+                    // 操作失败，显示错误提示
+                    $('.error-message').text(res.message);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // 请求失败，输出错误信息并弹出提示信息
+                console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
+                alert('请求失败，请稍后再试。');
+            }
+        });
+    });
+
+
+
+
 });
+
 </script>
 </body>
 </html>

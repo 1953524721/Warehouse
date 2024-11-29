@@ -197,11 +197,19 @@ class Index extends BaseController
         $data = $productionModel->findProduct($id);
         return json($data);
     }
-    public function updateItem(Request $request): Json
+    public function update(Request $request)
+    {
+        $appName = env("APP_NAME");
+        $id = $request->get('id');
+        return view('update',[
+            'id'=>$id,
+            'appName'=>$appName
+        ]);
+    }
+    public function updateItem(Request $request)
     {
         // 获取表单数据
-
-        $names      = $request->post('name');
+        $names      = $request->post('names');
         $id         = $request->post('id');
         $describe   = $request->post('describe');
         $models     = $request->post('models');
@@ -213,27 +221,50 @@ class Index extends BaseController
 
         // 获取上传的文件
         $file = $request->file('flier');
+        if ($file) {
+            // 检查文件上传是否成功
+            if ($file->isValid()) {
+                $saveName = \think\facade\Filesystem::putFile('topic', $file);
+                $productionModel = new product();
+                $data = $productionModel->updateProduct($id, $names, $describe, $models, $brand, $production, $num, $unit, $saveName, $date);
+                // 返回更新结果
+//                return $data;
+                if ($data) {
+                    return json(['status' => 'success', 'message' => '更新成功']);
+                } else {
+                    return json(['status' => 'error', 'message' => '更新失败']);
+                }
+            } else {
+                // 文件上传失败
+                Log::error('File upload failed:', ['file' => $file, 'errors' => $file->getError()]);
+                return json(['status' => 'error', 'message' => '文件上传失败']);
+            }
+        } else {
+            // 没有文件上传
+            return json(['status' => 'error', 'message' => '没有文件上传']);
+        }
+
 
         // 如果文件上传成功，进行保存并调用模型方法保存产品信息
-        if ($file) {
-            $saveName = \think\facade\Filesystem::putFile( 'topic', $file);
-            $productionModel = new product();
-            $data = $productionModel->updateProduct($id,$names, $describe, $models, $brand, $production, $num,$unit, $saveName,$date);
-
-            // 根据产品保存结果，返回相应的JSON响应
-            if (!$data)
-            {
-                return json(['status' => 'error', 'message' => '更新失败']);
-            }
-            else
-            {
-                return json(['status' => 'success', 'message' => '更新失败','data'=>$data]);
-            }
-        }
-        else
-        {
-            return json(['status' => 'error', 'message' => '添加失败']);
-        }
+//        if ($file) {
+//            $saveName = \think\facade\Filesystem::putFile( 'topic', $file);
+//            $productionModel = new product();
+//            $data = $productionModel->updateProduct($id,$names, $describe, $models, $brand, $production, $num,$unit, $saveName,$date);
+////            return json($data);
+//            // 根据产品保存结果，返回相应的JSON响应
+//            if (!$data)
+//            {
+//                return json(['status' => 'error', 'message' => '更新失败']);
+//            }
+//            else
+//            {
+//                return json(['status' => 'success', 'message' => '更新成功']);
+//            }
+//        }
+//        else
+//        {
+//            return json(['status' => 'error', 'message' => '图片上传失败']);
+//        }
     }
 
      public function configAll(): void

@@ -2,7 +2,9 @@
 
 namespace app\admin\model;
 
+use think\db\exception\DbException;
 use think\facade\Db;
+use think\facade\Log;
 use think\Model;
 
 class product extends Model
@@ -85,9 +87,11 @@ class product extends Model
         // table方法必须指定完整的数据表名
        return Db::table($this->table)->where('id', $id)->find();
     }
-    public function updateProduct($id,string $names, string $describe, string $models, string $brand, string $production, int $num, string $unit, string $filePath, string $date): int
+    public function updateProduct($id,string $names, string $describe, string $models, string $brand, string $production, int $num, string $unit, string $filePath, string $date): mixed
     {
+
         $names      = htmlspecialchars($names);
+        $id         = htmlspecialchars($id);
         $describe   = htmlspecialchars($describe);
         $models     = htmlspecialchars($models);
         $brand      = htmlspecialchars($brand);
@@ -100,16 +104,21 @@ class product extends Model
         if (!is_numeric($num)) {
             throw new \InvalidArgumentException("产品数量必须是数字");
         }
-        return Db::name($this->table)->where('id', $id)->update([
-            'names'      => $names,
-            'describe'   => $describe,
-            'models'     => $models,
-            'brand'      => $brand,
-            'production' => $production,
-            'num'        => $num,
-            'unit'       => $unit,
-            'flier'      => $filePath,
-            'date'       => $date
-        ]);
+        try {
+            return Db::name($this->table)->where('id', $id)->update([
+                'names'      => $names,
+                'describe'   => $describe,
+                'models'     => $models,
+                'brand'      => $brand,
+                'production' => $production,
+                'num'        => $num,
+                'unit'       => $unit,
+                'flier'      => $filePath,
+                'add_date'   => $date
+            ]);
+        } catch (DbException $e) {
+            Log::error("更新产品信息时发生错误: " . $e->getMessage());
+            return $e->getMessage();
+        }
     }
 }
