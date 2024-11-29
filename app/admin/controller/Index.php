@@ -151,12 +151,20 @@ class Index extends BaseController
          }
      }
 
-    public function show(): string
+    public function show(): string|Redirect
     {
-        $appName = env("APP_NAME");
-        return View::fetch("show",[
-            'appName' => $appName,
-        ]);
+        if ($this->isUserLoggedIn())
+        {
+            $appName = env("APP_NAME");
+            return View::fetch("show",[
+                'appName' => $appName,
+            ]);
+        }
+        else
+        {
+            return $this->redirectToLogin();
+        }
+
     }
     public function pageAll(Request $request)
     {
@@ -197,16 +205,7 @@ class Index extends BaseController
         $data = $productionModel->findProduct($id);
         return json($data);
     }
-    public function update(Request $request)
-    {
-        $appName = env("APP_NAME");
-        $id = $request->get('id');
-        return view('update',[
-            'id'=>$id,
-            'appName'=>$appName
-        ]);
-    }
-    public function updateItem(Request $request)
+    public function updateItem(Request $request): Json
     {
         // 获取表单数据
         $names      = $request->post('names');
@@ -243,49 +242,5 @@ class Index extends BaseController
             // 没有文件上传
             return json(['status' => 'error', 'message' => '没有文件上传']);
         }
-
-
-        // 如果文件上传成功，进行保存并调用模型方法保存产品信息
-//        if ($file) {
-//            $saveName = \think\facade\Filesystem::putFile( 'topic', $file);
-//            $productionModel = new product();
-//            $data = $productionModel->updateProduct($id,$names, $describe, $models, $brand, $production, $num,$unit, $saveName,$date);
-////            return json($data);
-//            // 根据产品保存结果，返回相应的JSON响应
-//            if (!$data)
-//            {
-//                return json(['status' => 'error', 'message' => '更新失败']);
-//            }
-//            else
-//            {
-//                return json(['status' => 'success', 'message' => '更新成功']);
-//            }
-//        }
-//        else
-//        {
-//            return json(['status' => 'error', 'message' => '图片上传失败']);
-//        }
     }
-
-     public function configAll(): void
-     {
-         echo "当前应用目录：".app_path()."<br>";
-         echo "应用基础目录：".base_path()."<br>";
-         echo "应用配置目录：".config_path()."<br>";
-         echo "web根目录：".public_path()."<br>";
-         echo "应用根目录：".root_path()."<br>";
-         echo "应用运行时目录：".runtime_path()."<br>";
-     }
-     public function test(): Json
-     {
-         $productionModel = new product();
-         $list = $productionModel->getProductsALL(1,10);
-         $total = $productionModel->getTotalProducts(); // 获取总记录数
-
-         $response = [
-             'data' => $list,
-             'total' => $total
-         ];
-         return json($response);
-     }
 }
