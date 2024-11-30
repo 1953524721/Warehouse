@@ -27,11 +27,25 @@ class User extends Model
       return $this->where('name', $name)->where('pwd', $pwd)->find();
     }
 
+    /**
+     * 根据用户ID查找用户信息
+     *
+     * @param int $id 用户ID
+     * @return array|null 返回用户信息数组，如果未找到则返回null
+     */
     public function findUser($id)
     {
         return
             Db::table($this->table)->where('id', $id)->find();
     }
+
+    /**
+     * 获取所有用户信息，按页码和每页大小分页
+     *
+     * @param int $page 页码
+     * @param int $pageSize 每页大小
+     * @return array|\think\Collection 返回用户信息的集合或数组
+     */
     public function getUserALL($page,$pageSize): array|\think\Collection
     {
         return Db::table($this->table)
@@ -39,10 +53,24 @@ class User extends Model
             ->page($page,$pageSize)
             ->select();
     }
+
+    /**
+     * 获取所有用户的总数
+     *
+     * @return int 用户总数
+     */
     public function getUserALLCount(): int
     {
         return $this->count();
     }
+
+    /**
+     * 更新用户的名称
+     *
+     * @param int $id 用户ID
+     * @param string $names 新的用户名称
+     * @return int|string 返回受影响的行数或错误信息字符串
+     */
     public function updateName($id, $names): int|string
     {
         $names      = htmlspecialchars($names);
@@ -56,18 +84,32 @@ class User extends Model
             return $e->getMessage();
         }
     }
+
+    /**
+     * 更新用户的密码为一个默认值
+     *
+     * @param int $id 用户ID
+     * @return int|string 返回受影响的行数或错误信息字符串
+     */
     public function updatePwd($id): int|string
     {
         $id = htmlspecialchars($id);
         try {
             return Db::name($this->table)->where('id', $id)->update([
-                'pwd'      => md5('222222'),
+                'pwd'      => md5('111111'),
             ]);
         } catch (DbException $e) {
             Log::error("更新产品信息时发生错误: " . $e->getMessage());
             return $e->getMessage();
         }
     }
+
+    /**
+     * 删除指定ID的用户
+     *
+     * @param int $id 用户ID
+     * @return \think\response\Json 返回JSON响应，包含删除状态和消息
+     */
     public function deleteUser($id): \think\response\Json
     {
         $id   = htmlspecialchars($id);
@@ -83,6 +125,14 @@ class User extends Model
             return json(['status' => 'error', 'message' => '删除失败']);
         }
     }
+
+    /**
+     * 更新用户的状态
+     *
+     * @param int $id 用户ID
+     * @param string $newState 新的用户状态
+     * @return int|string 返回受影响的行数或错误信息字符串
+     */
     public function updateState($id,$newState): int|string
     {
         $id         = htmlspecialchars($id);
