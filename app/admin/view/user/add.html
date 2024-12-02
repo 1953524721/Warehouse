@@ -54,6 +54,9 @@
                         $('.error_info').text(response.message);
                     } else {
                         $('.error_info').text(response.message); // 显示错误信息
+                        setTimeout(function() {
+                            location.reload(); // 刷新页面
+                        }, 2000); // 2000毫秒 = 2秒
                     }
                 },
                 error: function(xhr, status, error) {

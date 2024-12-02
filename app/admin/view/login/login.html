@@ -167,7 +167,9 @@
                     console.log(res);
                     //显示错误提示
                     $('.error-message').text(res.message);
-
+                    setTimeout(function() {
+                        location.reload(); // 刷新页面
+                    }, 2000); // 2000毫秒 = 2秒
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {

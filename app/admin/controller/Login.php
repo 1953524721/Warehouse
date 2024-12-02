@@ -70,18 +70,20 @@ class Login extends BaseController
 
         // 构建测试URL，此处简化了实际的URL构建过程
         $url = 'http://'.$serverIp.'/'.$appName.'/public/index.php/admin/Index/index';
-
-        // 根据验证结果，处理登录逻辑
-        if ($user)
+//        return json($user);
+        if (empty($user))
+        {
+            return json(['status' => 'error', 'message' => '用户名或密码错误']);
+        }
+        if ($user['state']=='0'){
+            return json(['status' => 'error', 'message' => '用户被禁用']);
+        }
+        else if ($user['state']=='1')
         {
             // 如果用户信息匹配，将用户信息存入会话
             Session::set('user', $user);
-
             // 返回登录成功的JSON响应，包括成功消息和测试URL
             return json(['status' => 'success', 'message' => '登录成功','urls'=>$url]);
-        } else {
-            // 如果用户信息不匹配，返回登录失败的JSON响应
-            return json(['status' => 'error', 'message' => '用户名或密码错误']);
         }
     }
 }
