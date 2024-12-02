@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>添加用户</title>
+    <meta name="csrf-token" content="{:token()}">
+
 </head>
 <body>
     <div id="app">
@@ -21,8 +23,8 @@
                     <td><input type="button" value="添加" id="addUserButton"></td>
                 </tr>
                 <tr>
-                    <td>
-                        <span class="error_info"></span>
+                    <td colspan="2">
+                        <span  class="error_info"></span>
                     </td>
                 </tr>
             </table>
@@ -37,13 +39,16 @@
             const password = $('.password').val();
 
             if (username === '' || password === '') {
-                $('#error_info').text('用户名或密码不能为空'); // 清空错误信息
+                $('.error_info').text('用户名或密码不能为空'); // 清空错误信息
                 return;
             }
 
-            $('#error_info').text(''); // 清空错误信息
+            $('.error_info').text(''); // 清空错误信息
 
             $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 url: '/{$appName}/public/index.php/admin/User/addUserPost', // 根据实际情况调整路径
                 type: 'POST',
                 data: { username: username, password: password },
