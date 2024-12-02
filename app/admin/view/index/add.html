@@ -5,6 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{:token()}">
     <title>添加商品</title>
 </head>
 <body>
@@ -81,6 +82,9 @@
         const formData = new FormData($('#productForm')[0]);
         // 发起 AJAX 请求
         $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
             url: 'addProduct',  // 你的后端接口地址
             data: formData,
             type: 'post',

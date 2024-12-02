@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>商品页</title>
+    <meta name="csrf-token" content="{:token()}">
     <style>
         /* 现有的样式 */
         table tr:nth-child(odd) {
@@ -304,6 +305,9 @@
             const formData = new FormData($('#productForm')[0]);
             // 发起 AJAX 请求
             $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 url: 'updateItem',  // 你的后端接口地址
                 data: formData,
                 type: 'post',

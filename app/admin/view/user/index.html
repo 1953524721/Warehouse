@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>用户页面</title>
+    <meta name="csrf-token" content="{:token()}">
     <style>
         /* 现有的样式 */
         table tr:nth-child(odd) {
@@ -109,21 +110,23 @@
     </table>
 </div>
 
+
 <!-- 模态对话框 -->
 <div id="myModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <form id="productForm" method="post" enctype="multipart/form-data">
-            <input type="hidden" id="id" name="id" value="">
+   <div class="modal-content">
+       <span class="close">&times;</span>
+       <form id="productForm" method="post" enctype="multipart/form-data">
+           <input type="hidden" id="id" name="id" value="">
 
-            <label for="names">名字:</label>
-            <input type="text" id="names" name="names" value=""><br>
+           <label for="names">名字:</label>
+           <input type="text" id="names" name="names" value=""><br>
 
-            <input type="button" value="提交" class="submit">
-            <span class="error-message"></span>
-        </form>
-    </div>
+           <input type="button" value="提交" class="submit">
+           <span class="error-message"></span>
+       </form>
+   </div>
 </div>
+
 
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
@@ -144,7 +147,11 @@
         let totalPages = 1; // 总页数
 
         function fetchData(page) {
+
             $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 url: '/{$appName}/public/index.php/admin/User/userPageAll', // 替换为你的API端点
                 method: 'GET',
                 data: {
@@ -219,10 +226,13 @@
             console.log('Editing item with ID:', id, typeof id); // 调试信息
 
             // 显示模态对话框
-            $myModal.show();
+            $('#myModal').show();
 
             // 获取数据并填充到表单中
             $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 url: '/{$appName}/public/index.php/admin/User/getItem', // 替换为你的API端点
                 method: 'GET',
                 data: {
@@ -242,7 +252,7 @@
 
         // 绑定关闭按钮事件
         $('.close').click(function() {
-            $myModal.hide();
+            $('#myModal').hide();
         });
 
         // 绑定表单提交事件
@@ -252,6 +262,9 @@
             const formData = new FormData($('#productForm')[0]);
             // 发起 AJAX 请求
             $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 url: '/{$appName}/public/index.php/admin/User/updateItem',  // 你的后端接口地址
                 data: formData,
                 type: 'post',
@@ -263,16 +276,16 @@
                     // 根据响应结果进行处理
                     if (res.status === 'success') {
                         // 操作成功，弹出提示信息并跳转到新页面
-                        $errorMessage.text(res.message);
+                        $(".error-message").text(res.message);
                         // 等待3秒后关闭模态对话框并刷新当前页面数据
                         setTimeout(function() {
-                            $myModal.hide(); // 关闭模态对话框
+                            $('#myModal').hide(); // 关闭模态对话框
                             fetchData(currentPage); // 刷新当前页面数据
-                        }, 3000); // 3000毫秒 = 3秒
+                        }, 2000); // 3000毫秒 = 3秒
 
                     } else {
                         // 操作失败，显示错误提示
-                        $errorMessage.text(res.message);
+                        $(".error-message").text(res.message);
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -291,6 +304,9 @@
             if (confirm('确定要删除该项吗？')) {
                 // 发送删除请求
                 $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
                     url: '/{$appName}/public/index.php/admin/User/deleteUser', // 替换为你的API端点
                     method: 'POST',
                     data: {
@@ -301,19 +317,19 @@
                         console.log('Item deleted successfully:', response);
                         if (response.status === 'success') {
                             // 删除成功，弹出提示信息并刷新当前页面数据
-                            $spanMessage.text(response.message);
+                            $(".span").text(response.message);
                             setTimeout(function() {
                                 fetchData(currentPage); // 刷新当前页面数据
                             }, 3000); // 3000毫秒 = 3秒
                         } else {
                             // 删除失败，显示错误提示
-                            $spanMessage.text(response.message);
+                            $(".span").text(response.message);
                         }
                         $(`.delete-btn[data-id="${id}"]`).closest('tr').remove();
                         fetchData(currentPage); // 刷新当前页面数据
                     },
                     error: function (xhr, status, error) {
-                        $spanMessage.text(response.message);
+                        $(".span").text(response.message);
                         console.error('Error deleting item:', error);
                     }
                 });
@@ -329,6 +345,9 @@
             console.log('Editing item with ID:', id, typeof id); // 调试信息
             // 获取数据并填充到表单中
             $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 url: '/{$appName}/public/index.php/admin/User/upUserPwd', // 替换为你的API端点
                 method: 'GET',
                 data: {
@@ -337,11 +356,11 @@
                 dataType: 'json',
                 success: function(response) {
                     console.log('Item updated successfully:', response);
-                    $spanMessage.text(response.message);
+                    $(".span").text(response.message);
                     fetchData(currentPage); // 刷新当前页面数据
                 },
                 error: function(xhr, status, error) {
-                    $spanMessage.text('修改失败，请稍后再试。');
+                    $(".span").text('修改失败，请稍后再试。');
                     console.error('Error updating item:', error);
                 }
             });
@@ -357,6 +376,9 @@
 
             // 发送 AJAX 请求更新状态
             $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 url: '/{$appName}/public/index.php/admin/User/updateState', // 替换为你的API端点
                 method: 'POST',
                 data: {

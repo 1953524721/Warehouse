@@ -5,6 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{:token()}">
     <style>
         body {
             display: flex;
@@ -117,7 +118,6 @@
             }
         }
     });
-
     // 为按钮点击事件添加处理函数
     $('.button').click(function () {
         // 获取用户名和密码输入框的值
@@ -146,6 +146,9 @@
     function performLogin(userName, userPwd) {
         // 发起登录请求
         $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
             url: 'loginDo',
             data: {
                 name: userName,

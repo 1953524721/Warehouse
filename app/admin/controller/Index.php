@@ -101,36 +101,50 @@ class Index extends BaseController
      */
     public function addProduct(Request $request): Json
     {
-        // 获取表单数据
-        $names      = $request->post('name');
-        $describe   = $request->post('describe');
-        $models     = $request->post('models');
-        $brand      = $request->post('brand');
-        $num        = $request->post('num');
-        $production = $request->post('production');
-        $unit       = $request->post('unit');
-        $date       = date('Y-m-d H:i:s');
+        $check = $request->checkToken('__token__');
+        if (false === $check) {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        } else {
+            // 获取表单数据
+            $names      = $request->post('name');
+            $describe   = $request->post('describe');
+            $models     = $request->post('models');
+            $brand      = $request->post('brand');
+            $num        = $request->post('num');
+            $production = $request->post('production');
+            $unit       = $request->post('unit');
+            $date       = date('Y-m-d H:i:s');
 
-        // 获取上传的文件
-        $file = $request->file('flier');
+            // 获取上传的文件
+            $file = $request->file('flier');
 
-        // 如果文件上传成功，进行保存并调用模型方法保存产品信息
-        if ($file) {
-            $saveName = \think\facade\Filesystem::putFile( 'topic', $file);
-            $productionModel = new product();
-            $data = $productionModel->createProduct($names, $describe, $models, $brand, $production, $num,$unit, $saveName,$date);
+            // 如果文件上传成功，进行保存并调用模型方法保存产品信息
+            if ($file) {
+                $saveName = \think\facade\Filesystem::putFile('topic', $file);
+                $productionModel = new product();
+                $data = $productionModel->createProduct($names, $describe, $models, $brand, $production, $num, $unit, $saveName, $date);
 
-            // 根据产品保存结果，返回相应的JSON响应
-            if (!$data)
-            {
-                return json(['status' => 'error', 'message' => '添加失败']);
-            }
-            else
-            {
-                return json(['status' => 'success', 'message' => '添加成功','data'=>$data]);
+                // 根据产品保存结果，返回相应的JSON响应
+                if (!$data) {
+                    return json(['status' => 'error', 'message' => '添加失败']);
+                } else {
+                    return json(['status' => 'success', 'message' => '添加成功', 'data' => $data]);
+                }
+            } else {
+                // 如果没有文件上传，仍然需要返回一个Json对象
+                $productionModel = new product();
+                $data = $productionModel->createProduct($names, $describe, $models, $brand, $production, $num, $unit, null, $date);
+
+                // 根据产品保存结果，返回相应的JSON响应
+                if (!$data) {
+                    return json(['status' => 'error', 'message' => '添加失败']);
+                } else {
+                    return json(['status' => 'success', 'message' => '添加成功', 'data' => $data]);
+                }
             }
         }
     }
+
 
 
 
@@ -169,25 +183,39 @@ class Index extends BaseController
     }
     public function pageAll(Request $request)
     {
-        if ($request->isAjax())
+        $check = $request->checkToken('__token__');
+        if (false === $check )
         {
-            $page            = $request->param('page', 1);
-            $pageSize        = $request->param('pageSize', 10);
-            $productionModel = new product();
-            $list            = $productionModel->getProductsALL($page, $pageSize);
-            $total           = $productionModel->getTotalProducts(); // 获取总记录数
+            return json(['status' => 'error', 'message' => 'token验证失败']);
 
-            $response   = [
-                'data'  => $list,
-                'total' => $total
-            ];
-            return json($response);
         }
+        else
+        {
+            if ($request->isAjax())
+            {
+                $page            = $request->param('page', 1);
+                $pageSize        = $request->param('pageSize', 10);
+                $productionModel = new product();
+                $list            = $productionModel->getProductsALL($page, $pageSize);
+                $total           = $productionModel->getTotalProducts(); // 获取总记录数
+
+                $response   = [
+                    'data'  => $list,
+                    'total' => $total
+                ];
+                return json($response);
+            }
+        }
+
     }
     public function deleteItem(Request $request): Json
     {
+        $check = $request->checkToken();
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
         $id = $request->param('id');
-//        return $id;die();
         $productionModel = new product();
         $result = $productionModel->destroy($id);
         if ($result)
@@ -201,6 +229,11 @@ class Index extends BaseController
     }
     public function getItem(Request $request): Json
     {
+        $check = $request->checkToken();
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
         $id = $request->param('id');
         $productionModel = new product();
         $data = $productionModel->findProduct($id);
@@ -208,6 +241,11 @@ class Index extends BaseController
     }
     public function updateItem(Request $request): Json
     {
+        $check = $request->checkToken();
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
         // 获取表单数据
         $names      = $request->post('names');
         $id         = $request->post('id');

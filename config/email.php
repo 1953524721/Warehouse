@@ -2,8 +2,10 @@
 /**
  * 邮件发送模块
  */
+
+use PHPMailer\PHPMailer\PHPMailer;
+
 return [
-   'default'     => 'qq',
    'smtp'        => [
        'host'        => 'smtp.qq.com', // SMTP服务器地址
        'port'        => 465,            // SMTP服务器端口
@@ -11,6 +13,7 @@ return [
        'password'    => 'clkwkozudraoebje',         // 授权码，不是QQ密码
        'address'     => '1953524721@qq.com', // 发件人邮箱地址
        'name'        => '鹅城县长',              // 发件人名称
-       'secure'      => 'ssl',                    // 加密方式
+       'secure'      => PHPMailer::ENCRYPTION_SMTPS,                    // 加密方式
+//       'secure'      => 'ssl',                    // 加密方式
    ],
 ];

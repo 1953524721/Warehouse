@@ -35,6 +35,11 @@ class User extends BaseController
      */
     public function userPageAll(Request $request): Json
     {
+        $check = $request->checkToken();
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
         if ($request->isAjax())
         {
             $page            = $request->param('page', 1);
@@ -59,6 +64,11 @@ class User extends BaseController
      */
     public function getItem(Request $request): Json
     {
+        $check = $request->checkToken();
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
         $id           = $request->param('id');
         $userModel    = new Useres();
         $list         = $userModel->findUser($id);
@@ -73,6 +83,11 @@ class User extends BaseController
      */
     public function updateItem(Request $request): Json
     {
+        $check = $request->checkToken();
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
         $id        = $request->param('id');
         $name      = $request->param('names');
         $userModel = new Useres();
@@ -92,6 +107,11 @@ class User extends BaseController
      */
     public function deleteUser(Request $request): Json
     {
+        $check = $request->checkToken();
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
         $id = $request->param('id');
         if ($id == 1)
         {
@@ -117,6 +137,11 @@ class User extends BaseController
      */
     public function upUserPwd(Request $request): Json
     {
+        $check = $request->checkToken();
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
         if ($request->isAjax())
         {
             $id = $request->param('id');
@@ -143,6 +168,11 @@ class User extends BaseController
      */
     public function updateState(Request $request): Json
     {
+        $check = $request->checkToken();
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
         if ($request->isAjax())
         {
             $id       = $request->param('id');
@@ -163,7 +193,7 @@ class User extends BaseController
             }
         }
     }
-    public function addUser()
+    public function addUser(): string
     {
 
         $appName = env("APP_NAME");
@@ -173,6 +203,11 @@ class User extends BaseController
     }
     public function addUserPost(Request $request)
     {
+        $check = $request->checkToken();
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
         if ($request->isAjax())
         {
             $name      = $request->param('username');

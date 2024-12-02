@@ -49,8 +49,13 @@ class Login extends BaseController
      */
     public function loginDo(Request $request): Json
     {
+        $check = $request->checkToken('__token__');
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
         // 获取用户提交的用户名和密码
-        $name = $request->post('name');
+        $name =     $request->post('name');
         $pwd  = md5($request->post('pwd'));
 
         // 创建User模型实例，用于处理用户数据
