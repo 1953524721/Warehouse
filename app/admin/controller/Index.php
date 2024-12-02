@@ -48,6 +48,31 @@ class Index extends BaseController
              return false;
          }
      }
+
+    /**
+     * 处理用户请求的入口方法
+     *
+     * @return string|Redirect 根据用户登录状态返回欢迎信息或重定向到登录页面
+     */
+    public function index(): string|Redirect
+    {
+        // 根据用户是否登录，返回相应的响应
+        if ($this->isUserLoggedIn())
+        {
+            //return '您好！这是一个[index]示例应用';
+            $appName = env("APP_NAME");
+            $serverIp  = $_SERVER['SERVER_ADDR'];
+            // 获取用户信息，用于在页面中显示
+            $user = Session::get('user')['name'];
+            return View::fetch("index",[
+                'user' => $user,
+                'appName' => $appName,
+                'serverIp' => $serverIp
+            ]);
+        } else {
+            return $this->redirectToLogin();
+        }
+    }
     /**
      * 显示添加产品页面
      *
@@ -126,30 +151,6 @@ class Index extends BaseController
          return redirect($url);
      }
 
-     /**
-      * 处理用户请求的入口方法
-      *
-      * @return string|Redirect 根据用户登录状态返回欢迎信息或重定向到登录页面
-      */
-     public function index(): string|Redirect
-     {
-         // 根据用户是否登录，返回相应的响应
-         if ($this->isUserLoggedIn())
-         {
-             //return '您好！这是一个[index]示例应用';
-             $appName = env("APP_NAME");
-             $serverIp  = $_SERVER['SERVER_ADDR'];
-             // 获取用户信息，用于在页面中显示
-             $user = Session::get('user')['name'];
-             return View::fetch("index",[
-                 'user' => $user,
-                 'appName' => $appName,
-                 'serverIp' => $serverIp
-             ]);
-         } else {
-             return $this->redirectToLogin();
-         }
-     }
 
     public function show(): string|Redirect
     {

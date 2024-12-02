@@ -92,7 +92,7 @@
         </tr>
 
         <tbody id="data-table">
-            <!-- 数据将在这里动态插入 -->
+        <!-- 数据将在这里动态插入 -->
         </tbody>
 
         <tr>
@@ -128,6 +128,7 @@
             <input type="text" id="unit" name="unit" value=""><br>
             <label for="flier">简略图:</label>
             <input type="file" id="flier" name="flier" value="">
+            <img id="flier-preview" src="" alt="简略图" style="width: 50px; height: 50px; display: none;">
             <br>
             <input type="button" value="提交" class="submit">
             <span class="error-message"></span>
@@ -138,201 +139,201 @@
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
     $.ajaxSetup({
-    beforeSend: function(xhr) {
-        // 获取CSRF令牌
-        const csrfToken = $('meta[name="csrf-token"]').attr('content');
-        // 如果CSRF令牌存在，则将其添加到请求头中
-        if (csrfToken) {
-            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-        }
-    }
-});
-
-$(document).ready(function() {
-    let currentPage = 1;
-    const pageSize = 10; // 每页显示的记录数
-    let totalPages = 1; // 总页数
-
-    function fetchData(page) {
-        $.ajax({
-            url: 'pageAll', // 替换为你的API端点
-            method: 'GET',
-            data: {
-                page: page,
-                pageSize: pageSize
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log('Response:', response);
-                // 清空当前表格内容
-                $('#data-table').empty();
-
-                // 遍历数据并生成表格行
-                response.data.forEach(function(item) {
-                    console.log('Item ID:', item.id, typeof item.id); // 调试信息
-                    $('#data-table').append(`                            <tr>
-                                <td>${item.id}</td>
-                                <td>${item.names}</td>
-                                <td>${item.describe}</td>
-                                <td>${item.models}</td>
-                                <td>${item.brand}</td>
-                                <td>${item.production}</td>
-                                <td>${item.num}</td>
-                                <td>${item.unit}</td>
-                                <td><img src="/{$appName}/runtime/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;"></td>
-                                <td>${item.add_date}</td>
-                                <td>
-                                    <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
-                                    <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
-                                </td>
-                            </tr>
-                        `);
-                });
-
-                // 更新总页数
-                totalPages = Math.ceil(response.total / pageSize);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error fetching data:', error);
+        beforeSend: function(xhr) {
+            // 获取CSRF令牌
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            // 如果CSRF令牌存在，则将其添加到请求头中
+            if (csrfToken) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             }
-        });
-    }
-
-    // 初始化加载第一页数据
-    fetchData(currentPage);
-
-    // 绑定分页按钮事件
-    $('.one').click(function() {
-        currentPage = 1;
-        fetchData(currentPage);
-    });
-
-    $('.up').click(function() {
-        if (currentPage > 1) {
-            currentPage--;
-            fetchData(currentPage);
         }
     });
 
-    $('.down').click(function() {
-        if (currentPage < totalPages) {
-            currentPage++;
-            fetchData(currentPage);
-        }
-    });
+    $(document).ready(function() {
+        let currentPage = 1;
+        const pageSize = 10; // 每页显示的记录数
+        let totalPages = 1; // 总页数
 
-    $('.last').click(function() {
-        currentPage = totalPages;
-        fetchData(currentPage);
-    });
+        function fetchData(page) {
+            $.ajax({
+                url: 'pageAll', // 替换为你的API端点
+                method: 'GET',
+                data: {
+                    page: page,
+                    pageSize: pageSize
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Response:', response);
+                    // 清空当前表格内容
+                    $('#data-table').empty();
 
-    // 绑定修改按钮事件
-    $(document).on('click', '.edit-btn', function() {
-        const id = $(this).data('id'); // 获取按钮上的ID
-        console.log('Editing item with ID:', id, typeof id); // 调试信息
+                    // 遍历数据并生成表格行
+                    response.data.forEach(function(item) {
+                        console.log('Item ID:', item.id, typeof item.id); // 调试信息
+                        $('#data-table').append(`                        <tr>
+                            <td>${item.id}</td>
+                            <td>${item.names}</td>
+                            <td>${item.describe}</td>
+                            <td>${item.models}</td>
+                            <td>${item.brand}</td>
+                            <td>${item.production}</td>
+                            <td>${item.num}</td>
+                            <td>${item.unit}</td>
+                            <td><img src="/{$appName}/runtime/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;"></td>
+                            <td>${item.add_date}</td>
+                            <td>
+                                <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
+                                <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
+                            </td>
+                        </tr>
+                    `);
+                    });
 
-        // 显示模态对话框
-        $('#myModal').show();
-
-        // 获取数据并填充到表单中
-        $.ajax({
-            url: 'getItem', // 替换为你的API端点
-            method: 'GET',
-            data: {
-                id: id
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log('Response:', response);
-                $('#id').val(response.id);
-                $('#names').val(response.names);
-                $('#describe').val(response.describe);
-                $('#models').val(response.models);
-                $('#brand').val(response.brand);
-                $('#production').val(response.production);
-                $('#num').val(response.num);
-                $('#unit').val(response.unit);
-                $('#flier').val(response.flier);
-                $('#add_date').val(response.add_date);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error fetching data:', error);
-            }
-        });
-    });
-
-    // 绑定关闭按钮事件
-    $('.close').click(function() {
-        $('#myModal').hide();
-    });
-
-
-
-    // 绑定删除按钮事件
-    $(document).on('click', '.delete-btn', function() {
-        const id = $(this).data('id'); // 获取按钮上的ID
-        console.log('Deleting item with ID:', id, typeof id); // 调试信息
-
-        // 发送删除请求
-        $.ajax({
-            url: 'deleteItem', // 替换为你的API端点
-            method: 'POST',
-            data: {
-                id: id
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log('Item deleted successfully:', response);
-                $(`.delete-btn[data-id="${id}"]`).closest('tr').remove();
-                fetchData(currentPage); // 刷新当前页面数据
-            },
-            error: function(xhr, status, error) {
-                console.error('Error deleting item:', error);
-            }
-        });
-    });
-    // 绑定表单提交事件
-    $('.submit').click(function () {
-        console.log('Submit button clicked');
-        // 创建 FormData 对象
-        const formData = new FormData($('#productForm')[0]);
-        // 发起 AJAX 请求
-        $.ajax({
-            url: 'updateItem',  // 你的后端接口地址
-            data: formData,
-            type: 'post',
-            processData: false,  // 不处理数据
-            contentType: false,  // 不设置内容类型
-            dataType: 'json',
-            success: function (res) {
-                console.log(res);
-                // 根据响应结果进行处理
-                if (res.status === 'success') {
-                    // 操作成功，弹出提示信息并跳转到新页面
-                    $('.error-message').text(res.message);
-                    // 等待3秒后关闭模态对话框并刷新当前页面数据
-                    setTimeout(function() {
-                        $('#myModal').hide(); // 关闭模态对话框
-                        fetchData(currentPage); // 刷新当前页面数据
-                    }, 3000); // 3000毫秒 = 3秒
-
-                } else {
-                    // 操作失败，显示错误提示
-                    $('.error-message').text(res.message);
+                    // 更新总页数
+                    totalPages = Math.ceil(response.total / pageSize);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
                 }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                // 请求失败，输出错误信息并弹出提示信息
-                console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
-                alert('请求失败，请稍后再试。');
+            });
+        }
+
+        // 初始化加载第一页数据
+        fetchData(currentPage);
+
+        // 绑定分页按钮事件
+        $('.one').click(function() {
+            currentPage = 1;
+            fetchData(currentPage);
+        });
+
+        $('.up').click(function() {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchData(currentPage);
             }
         });
+
+        $('.down').click(function() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                fetchData(currentPage);
+            }
+        });
+
+        $('.last').click(function() {
+            currentPage = totalPages;
+            fetchData(currentPage);
+        });
+
+        // 绑定修改按钮事件
+        $(document).on('click', '.edit-btn', function() {
+            const id = $(this).data('id'); // 获取按钮上的ID
+            console.log('Editing item with ID:', id, typeof id); // 调试信息
+
+            // 显示模态对话框
+            $('#myModal').show();
+
+            $('.error-message').text("");
+
+            // 获取数据并填充到表单中
+            $.ajax({
+                url: 'getItem', // 替换为你的API端点
+                method: 'GET',
+                data: {
+                    id: id
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Response:', response);
+                    $('#id').val(response.id);
+                    $('#names').val(response.names);
+                    $('#describe').val(response.describe);
+                    $('#models').val(response.models);
+                    $('#brand').val(response.brand);
+                    $('#production').val(response.production);
+                    $('#num').val(response.num);
+                    $('#unit').val(response.unit);
+                    $('#flier-preview').attr('src', `/{$appName}/runtime/storage/${response.flier}`);
+                    $('#flier-preview').show();
+                    $('#flier').val(''); // 清空文件输入字段
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        });
+
+        // 绑定关闭按钮事件
+        $('.close').click(function() {
+            $('#myModal').hide();
+            $('#flier-preview').hide();
+            $('#flier').val(''); // 清空文件输入字段
+        });
+
+        // 绑定删除按钮事件
+        $(document).on('click', '.delete-btn', function() {
+            const id = $(this).data('id'); // 获取按钮上的ID
+            console.log('Deleting item with ID:', id, typeof id); // 调试信息
+
+            // 发送删除请求
+            $.ajax({
+                url: 'deleteItem', // 替换为你的API端点
+                method: 'POST',
+                data: {
+                    id: id
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Item deleted successfully:', response);
+                    $(`.delete-btn[data-id="${id}"]`).closest('tr').remove();
+                    fetchData(currentPage); // 刷新当前页面数据
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error deleting item:', error);
+                }
+            });
+        });
+
+        // 绑定表单提交事件
+        $('.submit').click(function () {
+            console.log('Submit button clicked');
+            // 创建 FormData 对象
+            const formData = new FormData($('#productForm')[0]);
+            // 发起 AJAX 请求
+            $.ajax({
+                url: 'updateItem',  // 你的后端接口地址
+                data: formData,
+                type: 'post',
+                processData: false,  // 不处理数据
+                contentType: false,  // 不设置内容类型
+                dataType: 'json',
+                success: function (res) {
+                    console.log(res);
+                    // 根据响应结果进行处理
+                    if (res.status === 'success') {
+                        // 操作成功，弹出提示信息并跳转到新页面
+                        $('.error-message').text(res.message);
+                        // 等待3秒后关闭模态对话框并刷新当前页面数据
+                        setTimeout(function() {
+                            $('#myModal').hide(); // 关闭模态对话框
+                            fetchData(currentPage); // 刷新当前页面数据
+                        }, 3000); // 3000毫秒 = 3秒
+
+                    } else {
+                        // 操作失败，显示错误提示
+                        $('.error-message').text(res.message);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    // 请求失败，输出错误信息并弹出提示信息
+                    console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
+                    alert('请求失败，请稍后再试。');
+                }
+            });
+        });
     });
-
-
-
-
-});
 
 </script>
 </body>

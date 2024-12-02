@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>侧边导航栏示例</title>
+    <title>{$appName}管理页面</title>
     <style>
-        /* styles.css */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -19,7 +18,7 @@
             color: white;
             height: 100vh;
             position: fixed;
-            top: 0;
+            top: 50px; /* 将 top 值增加到 50px */
             left: 0;
             overflow-y: auto;
         }
@@ -62,46 +61,74 @@
         #content {
             margin-left: 250px;
             padding: 20px;
+            margin-top: 50px; /* 调整内容区域的顶部边距以避免被置顶导航遮挡 */
         }
 
-        #content section {
-            margin: 20px 0;
-        }
-
-        #welcome-bar {
-            height: 100px;
-            background-color: #f1f1f1;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            width: calc(100% - 250px);
-        }
-
-        #welcome-left, #welcome-right {
+        #welcome-right {
             font-size: 18px;
             color: #333;
+            text-align: right;
+            margin-right: 50px; /* 向左移动 50px */
+            cursor: pointer; /* 添加鼠标指针样式 */
+            position: relative; /* 添加相对定位 */
         }
-        .top
-        {
+
+        #logout-container {
+            margin-top: 10px; /* 根据需要调整间距 */
+            display: none; /* 初始状态下隐藏 */
+            position: absolute; /* 绝对定位 */
+            top: 100%; /* 放置在 #welcome-right 的下方 */
+            right: 77px; /* 右对齐 */
+            background-color: white; /* 可选：添加背景色以便更明显 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 可选：添加阴影效果 */
+            z-index: 1001; /* 确保在其他内容之上 */
+            width: auto; /* 根据内容自动调整宽度 */
+            padding: 5px; /* 可选：添加内边距 */
+            border-radius: 5px; /* 可选：添加圆角 */
+        }
+
+
+        #logout-button {
+            padding: 5px 10px;
+            background-color: #ff4d4f;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #logout-button:hover {
+            background-color: #ff1919;
+        }
+
+        .top {
+            display: flex;
+            justify-content: flex-end; /* 使子元素靠右对齐 */
+            align-items: center; /* 垂直居中对齐 */
             height: 50px;
-            width: 86%;
-            background-color: red;
+            background-color: #7EB6FD;
             position: fixed;
             top: 0;
-            right: 0;
-            z-index: -1;
+            left: 0;
+            z-index: 1000; /* 确保置顶导航在其他内容之上 */
+            width: 100%;
+            padding: 0 20px;
         }
+
         #service-content {
             margin-top: 50px; /* 添加这行代码 */
         }
     </style>
 </head>
 <body>
+<div class="top">
+        <!-- 置顶导航横条的内容 -->
+        <div id="welcome-right">欢迎: {$user}</div>
+        <div id="logout-container" style="display: none;">
+            <button id="logout-button">退出</button>
+        </div>
+</div>
 <div id="sidebar">
-    <ul>
-        <li>欢迎:{$user}</li>
-    </ul>
     <ul>
         <li>
             <a href="javascript:void(0)">用户管理</a>
@@ -134,103 +161,157 @@
 <div id="service-content"></div>
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
 <script>
-    $(document).ready(function() {
-        // 缓存 DOM 元素
-        const $sidebarLinks = $('#sidebar > ul > li > a');
-        const $sidebarSubMenu = $('.sub-menu');
-        const $contentSections = $('#content section');
-        const $window = $(window);
+$(document).ready(function() {
+    // 缓存 DOM 元素
+    const $sidebarLinks = $('#sidebar > ul > li > a');
+    const $sidebarSubMenu = $('.sub-menu');
+    const $contentSections = $('#content section');
+    const $window = $(window);
+    const $welcomeRight = $('#welcome-right');
+    const $logoutContainer = $('#logout-container');
 
-        // 配置对象
-        const config = {
-            validUrlPattern: /^https?:\/\/(localhost|127\.0\.0\.1)/
-        };
+    // 配置对象
+    const config = {
+        validUrlPattern: /^https?:\/\/(localhost|127\.0\.0\.1)/
+    };
 
-        // 阻止默认行为并获取目标 URL
-        function preventDefaultAndGetHref(event) {
-            event.preventDefault();
-            return $(event.target).attr('href');
-        }
+    let hideLogoutTimeout;
 
-        // 展开和折叠子菜单
-        $sidebarLinks.click(function(e) {
-            const subMenu = $(this).next('.sub-menu');
+    const $userModal = $('#myModal');
+    $userModal.show();
+    $userModal.hide();
+    // 阻止默认行为并获取目标 URL
+    function preventDefaultAndGetHref(event) {
+        event.preventDefault();
+        return $(event.target).attr('href');
+    }
 
-            if (subMenu.is(':visible')) {
-                subMenu.slideUp();
-            } else {
-                subMenu.slideDown();
-            }
-        });
+    // 展开和折叠子菜单
+    $sidebarLinks.click(function(e) {
+        const subMenu = $(this).next('.sub-menu');
 
-        // 导航栏链接点击事件
-        $('#sidebar ul li a').click(function(e) {
-            const href = preventDefaultAndGetHref(e);  // 获取目标 URL
-
-            if ($(this).hasClass('ajax-link')) {
-                // 处理 AJAX 链接
-                handleAjaxLink(href);
-            } else {
-                // 处理普通链接
-                handleRegularLink(href);
-            }
-        });
-
-        // 导航栏高亮当前活动项
-        $window.scroll(function() {
-            const scrollPosition = $window.scrollTop();
-
-            $contentSections.each(function() {
-                var sectionTop = $(this).offset().top;
-                var sectionBottom = sectionTop + $(this).outerHeight();
-
-                if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
-                    var id = $(this).attr('id');
-                    $('#sidebar ul li a').removeClass('active');
-                    $('#sidebar ul li a[href="#' + id + '"]').addClass('active');
-                }
-            });
-        });
-
-        // 处理带有 ajax-link 类的链接点击事件
-        function handleAjaxLink(url) {
-            // 验证 URL 是否合法
-            if (!config.validUrlPattern.test(url)) {
-                console.error('无效的 URL:', url);
-                return;
-            }
-
-            // 使用 AJAX 请求页面内容
-            $.ajax({
-                url: url,
-                method: 'GET',
-                success: function(response) {
-                    // 直接将响应内容插入到 #service-content 中
-                    $('#service-content').empty();
-                    $('#service-content').html(response);
-                },
-                error: function(xhr, status, error) {
-                    console.error('请求失败:', error);
-                }
-            });
-        }
-
-        // 处理普通链接点击事件
-        function handleRegularLink(target) {
-            const targetElement = $(target);
-
-            if (targetElement.length) {
-                const targetPosition = targetElement.offset().top;  // 获取目标元素的顶部位置
-
-                // 平滑滚动到目标位置
-                requestAnimationFrame(function() {
-                    $('html, body').animate({
-                        scrollTop: targetPosition
-                    }, 1000);
-                });
-            }
+        if (subMenu.is(':visible')) {
+            subMenu.slideUp();
+        } else {
+            subMenu.slideDown();
         }
     });
-</script>
+
+    // 导航栏链接点击事件
+    $('#sidebar ul li a').click(function(e) {
+        const href = preventDefaultAndGetHref(e);  // 获取目标 URL
+
+        if ($(this).hasClass('ajax-link')) {
+            // 处理 AJAX 链接
+            handleAjaxLink(href);
+        } else {
+            // 处理普通链接
+            handleRegularLink(href);
+        }
+    });
+
+    // 导航栏高亮当前活动项
+    $window.scroll(function() {
+        const scrollPosition = $window.scrollTop();
+
+        $contentSections.each(function() {
+            var sectionTop = $(this).offset().top;
+            var sectionBottom = sectionTop + $(this).outerHeight();
+
+            if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                var id = $(this).attr('id');
+                $('#sidebar ul li a').removeClass('active');
+                $('#sidebar ul li a[href="#' + id + '"]').addClass('active');
+            }
+        });
+    });
+
+    // 处理带有 ajax-link 类的链接点击事件
+    function handleAjaxLink(url) {
+        // 验证 URL 是否合法
+        if (!config.validUrlPattern.test(url)) {
+            console.error('无效的 URL:', url);
+            return;
+        }
+
+        // 使用 AJAX 请求页面内容
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function(response) {
+                // 直接将响应内容插入到 #service-content 中
+                $('#service-content').empty();
+                $('#service-content').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error('请求失败:', error);
+            }
+        });
+    }
+
+    // 处理普通链接点击事件
+    function handleRegularLink(target) {
+        const targetElement = $(target);
+
+        if (targetElement.length) {
+            const targetPosition = targetElement.offset().top;  // 获取目标元素的顶部位置
+
+            // 平滑滚动到目标位置
+            requestAnimationFrame(function() {
+                $('html, body').animate({
+                    scrollTop: targetPosition
+                }, 1000);
+            });
+        }
+    }
+
+    // 点击欢迎文字显示退出按钮
+    $welcomeRight.click(function() {
+        $logoutContainer.show(); // 显示退出按钮
+        clearTimeout(hideLogoutTimeout); // 清除之前的定时器
+    });
+
+    // 当鼠标离开欢迎文字时，设置定时器隐藏退出按钮
+    $welcomeRight.mouseleave(function() {
+        hideLogoutTimeout = setTimeout(() => {
+            $logoutContainer.hide(); // 隐藏退出按钮
+        }, 2000); // 2秒后隐藏
+    });
+
+    // 当鼠标进入退出按钮时，清除定时器
+    $logoutContainer.mouseenter(function() {
+        clearTimeout(hideLogoutTimeout); // 清除定时器
+    });
+
+    // 当鼠标离开退出按钮时，设置定时器隐藏退出按钮
+    $logoutContainer.mouseleave(function() {
+        hideLogoutTimeout = setTimeout(() => {
+            $logoutContainer.hide(); // 隐藏退出按钮
+        }, 2000); // 2秒后隐藏
+    });
+
+    // 点击退出按钮执行退出操作
+    $('#logout-button').click(function() {
+        console.log('退出按钮被点击');
+        $.ajax({
+            url: '/{$appName}/public/index.php/admin/User/logout',
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    // 退出成功，重定向到登录页面
+                    window.location.href = '/{$appName}/public/index.php/admin/login/login';
+                } else {
+                    // 退出失败，显示错误信息
+                    alert(response.message);
+               }
+            }
+        })
+        // 这里可以添加退出逻辑，例如重定向到登录页面
+        window.location.href = "/{$appName}/public/index.php/admin/User/logout";
+    });
+});
+
+    </script>
 </body>
 </html>

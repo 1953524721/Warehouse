@@ -5,6 +5,7 @@ namespace app\admin\controller;
 use app\admin\model\product;
 use app\BaseController;
 use think\facade\Log;
+use think\facade\Session;
 use think\facade\View;
 use app\admin\model\User as Useres;
 use think\Paginator;
@@ -189,6 +190,11 @@ class User extends BaseController
                 return json(['status' => 'error', 'message' => '添加失败']);
             }
         }
+    }
+    public function logout(): Json
+    {
+        Session::delete('user');
+        return  json(['status' => 'success', 'message' => '注销成功']);
     }
 
 }

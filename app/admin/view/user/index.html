@@ -137,10 +137,11 @@
             }
         }
     });
+
     // 缓存常用的选择器
-    const $myModal = $('#myModal');
-    const $errorMessage = $('.error-message');
-    const $spanMessage = $('.span');
+    // const $myModal = $('#myModal');
+    // const $errorMessage = $('.error-message');
+    // const $spanMessage = $('.span');
 
     $(document).ready(function() {
         let currentPage = 1;
@@ -223,7 +224,7 @@
             console.log('Editing item with ID:', id, typeof id); // 调试信息
 
             // 显示模态对话框
-            $('#myModal').show();
+            $myModal.show();
 
             // 获取数据并填充到表单中
             $.ajax({
@@ -246,7 +247,7 @@
 
         // 绑定关闭按钮事件
         $('.close').click(function() {
-            $('#myModal').hide();
+            $myModal.hide();
         });
 
         // 绑定表单提交事件
@@ -267,16 +268,16 @@
                     // 根据响应结果进行处理
                     if (res.status === 'success') {
                         // 操作成功，弹出提示信息并跳转到新页面
-                        $('.error-message').text(res.message);
+                        $errorMessage.text(res.message);
                         // 等待3秒后关闭模态对话框并刷新当前页面数据
                         setTimeout(function() {
-                            $('#myModal').hide(); // 关闭模态对话框
+                            $myModal.hide(); // 关闭模态对话框
                             fetchData(currentPage); // 刷新当前页面数据
                         }, 3000); // 3000毫秒 = 3秒
 
                     } else {
                         // 操作失败，显示错误提示
-                        $('.error-message').text(res.message);
+                        $errorMessage.text(res.message);
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -305,19 +306,19 @@
                         console.log('Item deleted successfully:', response);
                         if (response.status === 'success') {
                             // 删除成功，弹出提示信息并刷新当前页面数据
-                            $('.span').text(response.message);
+                            $spanMessage.text(response.message);
                             setTimeout(function() {
                                 fetchData(currentPage); // 刷新当前页面数据
                             }, 3000); // 3000毫秒 = 3秒
                         } else {
                             // 删除失败，显示错误提示
-                            $('.span').text(response.message);
+                            $spanMessage.text(response.message);
                         }
                         $(`.delete-btn[data-id="${id}"]`).closest('tr').remove();
                         fetchData(currentPage); // 刷新当前页面数据
                     },
                     error: function (xhr, status, error) {
-                        $('.span').text(response.message);
+                        $spanMessage.text(response.message);
                         console.error('Error deleting item:', error);
                     }
                 });
@@ -341,11 +342,11 @@
                 dataType: 'json',
                 success: function(response) {
                     console.log('Item updated successfully:', response);
-                    $('.span').text(response.message);
+                    $spanMessage.text(response.message);
                     fetchData(currentPage); // 刷新当前页面数据
                 },
                 error: function(xhr, status, error) {
-                    $('.span').text('修改失败，请稍后再试。');
+                    $spanMessage.text('修改失败，请稍后再试。');
                     console.error('Error updating item:', error);
                 }
             });
