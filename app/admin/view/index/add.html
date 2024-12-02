@@ -38,10 +38,8 @@
             <tr>
                 <td>库存单位:</td>
                 <td>
-                    <select name="unit" class="unit">
-                        <option value="件">件</option>
-                        <option value="个">个</option>
-                        <option value="辆">辆</option>
+                    <select name="unit" class="unit" id="unitSelect">
+                        <!-- 数据将被动态插入到这里 -->
                     </select>
                 </td>
             </tr>
@@ -74,6 +72,38 @@
             }
         }
     });
+
+    // 页面加载完成后，获取单位数据并填充到下拉框中
+    $(document).ready(function() {
+        $.ajax({
+            url: 'getUnits',  // 替换为你的后端接口地址
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                console.log(data);  // 打印数据以确认格式
+                const selectElement = $('#unitSelect');
+                console.log(selectElement);  // 打印选择器结果以确认是否正确选择元素
+
+                // 检查 data 是否包含 units 数组
+                if (Array.isArray(data.units)) {
+                    // 清空下拉框中的现有选项
+                    selectElement.empty();
+                    // 遍历数据并创建选项
+                    data.units.forEach(item => {
+                        const option = $('<option></option>').val(item.unit_name).text(item.unit_name);
+                        selectElement.append(option);
+                    });
+                } else {
+                    console.error('Data does not contain a units array:', data);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
+                alert('获取单位数据失败，请稍后再试。');
+            }
+        });
+    });
+
 
     // 为按钮点击事件添加处理函数
     $('.submit').click(function () {

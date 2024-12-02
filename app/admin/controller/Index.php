@@ -82,14 +82,29 @@ class Index extends BaseController
      */
     public function add(): string
     {
+
+//        print_r($unitList);die();
         // 获取应用名称
         $appName   = env('APP_NAME');
         // 渲染并返回 "add" 视图，同时传递应用名称
         return View::fetch("add",[
-            'appName' => $appName
+            'appName'  => $appName
         ]);
     }
-
+    public function getUnits(Request $request): array|Json
+    {
+        $check = $request->checkToken('__token__');
+        if (false === $check)
+        {
+            return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
+        $unitModel = new \app\admin\model\Unit();
+        $unitList = $unitModel->selectAll();
+        $response = [
+            'units' => $unitList
+        ];
+        return $response;
+    }
     /**
      * 处理产品添加请求
      *

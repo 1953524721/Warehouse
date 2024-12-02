@@ -1,0 +1,377 @@
+<!-- show.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品库存单位</title>
+    <meta name="csrf-token" content="{:token()}">
+    <style>
+        /* 现有的样式 */
+        table tr:nth-child(odd) {
+            background-color: #f2f2f2; /* 奇数行的背景颜色 */
+        }
+
+        table tr:nth-child(even) {
+            background-color: #ffffff; /* 偶数行的背景颜色 */
+        }
+
+        /* 固定表头 */
+        th {
+            position: sticky;
+            top: 0;
+            background-color: #7EB6FD; /* 表头背景颜色 */
+            color: white; /* 表头文字颜色 */
+            z-index: 1; /* 确保表头在其他内容之上 */
+        }
+        .page ul {
+            list-style-type: none; /* 去掉默认的列表样式 */
+            padding: 0; /* 去掉默认的内边距 */
+            margin: 0; /* 去掉默认的外边距 */
+        }
+
+        .page li {
+            display: inline-block; /* 水平排列 */
+            margin-right: 10px; /* 右侧间距 */
+        }
+        td{
+            width: 150px;
+        }
+
+        /* 模态对话框样式 */
+        .modal {
+            display: none; /* 默认隐藏 */
+            position: fixed; /* 固定定位 */
+            z-index: 1; /* 放在最上层 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 宽度为100% */
+            height: 100%; /* 高度为100% */
+            overflow: auto; /* 溢出部分滚动 */
+            background-color: rgb(0,0,0); /* 背景颜色 */
+            background-color: rgba(0,0,0,0.4); /* 半透明背景 */
+            padding-top: 60px; /* 顶部内边距 */
+        }
+
+        .modal-content {
+            background-color: #fefefe; /* 内容背景颜色 */
+            margin: 5% auto; /* 上下居中 */
+            padding: 20px; /* 内边距 */
+            border: 1px solid #888; /* 边框 */
+            width: 80%; /* 宽度 */
+        }
+
+        .close {
+            color: #aaa; /* 关闭按钮颜色 */
+            float: right; /* 右对齐 */
+            font-size: 28px; /* 字体大小 */
+            font-weight: bold; /* 加粗 */
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black; /* 鼠标悬停时的颜色 */
+            text-decoration: none; /* 去掉下划线 */
+            cursor: pointer; /* 鼠标指针样式 */
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <input type="hidden" name="__token__" value="{:token()}" />
+    <input type="button" value="新增">
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>维护日期</th>
+            <th>操作</th>
+        </tr>
+
+        <tbody id="data-table">
+        <!-- 数据将在这里动态插入 -->
+        </tbody>
+
+        <tr>
+            <td colspan="10" class="page">
+                <input type="button" value="首页" class="one">
+                <input type="button" value="上一页" class="up">
+                <input type="button" value="下一页" class="down">
+                <input type="button" value="尾页" class="last">
+            </td>
+        </tr>
+    </table>
+    <!-- 模态对话框 -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>修改单位名称</h2>
+        <form id="editForm">
+            <label for="unitName">单位名称:</label><br>
+            <input type="text" id="unitName" name="unitName"><br><br>
+            <input type="hidden" id="unitId" name="unitId">
+            <input type="button" value="保存" id="saveEdit">
+        </form>
+    </div>
+</div>
+    <!-- 新增模态对话框 -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>新增单位名称</h2>
+        <form id="addForm">
+            <label for="newUnitName">单位名称:</label><br>
+            <input type="text" id="newUnitName" name="newUnitName"><br><br>
+            <input type="button" value="保存" id="saveAdd">
+        </form>
+        <span class="error-message"></span>
+    </div>
+</div>
+
+</div>
+
+
+<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
+<script type="text/javascript">
+
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            // 获取CSRF令牌
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            // 如果CSRF令牌存在，则将其添加到请求头中
+            if (csrfToken) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            }
+        }
+    });
+    $(document).ready(function() {
+        let currentPage = 1;
+        const pageSize = 10; // 每页显示的记录数
+        let totalPages = 1; // 总页数
+
+        // 获取模态对话框元素
+        const modal = $('#editModal');
+        const addModal = $('#addModal'); // 新增模态对话框
+        const span = $('.close');
+
+        // 获取模态对话框中的输入字段
+        const unitNameInput = $('#unitName');
+        const unitIdInput = $('#unitId');
+        const newUnitNameInput = $('#newUnitName'); // 新增单位名称输入字段
+
+        // 当用户点击“修改”按钮时
+        $(document).on('click', '.edit-btn', function() {
+            const unitId = $(this).data('id');
+            // 查找对应的行并获取单位名称
+            const row = $(this).closest('tr');
+            const unitName = row.find('td:eq(1)').text();
+
+            // 设置模态对话框中的值
+            unitNameInput.val(unitName);
+            unitIdInput.val(unitId);
+
+            // 显示模态对话框
+            modal.show();
+        });
+
+        // 当用户点击“新增”按钮时
+        $('input[type="button"][value="新增"]').click(function() {
+            // 清空新增单位名称输入字段
+            newUnitNameInput.val('');
+            // 显示新增模态对话框
+            addModal.show();
+        });
+
+        // 当用户点击关闭按钮或模态对话框外部时关闭模态对话框
+        span.on('click', function() {
+            modal.hide();
+            addModal.hide(); // 隐藏新增模态对话框
+        });
+
+        $(window).on('click', function(event) {
+            if ($(event.target).is(modal) || $(event.target).is(addModal)) {
+                modal.hide();
+                addModal.hide(); // 隐藏新增模态对话框
+            }
+        });
+
+        // 当用户点击保存按钮时
+        $('#saveEdit').on('click', function() {
+            const unitId = unitIdInput.val();
+            const unitName = unitNameInput.val();
+
+            // 发送AJAX请求更新数据
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '/{$appName}/public/index.php/admin/unit/updateUnit', // 替换为你的API端点
+                method: 'POST',
+                data: {
+                    id: unitId,
+                    unit_name: unitName
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Update Response:', response);
+                    if (response.status === 'success') {
+                        $(".error-message").text(response.message);
+                        setTimeout(function() {
+                            // 刷新当前页数据
+                            fetchData(currentPage);
+                            // 关闭模态对话框
+                            modal.hide();
+                        }, 1000); // 1000毫秒 = 1秒
+                    } else {
+                        alert('更新失败: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error updating data:', error);
+                    alert('更新失败，请稍后再试。');
+                }
+            });
+        });
+
+        // 当用户点击保存按钮时（新增）
+        $('#saveAdd').on('click', function() {
+            const newUnitName = newUnitNameInput.val();
+
+            // 发送AJAX请求新增数据
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '/{$appName}/public/index.php/admin/unit/addUnit', // 替换为你的API端点
+                method: 'POST',
+                data: {
+                    unit_name: newUnitName
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Add Response:', response);
+                    if (response.status === 'success') {
+                        // 刷新当前页数据
+                        fetchData(currentPage);
+                        // 关闭模态对话框
+                        addModal.hide();
+                    } else {
+                        alert('新增失败: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error adding data:', error);
+                    alert('新增失败，请稍后再试。');
+                }
+            });
+        });
+
+        // 当用户点击“删除”按钮时
+        $(document).on('click', '.delete-btn', function() {
+            const unitId = $(this).data('id');
+            if (confirm('确定要删除此单位吗？')) {
+                // 发送AJAX请求删除数据
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: '/{$appName}/public/index.php/admin/unit/deleteUnit', // 替换为你的API端点
+                    method: 'POST',
+                    data: {
+                        id: unitId
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Delete Response:', response);
+                        if (response.status === 'success') {
+                            // 刷新当前页数据
+                            fetchData(currentPage);
+                        } else {
+                            alert('删除失败: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error deleting data:', error);
+                        alert('删除失败，请稍后再试。');
+                    }
+                });
+            }
+        });
+
+        function fetchData(page) {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: '/{$appName}/public/index.php/admin/unit/unitPageAll', // 替换为你的API端点
+                method: 'GET',
+                data: {
+                    page: page,
+                    pageSize: pageSize
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Response:', response);
+                    // 清空当前表格内容
+                    $('#data-table').empty();
+
+                    // 遍历数据并生成表格行
+                    response.data.forEach(function(item) {
+                        console.log('Item ID:', item.id, typeof item.id); // 调试信息
+                        $('#data-table').append(`
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.unit_name}</td>
+                                <td>${item.date}</td>
+                                <td>
+                                    <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
+                                    <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
+                                </td>
+                            </tr>
+                        `);
+                    });
+
+                    // 更新总页数
+                    totalPages = Math.ceil(response.total / pageSize);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        // 初始化加载第一页数据
+        fetchData(currentPage);
+
+        // 绑定分页按钮事件
+        $('.one').click(function() {
+            currentPage = 1;
+            fetchData(currentPage);
+        });
+
+        $('.up').click(function() {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchData(currentPage);
+            }
+        });
+
+        $('.down').click(function() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                fetchData(currentPage);
+            }
+        });
+
+        $('.last').click(function() {
+            currentPage = totalPages;
+            fetchData(currentPage);
+        });
+    });
+
+
+
+
+
+</script>
+</body>
+</html>
