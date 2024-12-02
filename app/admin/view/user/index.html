@@ -138,11 +138,6 @@
         }
     });
 
-    // 缓存常用的选择器
-    // const $myModal = $('#myModal');
-    // const $errorMessage = $('.error-message');
-    // const $spanMessage = $('.span');
-
     $(document).ready(function() {
         let currentPage = 1;
         const pageSize = 10; // 每页显示的记录数
@@ -165,7 +160,7 @@
                     // 遍历数据并生成表格行
                     response.data.forEach(function(item) {
                         console.log('Item ID:', item.id, typeof item.id); // 调试信息
-                        const stateText = item.state === 1 ? '正常' : '异常';
+                        const stateText  = item.state === 1 ? '正常' : '异常';
                         const stateClass = item.state === 1 ? 'state-normal' : 'state-abnormal';
                         $('#data-table').append(`
                             <tr>

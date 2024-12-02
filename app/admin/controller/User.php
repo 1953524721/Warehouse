@@ -148,13 +148,14 @@ class User extends BaseController
             $id       = $request->param('id');
             $newState = $request->param('state');
     //        return json(['status' => $id, 'message' => $newState]);
+            $date = date("Y-m-d H:i:s");
     //        die();
             if ($id == 1)
             {
                 return json(['status' => 'error', 'message' => '管理员禁止修改状态']);
             }
             $userModel = new Useres();
-            $list = $userModel->updateState($id,$newState);
+            $list = $userModel->updateState($id,$newState,$date);
             if ($list) {
                 return json(['status' => 'success', 'message' => '状态修改成功']);
             } else {

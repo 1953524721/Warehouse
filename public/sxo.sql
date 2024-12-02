@@ -1,7 +1,7 @@
 /*
- Navicat Premium Dump SQL
+ Navicat Premium Data Transfer
 
- Source Server         : localhost
+ Source Server         : localhost_3306
  Source Server Type    : MySQL
  Source Server Version : 100432 (10.4.32-MariaDB)
  Source Host           : localhost:3306
@@ -11,7 +11,7 @@
  Target Server Version : 100432 (10.4.32-MariaDB)
  File Encoding         : 65001
 
- Date: 01/12/2024 01:35:52
+ Date: 02/12/2024 17:24:39
 */
 
 SET NAMES utf8mb4;
@@ -450,11 +450,11 @@ INSERT INTO `product` VALUES (421, '华为Mate70', '华为Mate70RS', 'PLU-AL10',
 INSERT INTO `product` VALUES (422, '华为Mate70', '华为Mate70RS', 'PLU-AL10', '华为', '深圳', '80000', '台', 'topic/20241128\\6133cd1bb616ace2d5d9d988b66e9593.png', '2024-11-29 14:20:41');
 INSERT INTO `product` VALUES (423, '华为Mate70', '华为Mate70RS', 'PLU-AL10', '华为', '深圳', '80000', '台', 'topic/20241128\\6133cd1bb616ace2d5d9d988b66e9593.png', '2024-11-29 14:20:41');
 INSERT INTO `product` VALUES (424, '华为Mate70', '华为Mate70RS', 'PLU-AL10', '华为', '深圳', '80000', '台', 'topic/20241128\\6133cd1bb616ace2d5d9d988b66e9593.png', '2024-11-29 14:20:41');
-INSERT INTO `product` VALUES (425, '华为Mate70', '华为Mate70RS', 'PLU-AL10', '华为', '深圳', '80000', '台', 'topic/20241129\\89b44bda92200e6474ef3c2273ae3c66.png', '2024-11-29 23:41:07');
-INSERT INTO `product` VALUES (426, '华为Mate70', '华为Mate70RS', 'PLU-AL10', '华为', '深圳', '80000', '台', 'topic/20241129\\9144a2a4ee2247b2387aaf61272be3dc.png', '2024-11-29 23:35:28');
-INSERT INTO `product` VALUES (427, '华为Mate70 XT', '华为Mate70RS XRT', 'PLU-AL101', '华为啊', '深圳啊', '1', '台', 'topic/20241129\\bdd0f19783f259bc7a617ed2e62fd954.png', '2024-11-29 23:33:33');
-INSERT INTO `product` VALUES (428, 'Mate x6', '华为Mate70X6', 'PLU-1123123', '华为', '深圳', '999999', '个', 'topic/20241129\\f695ca1fde1127dd501f153749619fe7.png', NULL);
-INSERT INTO `product` VALUES (429, 'Mate x6', '华为Mate70X6', 'PLU-1123123', '华为', '深圳', '999999', '个', 'topic/20241129\\21944471be12a5a12e298dbbaae701d1.png', '2024-11-29 23:44:39');
+INSERT INTO `product` VALUES (425, '华为Mate70', '华为Mate70RS', 'PLU-AL10', '华为', '深圳', '80000', '台', 'topic/20241202\\832ba0e5576bfb0e864e5aeff3630784.png', '2024-12-02 15:24:12');
+INSERT INTO `product` VALUES (426, '华为Mate70', '华为Mate70RS', 'PLU-AL10', '华为', '深圳', '80000', '台', 'topic/20241202\\5a84f9e0faa6ec031ad52c856bdf00e6.png', '2024-12-02 15:24:02');
+INSERT INTO `product` VALUES (427, '华为Mate70 XT', '华为Mate70RS XRT', 'PLU-AL101', '华为啊', '深圳啊', '1', '台', 'topic/20241202\\6f23a65a882ade5e55712734c758979a.png', '2024-12-02 15:25:46');
+INSERT INTO `product` VALUES (428, 'Mate x6', '华为Mate70X6', 'PLU-1123123', '华为', '深圳', '999999', '个', 'topic/20241202\\ef874435f45a178d3d75d2025ac3d210.jpg', '2024-12-02 14:45:37');
+INSERT INTO `product` VALUES (429, 'Mate x6', '华为Mate70X6', 'PLU-1123123', '华为', '深圳', '999999', '个', 'topic/20241202\\f55eca7dd8301a8bafdae60a7a0f8b6b.png', '2024-12-02 13:32:20');
 
 -- ----------------------------
 -- Table structure for user
@@ -467,7 +467,7 @@ CREATE TABLE `user`  (
   `state` int UNSIGNED NULL DEFAULT 1 COMMENT '状态：1为正常，0为禁止登录',
   `date` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user
@@ -478,14 +478,15 @@ INSERT INTO `user` VALUES (3, '张麻子', '1', 1, '2024-11-29 14:20:41');
 INSERT INTO `user` VALUES (4, '汤师爷', '1', 1, '2024-11-29 14:20:41');
 INSERT INTO `user` VALUES (5, '县长夫人', '1', 1, '2024-11-29 14:20:41');
 INSERT INTO `user` VALUES (6, '是武智冲', 'e3ceb5881a0a1fdaad01296d7554868d', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (7, '胡万', '1', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (8, '老六', '1', 1, '2024-11-29 14:20:41');
+INSERT INTO `user` VALUES (7, '胡万', '1', 1, '2024-12-02 15:39:46');
+INSERT INTO `user` VALUES (8, '老六', '1', 1, '2024-12-02 15:39:45');
 INSERT INTO `user` VALUES (9, '花姐', '1', 1, '2024-11-29 14:20:41');
 INSERT INTO `user` VALUES (10, '老三', '1', 1, '2024-11-29 14:20:41');
 INSERT INTO `user` VALUES (11, '老二', '1', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (12, '老四', '1', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (13, '老五', 'e3ceb5881a0a1fdaad01296d7554868d', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (14, '胡千', 'e3ceb5881a0a1fdaad01296d7554868d', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (15, '跑腿1', 'e3ceb5881a0a1fdaad01296d7554868d', 1, '2024-11-29 14:20:41');
+INSERT INTO `user` VALUES (12, '老四', '1', 0, '2024-12-02 15:39:59');
+INSERT INTO `user` VALUES (13, '老五', 'e3ceb5881a0a1fdaad01296d7554868d', 0, '2024-12-02 15:39:59');
+INSERT INTO `user` VALUES (14, '胡千', 'e3ceb5881a0a1fdaad01296d7554868d', 0, '2024-12-02 15:39:58');
+INSERT INTO `user` VALUES (15, '跑腿1', 'e3ceb5881a0a1fdaad01296d7554868d', 0, '2024-12-02 15:39:58');
+INSERT INTO `user` VALUES (16, '汤师爷啊', '96e79218965eb72c92a549dd5a330112', 0, '2024-12-02 15:39:58');
 
 SET FOREIGN_KEY_CHECKS = 1;

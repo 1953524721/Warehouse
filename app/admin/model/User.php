@@ -137,13 +137,14 @@ class User extends Model
      * @param string $newState 新的用户状态
      * @return int|string 返回受影响的行数或错误信息字符串
      */
-    public function updateState(int $id, string $newState): int|string
+    public function updateState(int $id, string $newState,$date): int|string
     {
         $id         = htmlspecialchars($id);
         $newState  = htmlspecialchars($newState);
         try {
             return Db::name($this->table)->where('id', $id)->update([
                 'state'      => $newState,
+                'date'      =>  $date,
             ]);
         } catch (DbException $e) {
             Log::error("更新状态信息时发生错误: " . $e->getMessage());
