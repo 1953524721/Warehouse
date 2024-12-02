@@ -7,6 +7,7 @@ use app\BaseController;
 use think\facade\Log;
 use think\facade\View;
 use app\admin\model\User as Useres;
+use think\Paginator;
 use think\Request;
 use think\response\Json;
 
@@ -31,7 +32,7 @@ class User extends BaseController
      * @param Request $request 请求对象，用于判断是否为Ajax请求并获取分页参数
      * @return Json 返回用户信息的JSON格式数据
      */
-    public function userPageAll(Request $request)
+    public function userPageAll(Request $request): Json
     {
         if ($request->isAjax())
         {
@@ -58,8 +59,8 @@ class User extends BaseController
     public function getItem(Request $request): Json
     {
         $id           = $request->param('id');
-        $userModel       = new Useres();
-        $list            = $userModel->findUser($id);
+        $userModel    = new Useres();
+        $list         = $userModel->findUser($id);
         return json($list);
     }
 
@@ -113,7 +114,7 @@ class User extends BaseController
      * @param Request $request 请求对象，用于获取用户ID参数
      * @return Json 返回密码重置结果的JSON格式数据
      */
-    public function upUserPwd(Request $request)
+    public function upUserPwd(Request $request): Json
     {
         if ($request->isAjax())
         {
@@ -139,7 +140,7 @@ class User extends BaseController
      * @param Request $request 请求对象，用于获取用户ID和新状态参数
      * @return Json 返回状态更新结果的JSON格式数据
      */
-    public function updateState(Request $request)
+    public function updateState(Request $request): Json
     {
         if ($request->isAjax())
         {
@@ -157,6 +158,35 @@ class User extends BaseController
                 return json(['status' => 'success', 'message' => '状态修改成功']);
             } else {
                 return json(['status' => 'error', 'message' => '状态修改失败']);
+            }
+        }
+    }
+    public function addUser()
+    {
+
+        $appName = env("APP_NAME");
+        return View::fetch("add",[
+            'appName' => $appName,
+        ]);
+    }
+    public function addUserPost(Request $request)
+    {
+        if ($request->isAjax())
+        {
+            $name      = $request->param('username');
+            $pwd       = $request->param('password');
+            $date      = date("Y-m-d H:i:s");
+            $userModel = new Useres();
+            $nameAdd   = $userModel->findUserName($name);
+            if ($nameAdd)
+            {
+                return json(['status' => 'error', 'message' => '用户已存在']);
+            }
+            $list = $userModel->addUser($name,$pwd,$date);
+            if ($list) {
+                return json(['status' => 'success', 'message' => '添加成功']);
+            } else {
+                return json(['status' => 'error', 'message' => '添加失败']);
             }
         }
     }

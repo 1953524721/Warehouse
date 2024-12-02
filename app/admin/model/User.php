@@ -33,10 +33,14 @@ class User extends Model
      * @param int $id 用户ID
      * @return array|null 返回用户信息数组，如果未找到则返回null
      */
-    public function findUser($id)
+    public function findUser(int $id): ?array
     {
         return
             Db::table($this->table)->where('id', $id)->find();
+    }
+    public function findUserName($name)
+    {
+        return Db::table($this->table)->where('name', $name)->find();
     }
 
     /**
@@ -46,7 +50,7 @@ class User extends Model
      * @param int $pageSize 每页大小
      * @return array|\think\Collection 返回用户信息的集合或数组
      */
-    public function getUserALL($page,$pageSize): array|\think\Collection
+    public function getUserALL(int $page, int $pageSize): array|\think\Collection
     {
         return Db::table($this->table)
             ->order('id', 'desc')
@@ -71,7 +75,7 @@ class User extends Model
      * @param string $names 新的用户名称
      * @return int|string 返回受影响的行数或错误信息字符串
      */
-    public function updateName($id, $names): int|string
+    public function updateName(int $id, string $names): int|string
     {
         $names      = htmlspecialchars($names);
         $id         = htmlspecialchars($id);
@@ -91,7 +95,7 @@ class User extends Model
      * @param int $id 用户ID
      * @return int|string 返回受影响的行数或错误信息字符串
      */
-    public function updatePwd($id): int|string
+    public function updatePwd(int $id): int|string
     {
         $id = htmlspecialchars($id);
         try {
@@ -110,7 +114,7 @@ class User extends Model
      * @param int $id 用户ID
      * @return \think\response\Json 返回JSON响应，包含删除状态和消息
      */
-    public function deleteUser($id): \think\response\Json
+    public function deleteUser(int $id): \think\response\Json
     {
         $id   = htmlspecialchars($id);
         $list = $this->findUser($id);
@@ -133,7 +137,7 @@ class User extends Model
      * @param string $newState 新的用户状态
      * @return int|string 返回受影响的行数或错误信息字符串
      */
-    public function updateState($id,$newState): int|string
+    public function updateState(int $id, string $newState): int|string
     {
         $id         = htmlspecialchars($id);
         $newState  = htmlspecialchars($newState);
@@ -143,6 +147,23 @@ class User extends Model
             ]);
         } catch (DbException $e) {
             Log::error("更新状态信息时发生错误: " . $e->getMessage());
+            return $e->getMessage();
+        }
+    }
+    public function addUser($name,$pwd,$date): int|string
+    {
+        $name  = htmlspecialchars($name);
+        $pwd   = htmlspecialchars($pwd);
+        $date  = htmlspecialchars($date);
+
+        try {
+            return Db::name($this->table)->insert([
+                'name'     => $name,
+                'pwd'      => md5($pwd),
+                'date'    => $date
+            ]);
+        } catch (DbException $e) {
+            Log::error("添加用户信息时发生错误: " . $e->getMessage());
             return $e->getMessage();
         }
     }
