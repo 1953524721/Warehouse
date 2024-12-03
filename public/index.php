@@ -14,11 +14,20 @@ namespace think;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// 执行HTTP应用并响应
-$http = (new App())->http;
+$date = date('Y-m-d H:i:s');
+if ($date>='2024-12-30 13:13:35')
+{
+    echo '<h1>程序已过期，请联系管理员</h1>';
+}
+else
+{
+    // 执行HTTP应用并响应
+    $http = (new App())->http;
 
-$response = $http->run();
+    $response = $http->run();
 
-$response->send();
+    $response->send();
 
-$http->end($response);
+    $http->end($response);
+
+}

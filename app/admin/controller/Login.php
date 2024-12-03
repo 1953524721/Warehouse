@@ -4,6 +4,7 @@ declare (strict_types = 1);
 namespace app\admin\controller;
 
 use app\BaseController;
+use think\captcha\facade\Captcha;
 use think\Request;
 use think\facade\View;
 
@@ -32,10 +33,6 @@ class Login extends BaseController
             'appName' => $appName
         ]);
     }
-    public function test(): string
-    {
-        return View::fetch("test");
-    }
 
     /**
      * 处理用户登录请求
@@ -53,6 +50,11 @@ class Login extends BaseController
         if (false === $check)
         {
             return json(['status' => 'error', 'message' => 'token验证失败']);
+        }
+        $captcha  =   $request->post('captcha');
+        if (!captcha_check($captcha))
+        {
+            return json(['status' => 'error', 'message' => '验证码错误']);
         }
         // 获取用户提交的用户名和密码
         $name =     $request->post('name');
@@ -83,7 +85,7 @@ class Login extends BaseController
             // 如果用户信息匹配，将用户信息存入会话
             Session::set('user', $user);
             // 返回登录成功的JSON响应，包括成功消息和测试URL
-            return json(['status' => 'success', 'message' => '登录成功','urls'=>$url]);
+            return json(['status' => 'success', 'message' => '登录成功,即将跳转','urls'=>$url]);
         }
     }
 }

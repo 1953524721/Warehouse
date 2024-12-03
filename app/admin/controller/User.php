@@ -3,7 +3,11 @@
 namespace app\admin\controller;
 
 use app\admin\model\product;
+use app\admin\model\UserInfo;
 use app\BaseController;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\DbException;
+use think\db\exception\ModelNotFoundException;
 use think\facade\Log;
 use think\facade\Session;
 use think\facade\View;
@@ -61,6 +65,9 @@ class User extends BaseController
      *
      * @param Request $request 请求对象，用于获取用户ID参数
      * @return Json 返回用户信息的JSON格式数据
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
     public function getItem(Request $request): Json
     {
@@ -231,6 +238,18 @@ class User extends BaseController
     {
         Session::delete('user');
         return  json(['status' => 'success', 'message' => '注销成功']);
+    }
+    public function getUser(): string
+    {
+        $userInfoModel = new UserInfo();
+        $id = Session::get('user')['id'];
+        $data = $userInfoModel->getUserInfo($id);
+//        $newData = json_encode($data);
+        $appName = env("APP_NAME");
+        return View::fetch("getUser",[
+            'appName' => $appName,
+            'data' => $data
+        ]);
     }
 
 }

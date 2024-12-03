@@ -22,14 +22,24 @@ class Index extends BaseController
       */
      public function __construct(App $app)
      {
-         $this->app = $app;
-         parent::__construct($this->app);
-
-         // 检查用户是否已登录，未登录则重定向到登录页面
-         if (!$this->isUserLoggedIn())
+         $allowedUntil = strtotime('2024-12-01 00:00:00');
+         $date  = date('Y-m-d H:i:s');
+         if ($date>$allowedUntil)
          {
-             $this->redirectToLogin();
+             return '<h1>程序已过期，请联系管理员</h1>';
          }
+         else
+         {
+             $this->app = $app;
+             parent::__construct($this->app);
+
+             // 检查用户是否已登录，未登录则重定向到登录页面
+             if (!$this->isUserLoggedIn())
+             {
+                 $this->redirectToLogin();
+             }
+         }
+
      }
 
      /**

@@ -43,11 +43,20 @@ abstract class BaseController
      */
     public function __construct(App $app)
     {
-        $this->app     = $app;
-        $this->request = $this->app->request;
+        $allowedUntil = strtotime('2024-12-01 00:00:00');
+        $date  = date('Y-m-d H:i:s');
+        if ($date>$allowedUntil)
+        {
+            return '<h1>程序已过期，请联系管理员</h1>';
+        }
+        else
+        {
+            $this->app     = $app;
+            $this->request = $this->app->request;
+            // 控制器初始化
+            $this->initialize();
+        }
 
-        // 控制器初始化
-        $this->initialize();
     }
 
     // 初始化
@@ -90,5 +99,6 @@ abstract class BaseController
 
         return $v->failException(true)->check($data);
     }
+
 
 }

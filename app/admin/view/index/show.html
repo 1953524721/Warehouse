@@ -187,6 +187,7 @@
                             <td>
                                 <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
                                 <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
+                                <input type="button" value="出库" class="" data-id="${item.id}">
                             </td>
                         </tr>
                     `);
@@ -279,23 +280,26 @@
             const id = $(this).data('id'); // 获取按钮上的ID
             console.log('Deleting item with ID:', id, typeof id); // 调试信息
 
-            // 发送删除请求
-            $.ajax({
-                url: 'deleteItem', // 替换为你的API端点
-                method: 'POST',
-                data: {
-                    id: id
-                },
-                dataType: 'json',
-                success: function(response) {
-                    console.log('Item deleted successfully:', response);
-                    $(`.delete-btn[data-id="${id}"]`).closest('tr').remove();
-                    fetchData(currentPage); // 刷新当前页面数据
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error deleting item:', error);
-                }
-            });
+            // 弹出确认对话框
+            if (confirm('确定要删除此商品吗？')) {
+                // 发送删除请求
+                $.ajax({
+                    url: 'deleteItem', // 替换为你的API端点
+                    method: 'POST',
+                    data: {
+                        id: id
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Item deleted successfully:', response);
+                        $(`.delete-btn[data-id="${id}"]`).closest('tr').remove();
+                        fetchData(currentPage); // 刷新当前页面数据
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error deleting item:', error);
+                    }
+                });
+            }
         });
 
         // 绑定表单提交事件
