@@ -2,7 +2,10 @@
 
 namespace app\admin\model;
 
+use think\Collection;
+use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
+use think\db\exception\ModelNotFoundException;
 use think\facade\Db;
 use think\facade\Log;
 use think\Model;
@@ -19,12 +22,17 @@ class User extends Model
      * @param string $pwd 密码
      *
      * @return mixed 查询到的用户信息，如果没有找到匹配的用户则返回null
+     * @throws DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
      */
     function getUser(string $name, string $pwd): mixed
     {
       // 使用链式调用，根据用户名和密码查询数据库中的用户信息
         // 返回查询结果
       return $this->where('name', $name)->where('pwd', $pwd)->find();
+
+
     }
 
     /**
@@ -32,6 +40,9 @@ class User extends Model
      *
      * @param int $id 用户ID
      * @return array|null 返回用户信息数组，如果未找到则返回null
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
     public function findUser(int $id): ?array
     {
@@ -48,7 +59,10 @@ class User extends Model
      *
      * @param int $page 页码
      * @param int $pageSize 每页大小
-     * @return array|\think\Collection 返回用户信息的集合或数组
+     * @return array|Collection 返回用户信息的集合或数组
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
     public function getUserALL(int $page, int $pageSize): array|\think\Collection
     {
