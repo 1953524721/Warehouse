@@ -183,43 +183,46 @@
                 },
                 success: function(response) {
                     console.log('Update successful:', response);
+                        if (response.status==='success')
+                        {
+                            // 隐藏输入框
+                            $('.getUserLeft').addClass('hidden');
 
-                    // 隐藏输入框
-                    $('.getUserLeft').addClass('hidden');
+                            // 清空表格中的数据
+                            $('#data-table').empty();
 
-                    // 清空表格中的数据
-                    $('#data-table').empty();
-
-                    // 重新填充表格中的数据
-                    $('#data-table').append(`
-                        <tr>
-                            <td>姓名:</td>
-                            <td>${name}</td>
-                            <td>公司名称:</td>
-                            <td>${corporate_name}</td>
-                        </tr>
-                        <tr>
-                            <td>手机号:</td>
-                            <td>${phone}</td>
-                            <td>BASE:</td>
-                            <td>${base}</td>
-                        </tr>
-                        <tr>
-                            <td>状态:</td>
-                            <td>${status === '1' ? '在岗' : '离职'}</td>
-                            <td>身份证号:</td>
-                            <td>${id_number}</td>
-                        </tr>
-                        <tr>
-                            <td>所属部门:</td>
-                            <td>${belongs}</td>
-                            <td>e-mail:</td>
-                            <td>${email}</td>
-                        </tr>
+                            // 重新填充表格中的数据
+                            $('#data-table').append(`
+                            <tr>
+                                <td>姓名:</td>
+                                <td>${name}</td>
+                                <td>公司名称:</td>
+                                <td>${corporate_name}</td>
+                            </tr>
+                            <tr>
+                                <td>手机号:</td>
+                                <td>${phone}</td>
+                                <td>BASE:</td>
+                                <td>${base}</td>
+                            </tr>
+                            <tr>
+                                <td>状态:</td>
+                                <td>${status === '1' ? '在岗' : '离职'}</td>
+                                <td>身份证号:</td>
+                                <td>${id_number}</td>
+                            </tr>
+                            <tr>
+                                <td>所属部门:</td>
+                                <td>${belongs}</td>
+                                <td>e-mail:</td>
+                                <td>${email}</td>
+                            </tr>
                     `);
 
-                    // 显示 edit-button
-                    $('#edit-button').show();
+                        // 显示 edit-button
+                        $('#edit-button').show();
+                    }
+
                 },
                 error: function(xhr, status, error) {
                     console.error('Error updating user:', error);
