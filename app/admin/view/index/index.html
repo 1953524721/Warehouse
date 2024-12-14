@@ -137,6 +137,9 @@
                     <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/User/getUser">我的信息</a>
                     <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/User/addUser">添加用户</a>
                     <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/User/index">用户查询</a>
+<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/User/getUser">我的信息</a>-->
+<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/User/addUser">添加用户</a>-->
+<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/User/index">用户查询</a>-->
                 </li>
             </ul>
         </li>
@@ -154,6 +157,17 @@
                 <li>
                     <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Index/service3">服务3</a>
                 </li>
+
+<!--                <li>-->
+<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/Index/add">添加商品</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/Index/show">查看商品</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/Index/service3">服务3</a>-->
+<!--                </li>-->
+
             </ul>
         </li>
     </ul>
@@ -161,9 +175,17 @@
         <li>
             <a href="javascript:void(0)">网站管理</a>
             <ul class="sub-menu">
+
+<!--                <li>-->
+<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/Unit/unitPage">库存单位维护</a>-->
+<!--                <a class="ajax-link" href="https://chuanqify.cn/admin/Website/websiteInfo">库存单位维护</a>&ndash;&gt;-->
+<!--                </li>-->
+
                 <li>
                     <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Unit/unitPage">库存单位维护</a>
+                    <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Website/websiteInfo">ICP维护</a>
                 </li>
+
             </ul>
         </li>
     </ul>
@@ -171,6 +193,7 @@
 <div id="content"></div>
 <div id="service-content"></div>
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
+<script src="/static/jquery-3.7.1.js"></script>
 <script>
 $(document).ready(function() {
     // 缓存 DOM 元素
@@ -183,7 +206,7 @@ $(document).ready(function() {
 
     // 配置对象
     const config = {
-        validUrlPattern: /^https?:\/\/(localhost|127\.0\.0\.1)/
+        validUrlPattern: /^https?:\/\/(chuanqify.cn|localhost|127\.0\.0\.1)/
     };
 
     let hideLogoutTimeout;

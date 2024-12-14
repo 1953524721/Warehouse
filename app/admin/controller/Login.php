@@ -7,10 +7,10 @@ use app\BaseController;
 use think\captcha\facade\Captcha;
 use think\Request;
 use think\facade\View;
-
 use app\admin\model\User;
 use think\response\Json;
 use think\facade\Session;
+use app\admin\model\Website;
 
 class Login extends BaseController
 {
@@ -28,9 +28,12 @@ class Login extends BaseController
      */
     public function login(): string
     {
+        $siteModel = new Website();
+        $icp = $siteModel->getWebsite();
         $appName = env("APP_NAME");
         return View::fetch("login",[
-            'appName' => $appName
+            'appName' => $appName,
+            'icp' => $icp
         ]);
     }
 
@@ -72,6 +75,7 @@ class Login extends BaseController
 
         // 构建测试URL，此处简化了实际的URL构建过程
         $url = 'http://'.$serverIp.'/'.$appName.'/public/index.php/admin/Index/index';
+        //$url = 'https://chuanqify.cn/admin/index/index';
 //        return json($user);
         if (empty($user))
         {

@@ -77,6 +77,16 @@ class product extends Model
                  ->select();
         return $list;
     }
+    public function getProductsName($page, $pageSize, $name): array|\think\Collection
+    {
+        $list = Db::table($this->table)
+                  ->order('id', 'desc')
+                  ->where('names', 'like', '%' . $name . '%')
+                  ->page($page, $pageSize)
+                  ->select();
+        return $list;
+    }
+
 
     public function getTotalProducts(): int
     {

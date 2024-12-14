@@ -11,9 +11,12 @@ class Unit extends BaseController
 {
     public function unitPage(): string
     {
+
+        $serverIp  = $_SERVER['SERVER_ADDR'];
         $appName = env("APP_NAME");
         return View::fetch("unit",[
             'appName' => $appName,
+            'serverIp' => $serverIp
         ]);
 
     }

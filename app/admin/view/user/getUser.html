@@ -5,34 +5,227 @@
     <title>我的信息</title>
     <style>
         #app {
-            border: 1px solid #000;
+            border: 0px solid #000;
+        }
+        .custom-button {
+            background-color: #007bff; /* 背景颜色 */
+            color: white; /* 文字颜色 */
+            border: none; /* 去掉边框 */
+            border-radius: 5px; /* 圆角 */
+            padding: 10px 20px; /* 内边距 */
+            cursor: pointer; /* 鼠标悬停时的指针样式 */
+            transition: background-color 0.3s ease; /* 过渡效果 */
+        }
+
+        .custom-button:hover {
+            background-color: #0056b3; /* 悬停时的背景颜色 */
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
 <div id="app">
-    <div class="getUserLeft">
+    <h1>
+        我的信息
+    </h1>
+    <div class="getUserLeft hidden">
+        <input type="hidden" name="id" id="id">
+        <label for="name">姓名:</label>
+        <input type="text" id="name" name="name"><br><br>
 
+        <label for="corporate_name">公司名称:</label>
+        <input type="text" id="corporate_name" name="corporate_name"><br><br>
+
+        <label for="phone">手机号:</label>
+        <input type="text" id="phone" name="phone"><br><br>
+
+        <label for="base">BASE:</label>
+        <input type="text" id="base" name="base"><br><br>
+
+        <label for="status">状态:</label>
+        <select id="status" name="status">
+            <option value="1">在岗</option>
+            <option value="0">离职</option>
+        </select><br><br>
+
+        <label for="id_number">身份证号:</label>
+        <input type="text" id="id_number" name="id_number"><br><br>
+
+        <label for="belongs">所属部门:</label>
+        <input type="text" id="belongs" name="belongs"><br><br>
+
+        <label for="email">e-mail:</label>
+        <input type="text" id="email" name="email"><br><br>
+
+        <!-- 添加确认修改按钮 -->
+        <input type="button" class="custom-button" value="确认修改" id="confirm-edit-button">
     </div>
     <div class="getUserRight">
-        <table>
-            <tr>
-                <td>用户名:</td>
-                <td>{$data.name}</td>
-                <td>用户名:</td>
-                <td>{$data.name}</td>
-            </tr>
-            <tr>
-                <td>用户名:</td>
-                <td>{$data.name}</td>
-            </tr>
-        </table>
-    </div>
+        <table id="data-table">
 
+        </table>
+        <input type="button" class="custom-button" value="修改" id="edit-button">
+    </div>
 </div>
 </body>
+<script src="/static/jquery-3.7.1.js"></script>
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            // 获取CSRF令牌
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            // 如果CSRF令牌存在，则将其添加到请求头中
+            if (csrfToken) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            }
+        }
+    });
 
+    $(document).ready(function() {
+        let userData;
+
+        // 获取用户信息并填充到表格中
+        $.ajax({
+            type: 'post',
+            url: "{:url('admin/User/getUserFind')}",
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                userData = data; // 保存用户数据以便后续使用
+
+                // 将数据填充到表格中
+                $('#data-table').append(`
+                    <tr>
+                        <td>姓名:</td>
+                        <td>${data.name}</td>
+                        <td>公司名称:</td>
+                        <td>${data.corporate_name}</td>
+                    </tr>
+                    <tr>
+                        <td>手机号:</td>
+                        <td>${data.phone}</td>
+                        <td>BASE:</td>
+                        <td>${data.base}</td>
+                    </tr>
+                    <tr>
+                        <td>状态:</td>
+                        <td>${data.status === 1 ? '在岗' : '离职'}</td>
+                        <td>身份证号:</td>
+                        <td>${data.id_number}</td>
+                    </tr>
+                    <tr>
+                        <td>所属部门:</td>
+                        <td>${data.belongs}</td>
+                        <td>e-mail:</td>
+                        <td>${data.Email}</td>
+                    </tr>
+                `);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching data:', error);
+            }
+        });
+
+        // 添加点击事件监听器
+        $('#edit-button').click(function() {
+            // 移除 data-table 中的所有数据
+            $('#data-table').empty();
+
+            // 隐藏 edit-button
+            $('#edit-button').hide();
+
+            // 显示输入框
+            $('.getUserLeft').removeClass('hidden');
+
+            // 填充输入框的数据
+            $('#id').val(userData.id);
+            $('#name').val(userData.name);
+            $('#corporate_name').val(userData.corporate_name);
+            $('#phone').val(userData.phone);
+            $('#base').val(userData.base);
+            $('#status').val(userData.status);
+            $('#id_number').val(userData.id_number);
+            $('#belongs').val(userData.belongs);
+            $('#email').val(userData.Email);
+        });
+
+        // 绑定确认修改按钮的点击事件
+        $('#confirm-edit-button').click(function() {
+            // 获取输入框的值
+            const id = $('#id').val();
+            const name = $('#name').val();
+            const corporate_name = $('#corporate_name').val();
+            const phone = $('#phone').val();
+            const base = $('#base').val();
+            const status = $('#status').val();
+            const id_number = $('#id_number').val();
+            const belongs = $('#belongs').val();
+            const email = $('#email').val();
+
+            // 发送AJAX请求更新用户信息
+            $.ajax({
+                type: 'post',
+                url: "{:url('admin/Userinfo/updateUser')}",
+                data: {
+                    id: id,
+                    name: name,
+                    corporate_name: corporate_name,
+                    phone: phone,
+                    base: base,
+                    status: status,
+                    id_number: id_number,
+                    belongs: belongs,
+                    email: email
+                },
+                success: function(response) {
+                    console.log('Update successful:', response);
+
+                    // 隐藏输入框
+                    $('.getUserLeft').addClass('hidden');
+
+                    // 清空表格中的数据
+                    $('#data-table').empty();
+
+                    // 重新填充表格中的数据
+                    $('#data-table').append(`
+                        <tr>
+                            <td>姓名:</td>
+                            <td>${name}</td>
+                            <td>公司名称:</td>
+                            <td>${corporate_name}</td>
+                        </tr>
+                        <tr>
+                            <td>手机号:</td>
+                            <td>${phone}</td>
+                            <td>BASE:</td>
+                            <td>${base}</td>
+                        </tr>
+                        <tr>
+                            <td>状态:</td>
+                            <td>${status === '1' ? '在岗' : '离职'}</td>
+                            <td>身份证号:</td>
+                            <td>${id_number}</td>
+                        </tr>
+                        <tr>
+                            <td>所属部门:</td>
+                            <td>${belongs}</td>
+                            <td>e-mail:</td>
+                            <td>${email}</td>
+                        </tr>
+                    `);
+
+                    // 显示 edit-button
+                    $('#edit-button').show();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error updating user:', error);
+                }
+            });
+        });
+    });
 </script>
 </html>

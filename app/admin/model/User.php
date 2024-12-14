@@ -112,10 +112,24 @@ class User extends Model
     public function updatePwd(int $id): int|string
     {
         $id = htmlspecialchars($id);
+        $userInfoModel = new UserInfo();
+        $data = $userInfoModel->getUserInfo($id);
         try {
-            return Db::name($this->table)->where('id', $id)->update([
-                'pwd'      => md5('111111'),
-            ]);
+            if (empty($data))
+            {
+                $pwd  = md5('123456789');
+                return Db::name($this->table)->where('id', $id)->update([
+                    'pwd'      => md5($pwd),
+                ]);
+            }
+            else
+            {
+                $pwd  = $data['phone_unmber'];
+                return Db::name($this->table)->where('id', $id)->update([
+                    'pwd'      => md5($pwd),
+                ]);
+            }
+
         } catch (DbException $e) {
             Log::error("更新产品信息时发生错误: " . $e->getMessage());
             return $e->getMessage();
@@ -153,7 +167,7 @@ class User extends Model
      */
     public function updateState(int $id, string $newState,$date): int|string
     {
-        $id         = htmlspecialchars($id);
+        $id        = htmlspecialchars($id);
         $newState  = htmlspecialchars($newState);
         try {
             return Db::name($this->table)->where('id', $id)->update([
@@ -182,4 +196,19 @@ class User extends Model
             return $e->getMessage();
         }
     }
+    public function finduserNameALL($page,$pageSize,$name): array|Collection
+    {
+        return Db::table($this->table)
+            ->order('id', 'desc')
+            ->where('name', 'like', '%' . $name . '%')
+            ->page($page,$pageSize)
+            ->select();
+    }
+    public function finduserNameALLCount($name): int
+    {
+        return Db::table($this->table)
+            ->where('name', 'like', '%' . $name . '%')
+            ->count();
+    }
+
 }

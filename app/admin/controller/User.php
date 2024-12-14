@@ -16,6 +16,7 @@ use think\Paginator;
 use think\Request;
 use think\response\Json;
 
+
 class User extends BaseController
 {
     /**
@@ -175,11 +176,6 @@ class User extends BaseController
      */
     public function updateState(Request $request): Json
     {
-        $check = $request->checkToken();
-        if (false === $check)
-        {
-            return json(['status' => 'error', 'message' => 'token验证失败']);
-        }
         if ($request->isAjax())
         {
             $id       = $request->param('id');
@@ -241,15 +237,63 @@ class User extends BaseController
     }
     public function getUser(): string
     {
-        $userInfoModel = new UserInfo();
-        $id = Session::get('user')['id'];
-        $data = $userInfoModel->getUserInfo($id);
-//        $newData = json_encode($data);
         $appName = env("APP_NAME");
         return View::fetch("getUser",[
             'appName' => $appName,
-            'data' => $data
         ]);
     }
+    public function getUserFind(): Json
+    {
+        $userInfoModel = new UserInfo();
+        $id = Session::get('user')['id'];
+        $data = $userInfoModel->getUserInfo($id);
+        if(empty($data))
+        {
+            $keys = $userInfoModel->columns();
+            $keys = array_column($keys,'Filed');
+            foreach ($keys as $key)
+            {
+                $data[$key] = null;
+            }
+            return \json($data);
+        }
+        return \json($data);
+    }
 
+
+
+
+    public function searchItem(Request $request)
+    {
+        if ($request->isAjax())
+        {
+            $name            = $request->param('search');
+            $page            = $request->param('page', 1);
+            $pageSize        = $request->param('pageSize', 10);
+            $userModel       = new Useres();
+            $list            = $userModel->finduserNameALL($page, $pageSize,$name);
+            $total           = $userModel->finduserNameALLCount($name); // 获取总记录数
+            $response   = [
+                'data'  => $list,
+                'total' => $total
+            ];
+            return json($response);
+        }
+    }
+    public function test(Request $request)
+    {
+        $userInfoModel = new UserInfo();
+        $id = Session::get('user')['id'];
+        $data = $userInfoModel->getUserInfo($id);
+        if(empty($data))
+        {
+            $keys = $userInfoModel->columns();
+            $keys = array_column($keys,'Feild');
+            foreach ($keys as $key)
+            {
+                $data[$key] = null;
+            }
+        }
+        print_r($data);
+    }
 }

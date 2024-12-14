@@ -73,11 +73,60 @@
             text-decoration: none; /* 去掉下划线 */
             cursor: pointer; /* 鼠标指针样式 */
         }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        /* 搜索框样式 */
+        #searchInput {
+            width: 300px; /* 调整宽度 */
+            padding: 10px; /* 内边距 */
+            margin-right: 10px; /* 右边距 */
+            border: 2px solid #ccc; /* 边框 */
+            border-radius: 25px; /* 圆角 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 阴影 */
+            transition: border-color 0.3s ease; /* 过渡效果 */
+            outline: none; /* 去掉聚焦时的默认轮廓 */
+            font-size: 16px; /* 字体大小 */
+        }
+
+        /* 搜索框聚焦时的样式 */
+        #searchInput:focus {
+            border-color: #4CAF50; /* 聚焦时的边框颜色 */
+        }
+
+        /* 占位符样式 */
+        #searchInput::placeholder {
+            color: #999; /* 占位符颜色 */
+            opacity: 1; /* Firefox */
+        }
+
+        /* 搜索按钮样式 */
+        #searchButton {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* 搜索按钮悬停时的样式 */
+        #searchButton:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
 <div id="app">
     <input type="hidden" name="__token__" value="{:token()}" />
+    <div>
+        <input type="text" id="searchInput" placeholder="输入名称搜索"></input>
+        <input type="button" value="搜索" id="searchButton"  class="searchButton">
+    </div>
     <table>
         <tr>
             <th>ID</th>
@@ -89,7 +138,7 @@
             <th>数量</th>
             <th>单位</th>
             <th>简略图</th>
-            <th>添加日期</th>
+            <th>操作日期</th>
             <th>操作</th>
         </tr>
 
@@ -98,7 +147,7 @@
         </tbody>
 
         <tr>
-            <td colspan="10" class="page">
+            <td colspan="11" class="page">
                 <input type="button" value="首页" class="one">
                 <input type="button" value="上一页" class="up">
                 <input type="button" value="下一页" class="down">
@@ -139,6 +188,7 @@
 </div>
 
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
+<script src="/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
     $.ajaxSetup({
         beforeSend: function(xhr) {
@@ -172,7 +222,7 @@
 
                     // 遍历数据并生成表格行
                     response.data.forEach(function(item) {
-                        console.log('Item ID:', item.id, typeof item.id); // 调试信息
+                        //console.log('Item ID:', item.id, typeof item.id); // 调试信息
                         $('#data-table').append(`                        <tr>
                             <td>${item.id}</td>
                             <td>${item.names}</td>
@@ -182,7 +232,10 @@
                             <td>${item.production}</td>
                             <td>${item.num}</td>
                             <td>${item.unit}</td>
-                            <td><img src="/{$appName}/runtime/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;"></td>
+                            <td>
+<!--                                <img src="/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">-->
+                                <img src="/{$appName}/public/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">
+                            </td>
                             <td>${item.add_date}</td>
                             <td>
                                 <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
@@ -258,7 +311,7 @@
                     $('#production').val(response.production);
                     $('#num').val(response.num);
                     $('#unit').val(response.unit);
-                    $('#flier-preview').attr('src', `/{$appName}/runtime/storage/${response.flier}`);
+                    $('#flier-preview').attr('src', `/storage/${response.flier}`);
                     $('#flier-preview').show();
                     $('#flier').val(''); // 清空文件输入字段
                 },
@@ -342,8 +395,60 @@
                 }
             });
         });
-    });
 
+        $('.searchButton').click(function () {
+
+            const search = $('#searchInput').val();
+            if (search.length ==='0')
+            {
+                return false
+            }
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: 'searchItem',
+                type: 'post',
+                data: {
+                    search: search
+                },
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response)
+                    $('#data-table').empty();
+                    response.data.forEach(function(item) {
+                        //console.log('Item ID:', item.id, typeof item.id); // 调试信息
+                        $('#data-table').append(`                        <tr>
+                            <td>${item.id}</td>
+                            <td>${item.names}</td>
+                            <td>${item.describe}</td>
+                            <td>${item.models}</td>
+                            <td>${item.brand}</td>
+                            <td>${item.production}</td>
+                            <td>${item.num}</td>
+                            <td>${item.unit}</td>
+                            <td>
+<!--                                <img src="/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">-->
+                                <img src="/{$appName}/public/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">
+                            </td>
+                            <td>${item.add_date}</td>
+                            <td>
+                                <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
+                                <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
+                                <input type="button" value="出库" class="" data-id="${item.id}">
+                            </td>
+                        </tr>
+                    `);
+                    });
+                }
+                , error: function (xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            })
+
+
+        })
+    });
 </script>
 </body>
 </html>

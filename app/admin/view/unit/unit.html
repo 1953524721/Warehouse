@@ -130,7 +130,8 @@
 </div>
 
 
-<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
+<!--<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>-->
+<script src="/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
 
     $.ajaxSetup({
@@ -204,7 +205,8 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                url: '/{$appName}/public/index.php/admin/unit/updateUnit', // 替换为你的API端点
+                // url: 'https://chuanqify.cn/admin/unit/updateUnit', // 替换为你的API端点
+                 url: 'http://{$serverIp}/{$appName}/public/index.php/admin/unit/updateUnit', // 替换为你的API端点
                 method: 'POST',
                 data: {
                     id: unitId,
@@ -241,7 +243,8 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                url: '/{$appName}/public/index.php/admin/unit/addUnit', // 替换为你的API端点
+                // url: 'https://chuanqify.cn/admin/unit/addUnit', // 替换为你的API端点
+                 url: 'http://{$serverIp}/{$appName}/public/index.php/admin/unit/addUnit', // 替换为你的API端点
                 method: 'POST',
                 data: {
                     unit_name: newUnitName
@@ -274,7 +277,8 @@
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    url: '/{$appName}/public/index.php/admin/unit/deleteUnit', // 替换为你的API端点
+                    // url: 'https://chuanqify.cn/admin/unit/deleteUnit', // 替换为你的API端点
+                     url: 'http://{$serverIp}/{$appName}/public/index.php/admin/unit/deleteUnit', // 替换为你的API端点
                     method: 'POST',
                     data: {
                         id: unitId
@@ -302,7 +306,8 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                url: '/{$appName}/public/index.php/admin/unit/unitPageAll', // 替换为你的API端点
+                // url: 'https://chuanqify.cn/admin/unit/unitPageAll', // 替换为你的API端点
+                url: 'http://{$serverIp}/{$appName}/public/index.php/admin/unit/unitPageAll', // 替换为你的API端点
                 method: 'GET',
                 data: {
                     page: page,

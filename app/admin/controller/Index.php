@@ -22,24 +22,14 @@ class Index extends BaseController
       */
      public function __construct(App $app)
      {
-         $allowedUntil = strtotime('2024-12-01 00:00:00');
-         $date  = date('Y-m-d H:i:s');
-         if ($date>$allowedUntil)
-         {
-             return '<h1>程序已过期，请联系管理员</h1>';
-         }
-         else
-         {
-             $this->app = $app;
-             parent::__construct($this->app);
+         $this->app = $app;
+         parent::__construct($this->app);
 
-             // 检查用户是否已登录，未登录则重定向到登录页面
-             if (!$this->isUserLoggedIn())
-             {
-                 $this->redirectToLogin();
-             }
+         // 检查用户是否已登录，未登录则重定向到登录页面
+         if (!$this->isUserLoggedIn())
+         {
+             $this->redirectToLogin();
          }
-
      }
 
      /**
@@ -145,7 +135,7 @@ class Index extends BaseController
 
             // 如果文件上传成功，进行保存并调用模型方法保存产品信息
             if ($file) {
-                $saveName = \think\facade\Filesystem::putFile('topic', $file);
+                $saveName = \think\facade\Filesystem::disk('public')->putFile('topic', $file);
                 $productionModel = new product();
                 $data = $productionModel->createProduct($names, $describe, $models, $brand, $production, $num, $unit, $saveName, $date);
 
@@ -185,7 +175,10 @@ class Index extends BaseController
          $appName   = env('APP_NAME');
 
          // 构建测试URL，此处简化了实际的URL构建过程
+         $url = '/admin/Login/login';
          $url = 'http://'.$serverIp.'/'.$appName.'/public/index.php/admin/Login/login';
+
+
 
          return redirect($url);
      }
@@ -306,5 +299,19 @@ class Index extends BaseController
             // 没有文件上传
             return json(['status' => 'error', 'message' => '没有文件上传']);
         }
+    }
+    public function searchItem(Request $request): Json
+    {
+        $name            = $request->param('search');
+        $page            = $request->param('page', 1);
+        $pageSize        = $request->param('pageSize', 10);
+        $productionModel = new product();
+        $item = $productionModel->getProductsName($page, $pageSize,$name);
+        $total = $productionModel->getTotalProducts();
+        $item = [
+            'data'  => $item,
+            'total' => $total
+        ];
+        return json($item);
     }
 }

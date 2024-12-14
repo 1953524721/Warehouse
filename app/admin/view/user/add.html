@@ -32,7 +32,8 @@
         </form>
     </div>
 </body>
-<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
+<!--<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>-->
+<script src="/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         $('#addUserButton').click(function() {
@@ -50,7 +51,7 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                url: '/{$appName}/public/index.php/admin/User/addUserPost', // 根据实际情况调整路径
+                url: 'https://chuanqify.cn/admin/User/addUserPost', // 根据实际情况调整路径
                 type: 'POST',
                 data: { username: username, password: password },
                 success: function(response) {

@@ -7,12 +7,20 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{:token()}">
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
         body {
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle, #ADD8E6 0%, #ADD8E6 50%, #0000ff 100%);
+        }
+        .app {
+            flex: 1;
             display: flex;
             justify-content: center; /* 水平居中 */
             align-items: center;
-            height: 100vh;
-            background: radial-gradient(circle, #ADD8E6 0%, #ADD8E6 50%, #0000ff 100%);
         }
         .login-pages {
             border: 1px solid #000; /* 可选，用于展示容器边界 */
@@ -60,6 +68,17 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             background-color: #ff7b83;
         }
+        .foot {
+            width: 100%;
+            height: 100px;
+            //background-color: red;
+            text-align: center;
+            line-height: 100px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 1000; /* 确保页脚在最上层 */
+        }
     </style>
     <title>管理登录</title>
 </head>
@@ -94,10 +113,11 @@
         </div>
     </div>
 </div>
+<div class="foot">{$icp.value}</div>
 </body>
+<script src="/static/jquery-3.7.1.js"></script>
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
-    // alert($)
     // 设置全局AJAX选项
     $.ajaxSetup({
         beforeSend: function(xhr) {
@@ -156,7 +176,6 @@
                 if (res.status === 'success') {
                     // 登录成功，弹出提示信息并跳转到新页面
                     $('.error-message').text(res.message);
-                    // console.log(res.message);
                     setTimeout(function() {
                         window.location.href = res.urls;
                     }, 2000); // 2000毫秒 = 2秒
