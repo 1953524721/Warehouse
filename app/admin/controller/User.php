@@ -235,30 +235,7 @@ class User extends BaseController
         Session::delete('user');
         return  json(['status' => 'success', 'message' => '注销成功']);
     }
-    public function getUser(): string
-    {
-        $appName = env("APP_NAME");
-        return View::fetch("getUser",[
-            'appName' => $appName,
-        ]);
-    }
-    public function getUserFind(): Json
-    {
-        $userInfoModel = new UserInfo();
-        $id = Session::get('user')['id'];
-        $data = $userInfoModel->getUserInfo($id);
-        if(empty($data))
-        {
-            $keys = $userInfoModel->columns();
-            $keys = array_column($keys,'Filed');
-            foreach ($keys as $key)
-            {
-                $data[$key] = null;
-            }
-            return \json($data);
-        }
-        return \json($data);
-    }
+
 
 
 
@@ -280,7 +257,7 @@ class User extends BaseController
             return json($response);
         }
     }
-    public function test(Request $request)
+    public function test(Request $request): void
     {
         $userInfoModel = new UserInfo();
         $id = Session::get('user')['id'];

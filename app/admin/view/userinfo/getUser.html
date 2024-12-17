@@ -24,6 +24,12 @@
         .hidden {
             display: none;
         }
+        tr {
+            width: 50px;
+        }
+        td {
+            width: 130px;
+        }
     </style>
 </head>
 <body>
@@ -43,7 +49,10 @@
         <input type="text" id="phone" name="phone"><br><br>
 
         <label for="base">BASE:</label>
-        <input type="text" id="base" name="base"><br><br>
+        <select name="" id="base">
+            <!-- 城市选项将通过 AJAX 动态填充 -->
+        </select>
+        <br><br>
 
         <label for="status">状态:</label>
         <select id="status" name="status">
@@ -71,7 +80,7 @@
     </div>
 </div>
 </body>
-<script src="/static/jquery-3.7.1.js"></script>
+<script src="/jquery-3.7.1.js"></script>
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
     $.ajaxSetup({
@@ -87,16 +96,35 @@
 
     $(document).ready(function() {
         let userData;
+        let cityList = [];
+
+        // 通过 AJAX 请求获取城市列表
+        $.ajax({
+            type: 'get',
+            url: "{:url('admin/Userinfo/getCityList')}", // 假设后端提供的获取城市列表的 URL
+            dataType: 'json',
+            success: function(data) {
+                console.log(data);
+                cityList = data; // 将获取到的城市列表数据赋值给 cityList 变量
+                populateCitySelect(); // 调用函数填充城市选择框
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching city list:', error);
+            }
+        });
 
         // 获取用户信息并填充到表格中
         $.ajax({
             type: 'post',
-            url: "{:url('admin/User/getUserFind')}",
+            url: "{:url('admin/Userinfo/getUserFind')}",
             dataType: 'json',
             success: function (data) {
-                console.log(data);
+                console.log(data.base);
                 userData = data; // 保存用户数据以便后续使用
+                const baseAsNumber = parseInt(data.base, 10);
 
+                // 根据 base 查找城市名称
+                const cityName = cityList.find(city => city.city_id === baseAsNumber)?.city_name || '未知';
                 // 将数据填充到表格中
                 $('#data-table').append(`
                     <tr>
@@ -109,7 +137,7 @@
                         <td>手机号:</td>
                         <td>${data.phone}</td>
                         <td>BASE:</td>
-                        <td>${data.base}</td>
+                        <td>${cityName}</td>
                     </tr>
                     <tr>
                         <td>状态:</td>
@@ -121,7 +149,7 @@
                         <td>所属部门:</td>
                         <td>${data.belongs}</td>
                         <td>e-mail:</td>
-                        <td>${data.Email}</td>
+                        <td>${data.email}</td>
                     </tr>
                 `);
             },
@@ -150,85 +178,95 @@
             $('#status').val(userData.status);
             $('#id_number').val(userData.id_number);
             $('#belongs').val(userData.belongs);
-            $('#email').val(userData.Email);
+            $('#email').val(userData.email);
         });
 
-        // 绑定确认修改按钮的点击事件
-        $('#confirm-edit-button').click(function() {
-            // 获取输入框的值
-            const id = $('#id').val();
-            const name = $('#name').val();
-            const corporate_name = $('#corporate_name').val();
-            const phone = $('#phone').val();
-            const base = $('#base').val();
-            const status = $('#status').val();
-            const id_number = $('#id_number').val();
-            const belongs = $('#belongs').val();
-            const email = $('#email').val();
+       $('#confirm-edit-button').click(function() {
+           // 获取输入框的值
+           const id = $('#id').val();
+           const name = $('#name').val();
+           const corporate_name = $('#corporate_name').val();
+           const phone = $('#phone').val();
+           const base = $('#base').val();
+           const status = $('#status').val();
+           const id_number = $('#id_number').val();
+           const belongs = $('#belongs').val();
+           const email = $('#email').val();
 
-            // 发送AJAX请求更新用户信息
-            $.ajax({
-                type: 'post',
-                url: "{:url('admin/Userinfo/updateUser')}",
-                data: {
-                    id: id,
-                    name: name,
-                    corporate_name: corporate_name,
-                    phone: phone,
-                    base: base,
-                    status: status,
-                    id_number: id_number,
-                    belongs: belongs,
-                    email: email
-                },
-                success: function(response) {
-                    console.log('Update successful:', response);
-                        if (response.status==='success')
-                        {
-                            // 隐藏输入框
-                            $('.getUserLeft').addClass('hidden');
+           // 发送AJAX请求更新用户信息
+           $.ajax({
+               type: 'post',
+               url: "{:url('admin/Userinfo/updateUser')}",
+               data: {
+                   id: id,
+                   name: name,
+                   corporate_name: corporate_name,
+                   phone: phone,
+                   base: base,
+                   status: status,
+                   id_number: id_number,
+                   belongs: belongs,
+                   email: email
+               },
+               success: function(response) {
+                   console.log('Update successful:', response);
+                   if (response.status === 'success') {
+                       // 隐藏输入框
+                       $('.getUserLeft').addClass('hidden');
 
-                            // 清空表格中的数据
-                            $('#data-table').empty();
+                       // 清空表格中的数据
+                       $('#data-table').empty();
 
-                            // 重新填充表格中的数据
-                            $('#data-table').append(`
-                            <tr>
-                                <td>姓名:</td>
-                                <td>${name}</td>
-                                <td>公司名称:</td>
-                                <td>${corporate_name}</td>
-                            </tr>
-                            <tr>
-                                <td>手机号:</td>
-                                <td>${phone}</td>
-                                <td>BASE:</td>
-                                <td>${base}</td>
-                            </tr>
-                            <tr>
-                                <td>状态:</td>
-                                <td>${status === '1' ? '在岗' : '离职'}</td>
-                                <td>身份证号:</td>
-                                <td>${id_number}</td>
-                            </tr>
-                            <tr>
-                                <td>所属部门:</td>
-                                <td>${belongs}</td>
-                                <td>e-mail:</td>
-                                <td>${email}</td>
-                            </tr>
-                    `);
+                       // 根据 base 查找城市名称
+                       const cityName = cityList.find(city => city.city_id === parseInt(base, 10))?.city_name || '未知';
 
-                        // 显示 edit-button
-                        $('#edit-button').show();
-                    }
+                       // 重新填充表格中的数据
+                       $('#data-table').append(`
+                           <tr>
+                               <td>姓名:</td>
+                               <td>${name}</td>
+                               <td>公司名称:</td>
+                               <td>${corporate_name}</td>
+                           </tr>
+                           <tr>
+                               <td>手机号:</td>
+                               <td>${phone}</td>
+                               <td>BASE:</td>
+                               <td>${cityName}</td>
+                           </tr>
+                           <tr>
+                               <td>状态:</td>
+                               <td>${status === '1' ? '在岗' : '离职'}</td>
+                               <td>身份证号:</td>
+                               <td>${id_number}</td>
+                           </tr>
+                           <tr>
+                               <td>所属部门:</td>
+                               <td>${belongs}</td>
+                               <td>e-mail:</td>
+                               <td>${email}</td>
+                           </tr>
+                       `);
 
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error updating user:', error);
-                }
-            });
-        });
+                       // 显示 edit-button
+                       $('#edit-button').show();
+                   }
+               },
+               error: function(xhr, status, error) {
+                   console.error('Error updating user:', error);
+               }
+           });
+       });
+
+
+        // 动态填充城市选择框
+       function populateCitySelect() {
+           const selectElement = $('#base');
+           cityList.forEach(city => {
+               selectElement.append(`<option value="${city.city_id}">${city.city_name}</option>`);
+           });
+       }
+
     });
 </script>
 </html>
