@@ -378,14 +378,19 @@
         // 当用户点击保存按钮时
         $('#saveEdit').on('click', function() {
             const unitId = unitIdInput.val();
-            const unitName = unitNameInput.val();
+            const unitName = unitNameInput.val().trim();
+
+            // 非空验证
+            if (unitName === '') {
+                alert('单位名称不能为空');
+                return; // 阻止进一步执行
+            }
 
             // 发送AJAX请求更新数据
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                 url: "{:url('admin/unit/updateUnit')}", // 替换为你的API端点
                 method: 'POST',
                 data: {
                     id: unitId,
@@ -395,13 +400,10 @@
                 success: function(response) {
                     console.log('Update Response:', response);
                     if (response.status === 'success') {
-                        $(".error-message").text(response.message);
-                        setTimeout(function() {
-                            // 刷新当前页数据
-                            fetchData(currentPage);
-                            // 关闭模态对话框
-                            modal.hide();
-                        }, 1000); // 1000毫秒 = 1秒
+                        // 刷新当前页数据
+                        fetchData(currentPage);
+                        // 关闭模态对话框
+                        modal.hide();
                     } else {
                         alert('更新失败: ' + response.message);
                     }
@@ -413,16 +415,23 @@
             });
         });
 
+
         // 当用户点击保存按钮时（新增）
         $('#saveAdd').on('click', function() {
-            const newUnitName = newUnitNameInput.val();
+            const newUnitName = newUnitNameInput.val().trim();
+
+            // 非空验证
+            if (newUnitName === '') {
+                $('.error-message').text('单位名称不能为空').css('color', 'red');
+                return; // 阻止进一步执行
+            }
 
             // 发送AJAX请求新增数据
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                url: "{:url('admin/unit/addUnit')}", // 替换为你的API端点
+                url: "{:url('admin/unit/addUnit')}",
                 method: 'POST',
                 data: {
                     unit_name: newUnitName
@@ -431,6 +440,8 @@
                 success: function(response) {
                     console.log('Add Response:', response);
                     if (response.status === 'success') {
+                        // 清空错误消息
+                        $('.error-message').text('');
                         // 刷新当前页数据
                         fetchData(currentPage);
                         // 关闭模态对话框
@@ -445,6 +456,7 @@
                 }
             });
         });
+
 
         // 当用户点击“删除”按钮时
         $(document).on('click', '.delete-btn', function() {

@@ -19,7 +19,7 @@
         th {
             position: sticky;
             top: 0;
-            background-color: #7EB6FD; /* 表头背景颜色 */
+            background-color: #66B2FF; /* 表头背景颜色 */
             color: white; /* 表头文字颜色 */
             z-index: 1; /* 确保表头在其他内容之上 */
         }
@@ -119,139 +119,137 @@
             background-color: #45a049;
         }
             /* 基础按钮样式 */
-    .edit-btn, .delete-btn, .outstock-btn {
-        padding: 8px 16px;
-        margin: 2px;
-        border: none;
-        border-radius: 4px;
-        color: white;
-        cursor: pointer;
-        font-size: 14px;
-    }
+        .edit-btn, .delete-btn, .outstock-btn {
+            padding: 8px 16px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
 
-    /* 修改按钮样式 */
-    .edit-btn {
-        background-color: #007bff; /* 蓝色 */
-    }
+        /* 修改按钮样式 */
+        .edit-btn {
+            background-color: #007bff; /* 蓝色 */
+        }
 
-    .edit-btn:hover {
-        background-color: #0056b3; /* 悬停时的蓝色 */
-    }
+        .edit-btn:hover {
+            background-color: #0056b3; /* 悬停时的蓝色 */
+        }
 
-    /* 删除按钮样式 */
-    .delete-btn {
-        background-color: #dc3545; /* 红色 */
-    }
+        /* 删除按钮样式 */
+        .delete-btn {
+            background-color: #dc3545; /* 红色 */
+        }
 
-    .delete-btn:hover {
-        background-color: #c82333; /* 悬停时的红色 */
-    }
+        .delete-btn:hover {
+            background-color: #c82333; /* 悬停时的红色 */
+        }
 
-    /* 出库按钮样式 */
-    .outstock-btn {
-        background-color: #28a745; /* 绿色 */
-    }
+        /* 出库按钮样式 */
+        .outstock-btn {
+            background-color: #28a745; /* 绿色 */
+        }
 
-    .outstock-btn:hover {
-        background-color: #218838; /* 悬停时的绿色 */
-    }
-    /* 基础按钮样式 */
-    .one, .up, .down, .last {
-        padding: 8px 16px;
-        margin: 2px;
-        border: none;
-        border-radius: 4px;
-        color: white;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s ease;
-    }
+        .outstock-btn:hover {
+            background-color: #218838; /* 悬停时的绿色 */
+        }
+        /* 基础按钮样式 */
+        .one, .up, .down, .last {
+            padding: 8px 16px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
 
-    /* 首页按钮样式 */
-    .one {
-        background-color: #007bff; /* 蓝色 */
-    }
+        /* 首页按钮样式 */
+        .one {
+            background-color: #007bff; /* 蓝色 */
+        }
 
-    .one:hover {
-        background-color: #0056b3; /* 悬停时的蓝色 */
-    }
+        .one:hover {
+            background-color: #0056b3; /* 悬停时的蓝色 */
+        }
 
-    /* 上一页按钮样式 */
-    .up {
-        background-color: #6c757d; /* 灰色 */
-    }
+        /* 上一页按钮样式 */
+        .up {
+            background-color: #6c757d; /* 灰色 */
+        }
 
-    .up:hover {
-        background-color: #545b62; /* 悬停时的灰色 */
-    }
+        .up:hover {
+            background-color: #545b62; /* 悬停时的灰色 */
+        }
 
-    /* 下一页按钮样式 */
-    .down {
-        background-color: #6c757d; /* 灰色 */
-    }
+        /* 下一页按钮样式 */
+        .down {
+            background-color: #6c757d; /* 灰色 */
+        }
 
-    .down:hover {
-        background-color: #545b62; /* 悬停时的灰色 */
-    }
+        .down:hover {
+            background-color: #545b62; /* 悬停时的灰色 */
+        }
 
-    /* 尾页按钮样式 */
-    .last {
-        background-color: #007bff; /* 蓝色 */
-    }
+        /* 尾页按钮样式 */
+        .last {
+            background-color: #007bff; /* 蓝色 */
+        }
 
-    .last:hover {
-        background-color: #0056b3; /* 悬停时的蓝色 */
-    }
-       .operation-buttons {
-       display: flex;
-       justify-content: space-between; /* 平均分布每个按钮 */
-   }
+        .last:hover {
+            background-color: #0056b3; /* 悬停时的蓝色 */
+        }
+           .operation-buttons {
+           display: flex;
+           justify-content: space-between; /* 平均分布每个按钮 */
+       }
 
-   .operation-buttons input[type="button"] {
-       flex: 1; /* 让每个按钮占据相等的空间 */
-       margin: 2px; /* 保持按钮之间的最小间距 */
-   }
-    .action-column {
-        width: 220px; /* 根据需要调整宽度 */
-    }
-        /* 美化表单 */
-    #productForm {
-        display: flex;
-        flex-direction: column;
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+       .operation-buttons input[type="button"] {
+           flex: 1; /* 让每个按钮占据相等的空间 */
+           margin: 2px; /* 保持按钮之间的最小间距 */
+       }
+        .action-column {
+            width: 220px; /* 根据需要调整宽度 */
+        }
+            /* 美化表单 */
+        #productForm {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-    /* 美化输入框 */
-    #productForm input[type="text"],
-    #productForm input[type="number"] {
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 16px;
-    }
+        /* 美化输入框 */
+        #productForm input[type="text"],
+        #productForm input[type="number"] {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
 
-    /* 美化提交按钮 */
-    #productForm .submit {
-        padding: 10px;
-        background-color: #28a745;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-    }
+        /* 美化提交按钮 */
+        #productForm .submit {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
 
-    #productForm .submit[type="button"]:hover {
-        background-color: #218838;
-    }
-
-
+        #productForm .submit[type="button"]:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>

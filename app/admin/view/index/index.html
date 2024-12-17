@@ -106,7 +106,7 @@
             justify-content: flex-end; /* 使子元素靠右对齐 */
             align-items: center; /* 垂直居中对齐 */
             height: 50px;
-            background-color: #7EB6FD;
+            background: linear-gradient(to left, #66B2FF, #0056b3);
             position: fixed;
             top: 0;
             left: 0;
@@ -134,12 +134,9 @@
             <a href="javascript:void(0)">用户管理</a>
             <ul class="sub-menu">
                 <li>
-                    <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Userinfo/getUser">我的信息</a>
-                    <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/User/addUser">添加用户</a>
-                    <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/User/index">用户查询</a>
-<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/User/getUser">我的信息</a>-->
-<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/User/addUser">添加用户</a>-->
-<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/User/index">用户查询</a>-->
+                    <a class="ajax-link" href="{:url('Userinfo/getUser')}">我的信息</a>
+                    <a class="ajax-link" href="{:url('User/addUser')}">添加用户</a>
+                    <a class="ajax-link" href="{:url('User/index')}">用户查询</a>
                 </li>
             </ul>
         </li>
@@ -149,25 +146,10 @@
             <a href="javascript:void(0)">商品管理</a>
             <ul class="sub-menu">
                 <li>
-                    <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Index/add">添加商品</a>
+                    <a class="ajax-link" href="{:url('Index/add')}">添加商品</a>
+                    <a class="ajax-link" href="{:url('Index/show')}">查看商品</a>
+                    <a class="ajax-link" href="https://www.baidu.com">不知道写啥</a>
                 </li>
-                <li>
-                    <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Index/show">查看商品</a>
-                </li>
-                <li>
-                    <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Index/service3">服务3</a>
-                </li>
-
-<!--                <li>-->
-<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/Index/add">添加商品</a>-->
-<!--                </li>-->
-<!--                <li>-->
-<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/Index/show">查看商品</a>-->
-<!--                </li>-->
-<!--                <li>-->
-<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/Index/service3">服务3</a>-->
-<!--                </li>-->
-
             </ul>
         </li>
     </ul>
@@ -175,17 +157,10 @@
         <li>
             <a href="javascript:void(0)">网站管理</a>
             <ul class="sub-menu">
-
-<!--                <li>-->
-<!--                    <a class="ajax-link" href="https://chuanqify.cn/admin/Unit/unitPage">库存单位维护</a>-->
-<!--                <a class="ajax-link" href="https://chuanqify.cn/admin/Website/websiteInfo">库存单位维护</a>&ndash;&gt;-->
-<!--                </li>-->
-
                 <li>
-                    <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Unit/unitPage">库存单位维护</a>
-                    <a class="ajax-link" href="http://{$serverIp}/{$appName}/public/index.php/admin/Website/websiteInfo">ICP维护</a>
+                    <a class="ajax-link" href="{:url('Unit/unitPage')}">库存单位维护</a>
+                    <a class="ajax-link" href="{:url('Website/websiteInfo')}">ICP维护</a>
                 </li>
-
             </ul>
         </li>
     </ul>
@@ -193,7 +168,7 @@
 <div id="content"></div>
 <div id="service-content"></div>
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
-<script src="/static/jquery-3.7.1.js"></script>
+<!--<script src="/static/jquery-3.7.1.js"></script>-->
 <script>
 $(document).ready(function() {
     // 缓存 DOM 元素
@@ -206,7 +181,7 @@ $(document).ready(function() {
 
     // 配置对象
     const config = {
-        validUrlPattern: /^https?:\/\/(chuanqify.cn|localhost|127\.0\.0\.1)/
+        validUrlPattern: /^(https?:\/\/(chuanqify\.cn|localhost|127\.0\.0\.1)|\/)/
     };
 
     let hideLogoutTimeout;
@@ -345,6 +320,7 @@ $(document).ready(function() {
         window.location.href = "/{$appName}/public/index.php/admin/login/login";
     });
 });
+
 
     </script>
 </body>

@@ -18,7 +18,7 @@
         th {
             position: sticky;
             top: 0;
-            background-color: #7EB6FD; /* 表头背景颜色 */
+            background-color: #66B2FF; /* 表头背景颜色 */
             color: white; /* 表头文字颜色 */
             z-index: 1; /* 确保表头在其他内容之上 */
         }
@@ -545,11 +545,15 @@
 
         // 绑定状态单元格点击事件
         $(document).on('click', '.state-cell', function () {
-            const id = $(this).data('id'); // 获取按钮上的ID
-            const currentState = $(this).hasClass('state-normal') ? 1 : 0; // 获取当前状态
+            const $cell = $(this);
+            const id = $cell.data('id'); // 获取按钮上的ID
+            const currentState = $cell.hasClass('state-normal') ? 1 : 0; // 获取当前状态
             const newState = currentState === 1 ? 0 : 1; // 切换状态
 
             console.log('Changing state for item with ID:', id, 'from', currentState, 'to', newState);
+
+            // 禁用状态单元格
+            $cell.off('click');
 
             // 发送 AJAX 请求更新状态
             $.ajax({
@@ -567,7 +571,6 @@
                     console.log('State updated successfully:', response);
                     if (response.status === 'success') {
                         // 更新前端显示
-                        const $cell = $(`.state-cell[data-id="${id}"]`);
                         $cell.toggleClass('state-normal state-abnormal');
                         $cell.text(newState === 1 ? '正常' : '锁定');
                     } else {
@@ -578,9 +581,16 @@
                 error: function (xhr, status, error) {
                     console.error('Error updating state:', error);
                     alert('更新状态失败，请稍后再试。');
+                },
+                complete: function () {
+                    // 无论请求成功还是失败，重新绑定点击事件
+                    $cell.on('click', function () {
+                        $(this).trigger('click');
+                    });
                 }
             });
         });
+
 
         $('.searchButton').click(function () {
 
