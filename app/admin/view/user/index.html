@@ -76,7 +76,7 @@
             color: green;
         }
 
-        /* 定义状态异常的样式 */
+        /* 定义状态锁定的样式 */
         .state-abnormal {
             color: red;
         }
@@ -125,6 +125,133 @@
         #searchButton:hover {
             background-color: #45a049;
         }
+        .one, .up, .down, .last {
+            padding: 10px 20px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .one:hover, .up:hover, .down:hover, .last:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .one {
+            background-color: #007bff; /* 蓝色 */
+        }
+
+        .one:hover {
+            background-color: #0056b3; /* 悬停时的蓝色 */
+        }
+
+        .up, .down {
+            background-color: #6c757d; /* 灰色 */
+        }
+
+        .up:hover, .down:hover {
+            background-color: #545b62; /* 悬停时的灰色 */
+        }
+
+        .last {
+            background-color: #007bff; /* 蓝色 */
+        }
+
+        .last:hover {
+            background-color: #0056b3; /* 悬停时的蓝色 */
+        }
+        /* 统一按钮样式 */
+        .edit-btn, .delete-btn, .uppwd-btn {
+            background-color: #007bff; /* 蓝色背景 */
+            color: white; /* 白色文字 */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 悬停效果 */
+        .edit-btn:hover, .delete-btn:hover, .uppwd-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 删除按钮的特殊样式 */
+        .delete-btn {
+            background-color: #dc3545; /* 红色背景 */
+        }
+
+        /* 删除按钮的悬停效果 */
+        .delete-btn:hover {
+            background-color: #c82333; /* 更深的红色 */
+        }
+
+        /* 添加图标 */
+        .edit-btn::before {
+            content: '\f044'; /* 编辑图标 */
+            font-family: 'FontAwesome',serif;
+            margin-right: 5px;
+        }
+
+        .delete-btn::before {
+            content: '\f1f8'; /* 删除图标 */
+            font-family: 'FontAwesome',serif;
+            margin-right: 5px;
+        }
+
+        .uppwd-btn::before {
+            content: '\f023'; /* 锁图标 */
+            font-family: 'FontAwesome',serif;
+            margin-right: 5px;
+        }
+        .action-column {
+            width: 300px; /* 根据需要调整宽度 */
+        }
+        /* 美化输入框 */
+        #names {
+            width: 300px; /* 调整宽度 */
+            padding: 10px; /* 内边距 */
+            border: 2px solid #ccc; /* 边框 */
+            border-radius: 4px; /* 圆角 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 阴影 */
+            transition: border-color 0.3s ease; /* 过渡效果 */
+            outline: none; /* 去掉聚焦时的默认轮廓 */
+            font-size: 16px; /* 字体大小 */
+        }
+
+        /* 输入框聚焦时的样式 */
+        #names:focus {
+            border-color: #4CAF50; /* 聚焦时的边框颜色 */
+        }
+
+        /* 美化提交按钮 */
+        .submit {
+            background-color: #4CAF50; /* 绿色背景 */
+            color: white; /* 白色文字 */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 提交按钮悬停效果 */
+        .submit:hover {
+            background-color: #45a049; /* 更深的绿色 */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
     </style>
 </head>
 <body>
@@ -136,10 +263,10 @@
 
     <table>
         <tr>
-            <th>ID</th>
+            <th>排序</th>
             <th>名字</th>
             <th>状态</th>
-            <th>操作</th>
+            <th class="action-column">操作</th>
         </tr>
 
         <tbody id="data-table">
@@ -178,8 +305,7 @@
 </div>
 
 
-<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
-<!--<script src="/static/jquery-3.7.1.js"></script>-->
+<script src="/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
     $.ajaxSetup({
         beforeSend: function(xhr) {
@@ -218,7 +344,7 @@
                     // 遍历数据并生成表格行
                     response.data.forEach(function (item) {
                         console.log('Item ID:', item.id, typeof item.id); // 调试信息
-                        const stateText = item.state === 1 ? '正常' : '异常';
+                        const stateText = item.state === 1 ? '正常' : '锁定';
                         const stateClass = item.state === 1 ? 'state-normal' : 'state-abnormal';
                         $('#data-table').append(`
                             <tr>
@@ -443,7 +569,7 @@
                         // 更新前端显示
                         const $cell = $(`.state-cell[data-id="${id}"]`);
                         $cell.toggleClass('state-normal state-abnormal');
-                        $cell.text(newState === 1 ? '正常' : '异常');
+                        $cell.text(newState === 1 ? '正常' : '锁定');
                     } else {
                         // 操作失败，显示错误提示
                         alert(response.message);
@@ -479,7 +605,7 @@
                     // 遍历数据并生成表格行
                     response.data.forEach(function (item) {
                         console.log('Item ID:', item.id, typeof item.id); // 调试信息
-                        const stateText = item.state === 1 ? '正常' : '异常';
+                        const stateText = item.state === 1 ? '正常' : '锁定';
                         const stateClass = item.state === 1 ? 'state-normal' : 'state-abnormal';
                         $('#data-table').append(`
                             <tr>

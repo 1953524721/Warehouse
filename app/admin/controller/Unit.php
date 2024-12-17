@@ -51,8 +51,8 @@ class Unit extends BaseController
             return json(['status' => 'error', 'message' => 'token验证失败']);
 
         }
-        $id        = $this->request->param('id');
-        $unit_name = $this->request->param('unit_name');
+        $id        = $request->param('id');
+        $unit_name = $request->param('unit_name');
         $date      = date("Y-m-d H:i:s");
         if ($request->isAjax())
         {

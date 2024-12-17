@@ -7,6 +7,93 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{:token()}">
     <title>添加商品</title>
+    <style>
+        /* 基本表单样式 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center; /* 使标题居中 */
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 0 auto; /* 使表单居中 */
+            max-width: 600px; /* 可选：设置表单的最大宽度 */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 10px;
+            vertical-align: middle; /* 使表格内的文字垂直居中 */
+            text-align: center; /* 使表格内的文字水平居中 */
+        }
+
+
+        /* 输入框样式 */
+        input[type="text"],
+        input[type="tel"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        input[type="file"]:focus,
+        select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* 按钮样式 */
+        input[type="button"],
+        input[type="reset"] {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="button"]:hover,
+        input[type="reset"]:hover {
+            background-color: #45a049;
+        }
+
+        /* 错误信息样式 */
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
 <h1>添加商品</h1>
@@ -30,11 +117,19 @@
             </tr>
             <tr>
                 <td>生产地:</td>
-                <td><input type="text" class="production" name="production"></td>
+                <td>
+                    <select name="production" id="" class="production">
+                        {volist name='cityList' id='cityList'}
+                        <option value="{$cityList.city_name}">{$cityList.city_name} </option>
+                        {/volist}
+                    </select>
+                </td>
             </tr>
             <tr>
                 <td>数量:</td>
-                <td><input type="tel" class="num" name="num"></td>
+                <td>
+                    <input type="tel" class="num" name="num">
+                </td>
             </tr>
             <tr>
                 <td>库存单位:</td>
@@ -49,8 +144,8 @@
                 <td><input type="file" class="flier" name="flier"></td>
             </tr>
             <tr>
-                <td><input type="button" value="提交" class="submit"></td>
                 <td><input type="reset" value="重置"></td>
+                <td><input type="button" value="提交" class="submit"></td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -60,7 +155,6 @@
         </table>
     </form>
 </body>
-<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
 <script src="/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
     // 设置全局AJAX选项
@@ -106,12 +200,54 @@
         });
     });
 
-
-    // 为按钮点击事件添加处理函数
+        // 为按钮点击事件添加处理函数
     $('.submit').click(function () {
         console.log('Submit button clicked');
+
+        // 获取所有需要验证的输入字段
+        const name = $('.name').val().trim();
+        const describe = $('.describe').val().trim();
+        const models = $('.models').val().trim();
+        const brand = $('.brand').val().trim();
+        const num = $('.num').val().trim();
+        const unit = $('.unit').val().trim();
+        const production = $('.production').val().trim();
+
+        // 初始化错误信息
+        let errorMessage = '';
+
+        // 验证每个字段是否为空
+        if (!name) {
+            errorMessage += '商品名称不能为空。\n';
+        }
+        if (!describe) {
+            errorMessage += '商品描述不能为空。\n';
+        }
+        if (!models) {
+            errorMessage += '商品型号不能为空。\n';
+        }
+        if (!brand) {
+            errorMessage += '品牌不能为空。\n';
+        }
+        if (!num) {
+            errorMessage += '数量不能为空。\n';
+        }
+        if (!unit) {
+            errorMessage += '库存单位不能为空。\n';
+        }
+        if (!production) {
+            errorMessage += '产地单位不能为空。\n';
+        }
+
+        // 如果存在错误信息，则显示错误信息并阻止提交
+        if (errorMessage) {
+            $('.error-message').text(errorMessage); // 将错误信息填入 class="error-message" 的元素中
+            return; // 阻止表单提交
+        }
+
         // 创建 FormData 对象
         const formData = new FormData($('#productForm')[0]);
+
         // 发起 AJAX 请求
         $.ajax({
             headers: {
@@ -141,5 +277,7 @@
             }
         });
     });
+
+
 </script>
 </html>

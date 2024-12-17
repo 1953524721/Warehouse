@@ -2,6 +2,7 @@
 
 namespace app\admin\controller;
 
+use app\admin\model\city;
 use app\admin\model\product;
 use app\BaseController;
 use think\App;
@@ -82,13 +83,14 @@ class Index extends BaseController
      */
     public function add(): string
     {
+        $cityModel = new  city();
+        $cityList = $cityModel->getCityParentId('0');
 
-//        print_r($unitList);die();
-        // 获取应用名称
         $appName   = env('APP_NAME');
         // 渲染并返回 "add" 视图，同时传递应用名称
         return View::fetch("add",[
-            'appName'  => $appName
+            'appName'  => $appName,
+            'cityList' => $cityList
         ]);
     }
     public function getUnits(Request $request): array|Json
@@ -190,7 +192,7 @@ class Index extends BaseController
         {
             $appName = env("APP_NAME");
             return View::fetch("show",[
-                'appName' => $appName,
+                'appName' => $appName
             ]);
         }
         else
@@ -199,6 +201,7 @@ class Index extends BaseController
         }
 
     }
+
     public function pageAll(Request $request)
     {
         $check = $request->checkToken('__token__');
@@ -224,7 +227,6 @@ class Index extends BaseController
                 return json($response);
             }
         }
-
     }
     public function deleteItem(Request $request): Json
     {

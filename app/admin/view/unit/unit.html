@@ -73,18 +73,198 @@
             text-decoration: none; /* 去掉下划线 */
             cursor: pointer; /* 鼠标指针样式 */
         }
+        /* 美化编辑按钮 */
+        .edit-btn {
+            padding: 10px 20px;
+            background-color: #007bff; /* 蓝色背景 */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px; /* 按钮间距 */
+        }
+
+        .edit-btn:hover {
+            background-color: #0056b3; /* 悬停时的颜色 */
+        }
+
+        /* 美化删除按钮 */
+        .delete-btn {
+            padding: 10px 20px;
+            background-color: #dc3545; /* 红色背景 */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333; /* 悬停时的颜色 */
+        }
+        .action-column {
+            width: 220px; /* 根据需要调整宽度 */
+        }
+        /* 美化表格单元格 */
+        .page {
+            text-align: right; /* 右对齐 */
+            padding: 10px;
+        }
+
+        /* 美化按钮通用样式 */
+        .page input[type="button"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 5px; /* 按钮间距 */
+        }
+
+        /* 美化首页按钮 */
+        .one {
+            background-color: #007bff; /* 蓝色背景 */
+            color: white;
+        }
+
+        .one:hover {
+            background-color: #0056b3; /* 悬停时的颜色 */
+        }
+
+        /* 美化上一页按钮 */
+        .up {
+            background-color: #28a745; /* 绿色背景 */
+            color: white;
+        }
+
+        .up:hover {
+            background-color: #218838; /* 悬停时的颜色 */
+        }
+
+        /* 美化下一页按钮 */
+        .down {
+            background-color: #ffc107; /* 黄色背景 */
+            color: white;
+        }
+
+        .down:hover {
+            background-color: #e0a800; /* 悬停时的颜色 */
+        }
+
+        /* 美化尾页按钮 */
+        .last {
+            background-color: #dc3545; /* 红色背景 */
+            color: white;
+        }
+
+        .last:hover {
+            background-color: #c82333; /* 悬停时的颜色 */
+        }
+
+        /* 美化新增按钮 */
+        .add-btn {
+            padding: 10px 20px;
+            background-color: #28a745; /* 绿色背景 */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .add-btn:hover {
+            background-color: #218838; /* 悬停时的颜色 */
+        }
+
+        /* 模态对话框样式 */
+        .modal {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* 输入框样式 */
+        .modal-content input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        /* 按钮样式 */
+        .modal-content input[type="button"] {
+            padding: 10px 20px;
+            background-color: #007bff; /* 蓝色背景 */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .modal-content input[type="button"]:hover {
+            background-color: #0056b3; /* 悬停时的颜色 */
+        }
+
+        /* 错误消息样式 */
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+
+
     </style>
 </head>
 <body>
 <div id="app">
     <input type="hidden" name="__token__" value="{:token()}" />
-    <input type="button" value="新增">
+    <h1>单位管理</h1>
+    <input type="button" value="新增" class="add-btn">
     <table>
         <tr>
-            <th>ID</th>
+            <th>排序</th>
             <th>名称</th>
             <th>维护日期</th>
-            <th>操作</th>
+            <th class="action-column">操作</th>
         </tr>
 
         <tbody id="data-table">
@@ -92,7 +272,7 @@
         </tbody>
 
         <tr>
-            <td colspan="10" class="page">
+            <td colspan="4" class="page">
                 <input type="button" value="首页" class="one">
                 <input type="button" value="上一页" class="up">
                 <input type="button" value="下一页" class="down">
@@ -205,8 +385,7 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                // url: 'https://chuanqify.cn/admin/unit/updateUnit', // 替换为你的API端点
-                 url: 'http://{$serverIp}/{$appName}/public/index.php/admin/unit/updateUnit', // 替换为你的API端点
+                 url: "{:url('admin/unit/updateUnit')}", // 替换为你的API端点
                 method: 'POST',
                 data: {
                     id: unitId,
@@ -243,8 +422,7 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                // url: 'https://chuanqify.cn/admin/unit/addUnit', // 替换为你的API端点
-                 url: 'http://{$serverIp}/{$appName}/public/index.php/admin/unit/addUnit', // 替换为你的API端点
+                url: "{:url('admin/unit/addUnit')}", // 替换为你的API端点
                 method: 'POST',
                 data: {
                     unit_name: newUnitName
@@ -277,8 +455,7 @@
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    // url: 'https://chuanqify.cn/admin/unit/deleteUnit', // 替换为你的API端点
-                     url: 'http://{$serverIp}/{$appName}/public/index.php/admin/unit/deleteUnit', // 替换为你的API端点
+                    url: "{:url('admin/unit/deleteUnit')}", // 替换为你的API端点
                     method: 'POST',
                     data: {
                         id: unitId
@@ -306,8 +483,7 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                // url: 'https://chuanqify.cn/admin/unit/unitPageAll', // 替换为你的API端点
-                url: 'http://{$serverIp}/{$appName}/public/index.php/admin/unit/unitPageAll', // 替换为你的API端点
+                url: "{:url('admin/unit/unitPageAll')}", // 替换为你的API端点
                 method: 'GET',
                 data: {
                     page: page,

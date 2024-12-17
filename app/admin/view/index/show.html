@@ -34,7 +34,7 @@
             margin-right: 10px; /* 右侧间距 */
         }
         td{
-            width: 150px;
+            width: 140px;
         }
 
         /* 模态对话框样式 */
@@ -118,6 +118,140 @@
         #searchButton:hover {
             background-color: #45a049;
         }
+            /* 基础按钮样式 */
+    .edit-btn, .delete-btn, .outstock-btn {
+        padding: 8px 16px;
+        margin: 2px;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    /* 修改按钮样式 */
+    .edit-btn {
+        background-color: #007bff; /* 蓝色 */
+    }
+
+    .edit-btn:hover {
+        background-color: #0056b3; /* 悬停时的蓝色 */
+    }
+
+    /* 删除按钮样式 */
+    .delete-btn {
+        background-color: #dc3545; /* 红色 */
+    }
+
+    .delete-btn:hover {
+        background-color: #c82333; /* 悬停时的红色 */
+    }
+
+    /* 出库按钮样式 */
+    .outstock-btn {
+        background-color: #28a745; /* 绿色 */
+    }
+
+    .outstock-btn:hover {
+        background-color: #218838; /* 悬停时的绿色 */
+    }
+    /* 基础按钮样式 */
+    .one, .up, .down, .last {
+        padding: 8px 16px;
+        margin: 2px;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
+
+    /* 首页按钮样式 */
+    .one {
+        background-color: #007bff; /* 蓝色 */
+    }
+
+    .one:hover {
+        background-color: #0056b3; /* 悬停时的蓝色 */
+    }
+
+    /* 上一页按钮样式 */
+    .up {
+        background-color: #6c757d; /* 灰色 */
+    }
+
+    .up:hover {
+        background-color: #545b62; /* 悬停时的灰色 */
+    }
+
+    /* 下一页按钮样式 */
+    .down {
+        background-color: #6c757d; /* 灰色 */
+    }
+
+    .down:hover {
+        background-color: #545b62; /* 悬停时的灰色 */
+    }
+
+    /* 尾页按钮样式 */
+    .last {
+        background-color: #007bff; /* 蓝色 */
+    }
+
+    .last:hover {
+        background-color: #0056b3; /* 悬停时的蓝色 */
+    }
+       .operation-buttons {
+       display: flex;
+       justify-content: space-between; /* 平均分布每个按钮 */
+   }
+
+   .operation-buttons input[type="button"] {
+       flex: 1; /* 让每个按钮占据相等的空间 */
+       margin: 2px; /* 保持按钮之间的最小间距 */
+   }
+    .action-column {
+        width: 220px; /* 根据需要调整宽度 */
+    }
+        /* 美化表单 */
+    #productForm {
+        display: flex;
+        flex-direction: column;
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 美化输入框 */
+    #productForm input[type="text"],
+    #productForm input[type="number"] {
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    /* 美化提交按钮 */
+    #productForm .submit {
+        padding: 10px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    #productForm .submit[type="button"]:hover {
+        background-color: #218838;
+    }
+
+
     </style>
 </head>
 <body>
@@ -129,17 +263,17 @@
     </div>
     <table>
         <tr>
-            <th>ID</th>
+            <th>序号</th>
             <th>名称</th>
             <th>简述</th>
             <th>型号</th>
             <th>品牌</th>
             <th>产地</th>
             <th>数量</th>
-            <th>单位</th>
+<!--            <th>单位</th>-->
             <th>简略图</th>
             <th>操作日期</th>
-            <th>操作</th>
+            <th class="action-column">操作</th>
         </tr>
 
         <tbody id="data-table">
@@ -187,7 +321,6 @@
     </div>
 </div>
 
-<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
 <script src="/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
     $.ajaxSetup({
@@ -202,6 +335,7 @@
     });
 
     $(document).ready(function() {
+
         let currentPage = 1;
         const pageSize = 10; // 每页显示的记录数
         let totalPages = 1; // 总页数
@@ -231,7 +365,7 @@
                             <td>${item.brand}</td>
                             <td>${item.production}</td>
                             <td>${item.num}</td>
-                            <td>${item.unit}</td>
+<!--                            <td>${item.unit}</td>-->
                             <td>
 <!--                                <img src="/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">-->
                                 <img src="/{$appName}/public/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">
@@ -240,7 +374,7 @@
                             <td>
                                 <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
                                 <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
-                                <input type="button" value="出库" class="" data-id="${item.id}">
+                                <input type="button" value="出库" class="outstock-btn" data-id="${item.id}">
                             </td>
                         </tr>
                     `);
@@ -311,7 +445,7 @@
                     $('#production').val(response.production);
                     $('#num').val(response.num);
                     $('#unit').val(response.unit);
-                    $('#flier-preview').attr('src', `/storage/${response.flier}`);
+                    $('#flier-preview').attr('src', `/{$appName}/public/storage/${response.flier}`);
                     $('#flier-preview').show();
                     $('#flier').val(''); // 清空文件输入字段
                 },
@@ -435,7 +569,7 @@
                             <td>
                                 <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
                                 <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
-                                <input type="button" value="出库" class="" data-id="${item.id}">
+                                <input type="button" value="出库" class="outstock-btn" data-id="${item.id}">
                             </td>
                         </tr>
                     `);

@@ -30,44 +30,81 @@
         td {
             width: 130px;
         }
+        .user_info {
+            text-align: right;
+        }
+        /* 美化输入框样式 */
+        .getUserLeft input[type="text"],
+        .getUserLeft input[type="number"],
+        .getUserLeft select {
+            width: 170%;
+            padding: 8px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .getUserLeft input[type="text"]:focus,
+        .getUserLeft input[type="number"]:focus,
+        .getUserLeft select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
     </style>
 </head>
 <body>
 <div id="app">
     <h1>
         我的信息
+        <input type="hidden" name="id" id="id">
     </h1>
     <div class="getUserLeft hidden">
-        <input type="hidden" name="id" id="id">
-        <label for="name">姓名:</label>
-        <input type="text" id="name" name="name"><br><br>
+        <table class="user_info">
+            <tr>
+                <td>姓名:</td>
+                <td><input type="text" id="name" name="name"></td>
+            </tr>
+            <tr>
+                <td>公司名称:</td>
+                <td><input type="text" id="corporate_name" name="corporate_name"></td>
+            </tr>
+            <tr>
+                <td>手机号:</td>
+                <td><input type="text" id="phone" name="phone"></td>
+            </tr>
+            <tr>
+                <td>BASE:</td>
+                <td>
+                    <select name="" id="base">
+                    <!-- 城市选项将通过 AJAX 动态填充 -->
+                </select>
+                </td>
+            </tr>
+            <tr>
+                <td>状态:</td>
+                <td>        <select id="status" name="status">
+                    <option value="1">在岗</option>
+                    <option value="0">离职</option>
+                </select></td>
+            </tr>
+            <tr>
+                <td>身份证号:</td>
+                <td><input type="text" id="id_number" name="id_number"></td>
+            </tr>
+            <tr>
+                <td>所属部门:</td>
+                <td><input type="text" id="belongs" name="belongs"></td>
+            </tr>
+            <tr>
+                <td>e-mail:</td>
+                <td><input type="text" id="email" name="email"></td>
+            </tr>
+        </table>
 
-        <label for="corporate_name">公司名称:</label>
-        <input type="text" id="corporate_name" name="corporate_name"><br><br>
-
-        <label for="phone">手机号:</label>
-        <input type="text" id="phone" name="phone"><br><br>
-
-        <label for="base">BASE:</label>
-        <select name="" id="base">
-            <!-- 城市选项将通过 AJAX 动态填充 -->
-        </select>
-        <br><br>
-
-        <label for="status">状态:</label>
-        <select id="status" name="status">
-            <option value="1">在岗</option>
-            <option value="0">离职</option>
-        </select><br><br>
-
-        <label for="id_number">身份证号:</label>
-        <input type="text" id="id_number" name="id_number"><br><br>
-
-        <label for="belongs">所属部门:</label>
-        <input type="text" id="belongs" name="belongs"><br><br>
-
-        <label for="email">e-mail:</label>
-        <input type="text" id="email" name="email"><br><br>
 
         <!-- 添加确认修改按钮 -->
         <input type="button" class="custom-button" value="确认修改" id="confirm-edit-button">
@@ -80,8 +117,7 @@
     </div>
 </div>
 </body>
-<script src="/jquery-3.7.1.js"></script>
-<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
+<script src="/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
     $.ajaxSetup({
         beforeSend: function(xhr) {
