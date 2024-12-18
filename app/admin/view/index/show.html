@@ -255,6 +255,139 @@
         .input-height {
             height: 40px; /* 假设输入框的高度是 34px */
         }
+        /* 出库模态对话框样式 */
+        #outstockModal {
+            display: none; /* 默认隐藏 */
+            position: fixed; /* 固定定位 */
+            z-index: 1; /* 放在最上层 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 宽度为100% */
+            height: 100%; /* 高度为100% */
+            overflow: auto; /* 溢出部分滚动 */
+            background-color: rgb(0,0,0); /* 背景颜色 */
+            background-color: rgba(0,0,0,0.4); /* 半透明背景 */
+            padding-top: 60px; /* 顶部内边距 */
+        }
+
+        #outstockModal .modal-content {
+            background-color: #fefefe; /* 内容背景颜色 */
+            margin: 5% auto; /* 上下居中 */
+            padding: 20px; /* 内边距 */
+            border: 1px solid #888; /* 边框 */
+            width: 30%; /* 宽度调整为60% */
+            max-height: 80vh; /* 最大高度为视口高度的80% */
+            overflow-y: auto; /* 内容超出时可滚动 */
+        }
+
+        #outstockModal .close {
+            color: #aaa; /* 关闭按钮颜色 */
+            float: right; /* 右对齐 */
+            font-size: 28px; /* 字体大小 */
+            font-weight: bold; /* 加粗 */
+        }
+
+        #outstockModal .close:hover,
+        #outstockModal .close:focus {
+            color: black; /* 鼠标悬停时的颜色 */
+            text-decoration: none; /* 去掉下划线 */
+            cursor: pointer; /* 鼠标指针样式 */
+        }
+        /* 模态对话框样式 */
+        .modal {
+            display: none; /* 默认隐藏 */
+            position: fixed; /* 固定定位 */
+            z-index: 1; /* 放在最上层 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 宽度为100% */
+            height: 100%; /* 高度为100% */
+            overflow: auto; /* 溢出部分滚动 */
+            background-color: rgb(0,0,0); /* 背景颜色 */
+            background-color: rgba(0,0,0,0.4); /* 半透明背景 */
+            padding-top: 60px; /* 顶部内边距 */
+            transition: opacity 0.3s ease; /* 过渡效果 */
+        }
+
+        .modal-content {
+            background-color: #fefefe; /* 内容背景颜色 */
+            margin: 5% auto; /* 上下居中 */
+            padding: 20px; /* 内边距 */
+            border: 1px solid #888; /* 边框 */
+            width: 30%; /* 宽度调整为30% */
+            max-height: 80vh; /* 最大高度为视口高度的80% */
+            overflow-y: auto; /* 内容超出时可滚动 */
+            border-radius: 8px; /* 圆角 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 阴影 */
+        }
+
+        .close {
+            color: #aaa; /* 关闭按钮颜色 */
+            float: right; /* 右对齐 */
+            font-size: 28px; /* 字体大小 */
+            font-weight: bold; /* 加粗 */
+            cursor: pointer; /* 鼠标指针样式 */
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black; /* 鼠标悬停时的颜色 */
+            text-decoration: none; /* 去掉下划线 */
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 15px; /* 底部间距 */
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px; /* 底部间距 */
+            font-weight: bold; /* 加粗 */
+        }
+
+        .form-group input[type="number"],
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: 100%; /* 宽度为100% */
+            padding: 10px; /* 内边距 */
+            border: 1px solid #ccc; /* 边框 */
+            border-radius: 4px; /* 圆角 */
+            box-sizing: border-box; /* 包括内边距和边框在内的宽度计算 */
+            font-size: 16px; /* 字体大小 */
+            transition: border-color 0.3s ease; /* 过渡效果 */
+        }
+
+        .form-group input[type="number"]:focus,
+        .form-group input[type="text"]:focus,
+        .form-group input[type="password"]:focus {
+            border-color: #4CAF50; /* 聚焦时的边框颜色 */
+        }
+
+        /* 提交按钮样式 */
+        .submit.outstock-submit {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%; /* 宽度为100% */
+        }
+
+        .submit.outstock-submit:hover {
+            background-color: #45a049;
+        }
+
+        /* 错误消息样式 */
+        .error-message {
+            color: red;
+            margin-top: 10px; /* 顶部间距 */
+        }
+
+
     </style>
 </head>
 <body>
@@ -329,6 +462,34 @@
         </form>
     </div>
 </div>
+<!-- 出库模态对话框 -->
+<div id="outstockModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>出库操作</h2>
+        <form id="outstockForm">
+            <input type="hidden" id="outstockId" name="id" value="">
+            <div class="form-group">
+                <label for="outstockQuantity">出库数量:</label>
+                <input type="number" id="outstockQuantity" name="quantity" required>
+            </div>
+            <div class="form-group">
+                <label for="outstockUsername">授权用户名:</label>
+                <input type="text" id="outstockUsername" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="outstockPassword">密码:</label>
+                <input type="password" id="outstockPassword" name="password" required>
+            </div>
+            <input type="button" value="提交" class="submit outstock-submit">
+            <span class="error-message"></span>
+        </form>
+    </div>
+</div>
+
+
+
+
 
 <script src="/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
@@ -588,9 +749,96 @@
                     console.error('Error fetching data:', error);
                 }
             })
-
-
         })
+        // 绑定出库按钮事件
+        $(document).on('click', '.outstock-btn', function() {
+            const id = $(this).data('id'); // 获取按钮上的ID
+            console.log('Outstocking item with ID:', id, typeof id); // 调试信息
+
+            // 显示出库模态对话框
+            $('#outstockModal').show();
+
+            $('.error-message').text("");
+
+            // 设置商品ID
+            $('#outstockId').val(id);
+        });
+
+        // 绑定出库按钮事件
+        $(document).on('click', '.outstock-btn', function() {
+            const id = $(this).data('id'); // 获取按钮上的ID
+            console.log('Outstocking item with ID:', id, typeof id); // 调试信息
+
+            // 显示出库模态对话框
+            $('#outstockModal').show();
+
+            // 清空之前的错误消息
+            $('#outstockModal .error-message').text('');
+
+            // 获取当前商品的数量
+            const currentQuantity = parseFloat($(this).closest('tr').find('td:eq(6)').text());
+            console.log('Current Quantity:', currentQuantity);
+
+            // 绑定出库表单提交事件
+            $('#outstockModal .outstock-submit').off('click').on('click', function() {
+                const outstockQuantity = $('#outstockQuantity').val().trim();
+                console.log('Outstock Quantity:', outstockQuantity);
+
+                // 验证输入是否为纯数字
+                if (!/^\d+$/.test(outstockQuantity)) {
+                    $('#outstockModal .error-message').text('出库数量必须为纯数字');
+                    return;
+                }
+
+                // 将输入转换为数字
+                const quantity = parseInt(outstockQuantity, 10);
+
+                // 验证输入数量是否不大于当前数量
+                if (quantity > currentQuantity) {
+                    $('#outstockModal .error-message').text('出库数量不能大于当前库存数量');
+                    return;
+                }
+
+                // 如果验证通过，发送出库请求
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: 'outstockItem', // 替换为你的出库API端点
+                    method: 'POST',
+                    data: {
+                        id: id,
+                        quantity: quantity,
+                        username: $('#outstockUsername').val(),
+                        password: $('#outstockPassword').val()
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Outstock successful:', response);
+                        if (response.status === 'success')
+                        {
+                            // 关闭模态对话框
+                            $('#outstockModal').hide();
+                            // 刷新当前页面数据
+                            fetchData(currentPage);
+                        }else
+                        {
+                            $('#outstockModal .error-message').text(response.message);
+                        }
+
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error outstocking item:', error);
+                        $('#outstockModal .error-message').text('出库失败，请重试');
+                    }
+                });
+            });
+        });
+
+        // 绑定关闭按钮事件
+        $('#outstockModal .close').click(function() {
+            $('#outstockModal').hide();
+        });
     });
 </script>
 </body>

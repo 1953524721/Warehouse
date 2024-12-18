@@ -28,11 +28,13 @@ class User extends Model
      */
     function getUser(string $name, string $pwd): mixed
     {
-      // 使用链式调用，根据用户名和密码查询数据库中的用户信息
-        // 返回查询结果
-      return $this->where('name', $name)->where('pwd', $pwd)->find();
+        // 根据用户名查询数据库中的用户信息
+        $user = $this->where('name', $name)->find();
 
-
+        if ($user && password_verify($pwd, $user['pwd']))
+        {
+            return $user;
+        }
     }
 
     /**
@@ -117,18 +119,16 @@ class User extends Model
         try {
             if (empty($data))
             {
-                $pwd  = md5('123456789');
-                return Db::name($this->table)->where('id', $id)->update([
-                    'pwd'      => md5($pwd),
-                ]);
+                $pwd = '1234567890';
             }
             else
             {
-                $pwd  = $data['phone_unmber'];
-                return Db::name($this->table)->where('id', $id)->update([
-                    'pwd'      => md5($pwd),
-                ]);
+                $pwd  = $data['phone'];
             }
+            $pwd = password_hash($pwd, PASSWORD_DEFAULT);
+            return Db::name($this->table)->where('id', $id)->update([
+                'pwd'      => $pwd,
+            ]);
 
         } catch (DbException $e) {
             Log::error("更新产品信息时发生错误: " . $e->getMessage());

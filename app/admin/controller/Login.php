@@ -61,22 +61,13 @@ class Login extends BaseController
         }
         // 获取用户提交的用户名和密码
         $name =     $request->post('name');
-        $pwd  = md5($request->post('pwd'));
-
+        $pwd  =     $request->post('pwd');
         // 创建User模型实例，用于处理用户数据
         $userModel = new User();
 
         // 调用User模型的getUser方法，验证用户名和密码
         $user = $userModel->getUser($name, $pwd);
-
-        // 获取服务器IP和应用名称，用于构建后续的URL
-        $serverIp  = $_SERVER['SERVER_ADDR'];
-        $appName   = env('APP_NAME');
-
-        // 构建测试URL，此处简化了实际的URL构建过程
-        $url = 'http://'.$serverIp.'/'.$appName.'/public/index.php/admin/Index/index';
-        //$url = 'https://chuanqify.cn/admin/index/index';
-//        return json($user);
+//        print_r(json_encode($user));
         if (empty($user))
         {
             return json(['status' => 'error', 'message' => '用户名或密码错误']);
@@ -89,7 +80,7 @@ class Login extends BaseController
             // 如果用户信息匹配，将用户信息存入会话
             Session::set('user', $user);
             // 返回登录成功的JSON响应，包括成功消息和测试URL
-            return json(['status' => 'success', 'message' => '登录成功,即将跳转','urls'=>$url]);
+            return json(['status' => 'success', 'message' => '登录成功,即将跳转']);
         }
     }
 }

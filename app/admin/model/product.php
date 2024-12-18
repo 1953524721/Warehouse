@@ -2,6 +2,7 @@
 
 namespace app\admin\model;
 
+use think\console\input\Argument;
 use think\db\exception\DbException;
 use think\facade\Db;
 use think\facade\Log;
@@ -129,6 +130,42 @@ class product extends Model
         } catch (DbException $e) {
             Log::error("更新产品信息时发生错误: " . $e->getMessage());
             return $e->getMessage();
+        }
+    }
+    public function outstockProduct($id, $quantity): array
+    {
+        // 获取当前产品的库存数量
+        $product = $this->findProduct($id);
+
+        if (!$product) {
+            return ['status' => 'error', 'message' => '产品不存在'];
+        }
+
+        // 获取当前库存数量
+        $currentStock = $product['num'];
+
+        // 检查库存是否足够
+        if ($currentStock < $quantity) {
+            return ['status' => 'error', 'message' => '库存不足'];
+        }
+
+        // 计算新的库存数量
+        $newStock = $currentStock - $quantity;
+
+        // 更新数据库中的库存数量
+        try {
+            $result = Db::name($this->table)->where('id', $id)->update([
+                'num' => $newStock
+            ]);
+
+            if ($result) {
+                return ['status' => 'success', 'message' => '出库成功', 'new_stock' => $newStock];
+            } else {
+                return ['status' => 'error', 'message' => '更新库存失败'];
+            }
+        } catch (DbException $e) {
+            Log::error("更新库存时发生错误: " . $e->getMessage());
+            return ['status' => 'error', 'message' => '更新库存时发生错误'];
         }
     }
 }

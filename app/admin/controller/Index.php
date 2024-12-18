@@ -4,8 +4,10 @@ namespace app\admin\controller;
 
 use app\admin\model\city;
 use app\admin\model\product;
+use app\admin\model\User as userModel;
 use app\BaseController;
 use think\App;
+use think\Exception;
 use think\facade\Log;
 use think\facade\Route;
 use think\facade\Session;
@@ -186,14 +188,28 @@ class Index extends BaseController
      }
 
 
+// 显示方法，用于渲染并返回页面，根据用户登录状态决定返回内容
+    /**
+     * 显示页面内容或重定向
+     *
+     * 此方法首先检查用户是否已登录如果用户已登录，它将创建一个城市模型实例，
+     * 获取所有父级城市列表，然后渲染并返回 "show" 视图如果用户未登录，它将重定向到登录页面
+     *
+     * @return string|Redirect 返回渲染后的视图或重定向响应
+     */
     public function show(): string|Redirect
     {
+        // 检查用户是否已登录
         if ($this->isUserLoggedIn())
-        {        $cityModel = new  city();
+        {
+            // 创建城市模型实例
+            $cityModel = new  city();
+            // 获取所有父级城市列表
             $cityList = $cityModel->getCityParentId('0');
 
+            // 获取应用名称
             $appName   = env('APP_NAME');
-            // 渲染并返回 "add" 视图，同时传递应用名称
+            // 渲染并返回 "show" 视图，同时传递应用名称和城市列表
             return View::fetch("show",[
                 'appName'  => $appName,
                 'cityList'=> $cityList
@@ -201,73 +217,112 @@ class Index extends BaseController
         }
         else
         {
+            // 如果用户未登录，则重定向到登录页面
             return $this->redirectToLogin();
         }
-
     }
+
 
     public function pageAll(Request $request)
     {
-        $check = $request->checkToken('__token__');
-        if (false === $check )
-        {
-            return json(['status' => 'error', 'message' => 'token验证失败']);
+        // 验证请求中的token
+        try {
+            $check = $request->checkToken('__token__');
+            if (false === $check) {
+                // 如果token验证失败，返回错误信息
+                return json(['status' => 'error', 'message' => 'token验证失败']);
+            }
 
-        }
-        else
-        {
-            if ($request->isAjax())
-            {
-                $page            = $request->param('page', 1);
-                $pageSize        = $request->param('pageSize', 10);
-                $productionModel = new product();
-                $list            = $productionModel->getProductsALL($page, $pageSize);
-                $total           = $productionModel->getTotalProducts(); // 获取总记录数
+            // 如果是Ajax请求
+            if ($request->isAjax()) {
+                // 获取分页参数并验证
+                $page = $request->param('page', 1);
+                $pageSize = $request->param('pageSize', 10);
 
-                $response   = [
+                // 确保分页参数为正整数
+                if (!is_numeric($page) || !is_numeric($pageSize) || $page < 1 || $pageSize < 1) {
+                    return json(['status' => 'error', 'message' => '分页参数无效']);
+                }
+
+                // 创建产品模型实例
+                $productionModel = new Product();
+
+                // 获取分页产品列表
+                $list = $productionModel->getProductsALL((int)$page, (int)$pageSize);
+
+                // 获取总记录数
+                $total = $productionModel->getTotalProducts();
+
+                // 构建响应数据
+                $response = [
                     'data'  => $list,
                     'total' => $total
                 ];
+
+                // 返回JSON响应
                 return json($response);
             }
+        } catch (\Exception $e) {
+            // 捕获异常并返回错误信息
+            return json(['status' => 'error', 'message' => '系统异常: ' . $e->getMessage()]);
         }
     }
+
+// 删除产品的方法，接收请求并处理删除操作
     public function deleteItem(Request $request): Json
     {
+        // 验证请求中的token
         $check = $request->checkToken();
         if (false === $check)
         {
+            // 如果token验证失败，返回错误信息
             return json(['status' => 'error', 'message' => 'token验证失败']);
         }
+        // 获取要删除的产品ID
         $id = $request->param('id');
+        // 创建产品模型实例
         $productionModel = new product();
+        // 执行删除操作
         $result = $productionModel->destroy($id);
         if ($result)
         {
+            // 如果删除成功，返回成功信息
             return json(['status' => 'success', 'message' => '删除成功']);
         }
         else
         {
+            // 如果删除失败，返回错误信息
             return json(['status' => 'error', 'message' => '删除失败']);
         }
     }
+
+// 获取产品信息的方法，根据请求参数返回相应的产品数据
     public function getItem(Request $request): Json
     {
+        // 验证请求中的token
         $check = $request->checkToken();
         if (false === $check)
         {
+            // 如果token验证失败，返回错误信息
             return json(['status' => 'error', 'message' => 'token验证失败']);
         }
+        // 获取要查询的产品ID
         $id = $request->param('id');
+        // 创建产品模型实例
         $productionModel = new product();
+        // 获取产品数据
         $data = $productionModel->findProduct($id);
+        // 返回产品数据
         return json($data);
     }
+// 更新产品信息的方法，接收请求并处理更新操作
     public function updateItem(Request $request): Json
     {
+        // 验证请求中的token
         $check = $request->checkToken();
         if (false === $check)
         {
+            // 如果token验证失败，返回错误信息
             return json(['status' => 'error', 'message' => 'token验证失败']);
         }
         // 获取表单数据
@@ -286,11 +341,13 @@ class Index extends BaseController
         if ($file) {
             // 检查文件上传是否成功
             if ($file->isValid()) {
+                // 保存上传的文件
                 $saveName = \think\facade\Filesystem::putFile('topic', $file);
+                // 创建产品模型实例
                 $productionModel = new product();
+                // 更新产品数据
                 $data = $productionModel->updateProduct($id, $names, $describe, $models, $brand, $production, $num, $unit, $saveName, $date);
                 // 返回更新结果
-//                return $data;
                 if ($data) {
                     return json(['status' => 'success', 'message' => '更新成功']);
                 } else {
@@ -306,18 +363,82 @@ class Index extends BaseController
             return json(['status' => 'error', 'message' => '没有文件上传']);
         }
     }
-    public function searchItem(Request $request): Json
+    // 出库产品的方法，处理出库操作
+    public function outstockItem(Request $request)
     {
-        $name            = $request->param('search');
-        $page            = $request->param('page', 1);
-        $pageSize        = $request->param('pageSize', 10);
-        $productionModel = new product();
-        $item = $productionModel->getProductsName($page, $pageSize,$name);
-        $total = $productionModel->getTotalProducts();
-        $item = [
-            'data'  => $item,
-            'total' => $total
-        ];
-        return json($item);
+        try {
+            if ($request->isAjax()) {
+                // 验证请求中的token
+                $check = $request->checkToken('__token__');
+                if (false === $check) {
+                    // 如果token验证失败，返回错误信息
+                    return json(['status' => 'error', 'message' => 'token验证失败']);
+                }
+
+                // 获取出库参数
+                $id = $request->param('id');
+                $quantity = $request->param('quantity');
+                $username = $request->param('username');
+                $password = $request->post('password');
+
+                // 参数验证
+                if (empty($id) || empty($quantity) || empty($username) || empty($password)) {
+                    return json(['status' => 'error', 'message' => '缺少必要参数']);
+                }
+
+                if (!is_numeric($id) || !is_numeric($quantity) || $quantity <= 0) {
+                    return json(['status' => 'error', 'message' => '参数格式不正确']);
+                }
+
+                // 密码处理
+                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+                // 获取用户模型实例
+                $userModel = $this->userModel();
+
+                // 验证用户身份
+                $userdata = $userModel->getUser($username, $hashedPassword);
+                if ($userdata) {
+                    // 创建产品模型实例
+                    $productionModel = new Product();
+
+                    // 执行出库操作
+                    $data = $productionModel->outstockProduct($id, $quantity);
+
+                    // 返回出库结果
+                    return json($data);
+                } else {
+                    // 如果用户身份验证失败，返回错误信息
+                    return json(['status' => 'error', 'message' => '用户名或密码错误']);
+                }
+            }
+        } catch (\PDOException $e) {
+            // 数据库相关异常
+            return json(['status' => 'error', 'message' => '数据库操作失败: ' . $e->getMessage()]);
+        } catch (\Exception $e) {
+            // 其他异常
+            return json(['status' => 'error', 'message' => '系统错误: ' . $e->getMessage()]);
+        }
+    }
+
+
+    // 获取用户模型实例的方法
+    public function userModel(): userModel
+    {
+        // 返回新的用户模型实例
+        return new userModel();
+    }
+    public function test()
+    {
+
+        // 创建密码散列
+        $hash = password_hash('111111', PASSWORD_DEFAULT);
+        // 验证密码
+        $password = '111111'; // 用户输入的密码
+        if (password_verify($password, $hash)) {
+            echo "密码验证通过".$hash;
+        } else {
+            echo "密码验证失败";
+        }
     }
 }
