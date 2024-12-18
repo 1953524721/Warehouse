@@ -78,14 +78,29 @@ class product extends Model
                  ->select();
         return $list;
     }
-    public function getProductsName($page, $pageSize, $name): array|\think\Collection
+    public function getProductsName($page, $pageSize, $name, $production): array|\think\Collection
+    {
+        $query = Db::table($this->table)
+                   ->order('id', 'desc')
+                   ->where('names', 'like', '%' . $name . '%');
+
+        if (is_array($production)) {
+            $query->whereIn('production', $production);
+        } else {
+            $query->where('production', $production);
+        }
+
+        return $query->page($page, $pageSize)
+                      ->select();
+    }
+
+    public function getProductsCount($name , $production): int
     {
         $list = Db::table($this->table)
-                  ->order('id', 'desc')
-                  ->where('names', 'like', '%' . $name . '%')
-                  ->page($page, $pageSize)
-                  ->select();
-        return $list;
+            ->where('names', 'like', '%' . $name . '%')
+            ->where('production', $production)
+            ->select();
+        return count($list);
     }
 
 

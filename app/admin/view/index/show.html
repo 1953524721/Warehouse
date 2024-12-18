@@ -386,7 +386,21 @@
             color: red;
             margin-top: 10px; /* 顶部间距 */
         }
-
+        .productions {
+            width: 200px;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            appearance: none; /* 移除默认样式 */
+            -webkit-appearance: none; /* 移除 WebKit 浏览器的默认样式 */
+            -moz-appearance: none; /* 移除 Firefox 的默认样式 */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="#333" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 10px 10px;
+            cursor: pointer;
+        }
 
     </style>
 </head>
@@ -394,7 +408,12 @@
 <div id="app">
     <input type="hidden" name="__token__" value="{:token()}" />
     <div>
-        <input type="text" id="searchInput" placeholder="输入名称搜索"></input>
+        <input type="text" id="searchInput" placeholder="输入名称搜索">
+        <select name="production" id="" class="productions">
+            {volist name='cityList' id='city'}
+            <option value="{$city.city_name}">{$city.city_name} </option>
+            {/volist}
+        </select>
         <input type="button" value="搜索" id="searchButton"  class="searchButton">
     </div>
     <table>
@@ -702,11 +721,12 @@
 
         $('.searchButton').click(function () {
 
-            const search = $('#searchInput').val();
-            if (search.length ==='0')
-            {
-                return false
+            const search      = $('#searchInput').val();
+            const productions = $('.productions').val();
+            if (search.length === 0) {
+                return false;
             }
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -714,42 +734,59 @@
                 url: 'searchItem',
                 type: 'post',
                 data: {
-                    search: search
+                    search: search,
+                    productions: productions
                 },
                 dataType: 'json',
                 success: function (response) {
-                    console.log(response)
+                    console.log(response); // 打印整个响应对象以进行调试
+
+                    if (!response || !response.data || !Array.isArray(response.data)) {
+                        console.error('Invalid response format or missing data:', response);
+                        return;
+                    }
                     $('#data-table').empty();
-                    response.data.forEach(function(item) {
-                        //console.log('Item ID:', item.id, typeof item.id); // 调试信息
-                        $('#data-table').append(`                        <tr>
-                            <td>${item.id}</td>
-                            <td>${item.names}</td>
-                            <td>${item.describe}</td>
-                            <td>${item.models}</td>
-                            <td>${item.brand}</td>
-                            <td>${item.production}</td>
-                            <td>${item.num}</td>
-                            <td>${item.unit}</td>
-                            <td>
-<!--                                <img src="/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">-->
-                                <img src="/{$appName}/public/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">
-                            </td>
-                            <td>${item.add_date}</td>
-                            <td>
-                                <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
-                                <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
-                                <input type="button" value="出库" class="outstock-btn" data-id="${item.id}">
-                            </td>
+                    const total = response.total;
+
+                    if (total === 0) {
+                        // 如果 total 为 0，显示一行“未查询到数据”
+                            $('#data-table').empty().append(`             <tr>
+                            <td colspan="10" style="text-align: center;">未查询到数据</td>
                         </tr>
                     `);
+                            }
+
+                        response.data.forEach(function(item) {
+                        console.log('Item ID:', item.id, typeof item.id); // 调试信息
+                        $('#data-table').append(`
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.names}</td>
+                                <td>${item.describe}</td>
+                                <td>${item.models}</td>
+                                <td>${item.brand}</td>
+                                <td>${item.production}</td>
+                                <td>${item.num}</td>
+                                <td>
+                                    <img src="/{$appName}/public/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">
+                                </td>
+                                <td>${item.add_date}</td>
+                                <td>
+                                    <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
+                                    <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
+                                    <input type="button" value="出库" class="outstock-btn" data-id="${item.id}">
+                                </td>
+                            </tr>
+                        `);
                     });
-                }
-                , error: function (xhr, status, error) {
+                },
+                error: function (xhr, status, error) {
                     console.error('Error fetching data:', error);
                 }
-            })
-        })
+
+            });
+        });
+
         // 绑定出库按钮事件
         $(document).on('click', '.outstock-btn', function() {
             const id = $(this).data('id'); // 获取按钮上的ID

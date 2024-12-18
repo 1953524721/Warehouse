@@ -221,6 +221,21 @@ class Index extends BaseController
             return $this->redirectToLogin();
         }
     }
+    public function searchItem(Request $request): Json
+    {
+        $page         = $request->param('page', 1);
+        $pageSize     = $request->param('pageSize', 10);
+        $name         = $request->param('search');
+        $productions  = $request->param('productions');
+        $productionModel = new product();
+        $list  = $productionModel->getProductsName($page, $pageSize, $name , $productions);
+        $total = $productionModel->getProductsCount($name, $productions);
+        $response = [
+            'data'  => $list,
+            'total' => $total
+        ];
+         return json($response);
+    }
 
 
     public function pageAll(Request $request)
@@ -236,7 +251,7 @@ class Index extends BaseController
             // 如果是Ajax请求
             if ($request->isAjax()) {
                 // 获取分页参数并验证
-                $page = $request->param('page', 1);
+                $page     = $request->param('page', 1);
                 $pageSize = $request->param('pageSize', 10);
 
                 // 确保分页参数为正整数
