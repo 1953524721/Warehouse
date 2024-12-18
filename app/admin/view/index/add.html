@@ -87,7 +87,9 @@
         input[type="reset"]:hover {
             background-color: #45a049;
         }
-
+        .input-height {
+            height: 40px; /* 假设输入框的高度是 34px */
+        }
         /* 错误信息样式 */
         .error-message {
             color: red;
@@ -118,7 +120,7 @@
             <tr>
                 <td>生产地:</td>
                 <td>
-                    <select name="production" id="" class="production">
+                    <select name="production" id="" class="production input-height">
                         {volist name='cityList' id='cityList'}
                         <option value="{$cityList.city_name}">{$cityList.city_name} </option>
                         {/volist}

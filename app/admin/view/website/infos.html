@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>网站信息</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid black;
+        }
+        th {
+            text-align: left;
+            padding: 8px;
+            background-color: #f2f2f2;
+        }
+        td {
+            border-bottom: 1px solid black;
+            padding: 8px;
+        }
+        tr:last-child td {
+            border-bottom: none; /* 去掉最后一行的底部边框 */
+        }
+        .second-table {
+            margin-top: 20px; /* 调整这个值以改变间距 */
+        }
+
+    </style>
+</head>
+<body>
+    <h1>网站信息</h1>
+    <div class="clearfix">
+        <table>
+            <tr>
+                <th colspan="2">基础信息</th>
+            </tr>
+            <tr>
+                <td>运行系统:</td>
+                <td>{$uname}</td>
+            </tr>
+            <tr>
+                <td>数据库服务器版本:</td>
+                <td>{$version}</td>
+            </tr>
+            <tr>
+                <td>数据库服务器类型:</td>
+                <td>{$serverType}</td>
+            </tr>
+            <tr>
+                <td>数据库字符集:</td>
+                <td>{$charset}</td>
+            </tr>
+            <tr>
+                <td>数据库排序规则:</td>
+                <td>{$collation}</td>
+            </tr>
+        </table>
+
+        <table class="second-table">
+            <tr>
+                <th colspan="2">网站服务器</th>
+            </tr>
+            <tr>
+                <td>网站服务器:</td>
+                <td>{$webServerType}</td>
+            </tr>
+            <tr>
+                <td>PHP 版本:</td>
+                <td>{$phpVersion}</td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+<script src="/static/jquery-3.7.1.js"></script>
+<script type="text/javascript">
+
+</script>
+</html>

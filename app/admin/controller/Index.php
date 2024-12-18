@@ -189,10 +189,14 @@ class Index extends BaseController
     public function show(): string|Redirect
     {
         if ($this->isUserLoggedIn())
-        {
-            $appName = env("APP_NAME");
+        {        $cityModel = new  city();
+            $cityList = $cityModel->getCityParentId('0');
+
+            $appName   = env('APP_NAME');
+            // 渲染并返回 "add" 视图，同时传递应用名称
             return View::fetch("show",[
-                'appName' => $appName
+                'appName'  => $appName,
+                'cityList'=> $cityList
             ]);
         }
         else

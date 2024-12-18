@@ -57,7 +57,9 @@
             margin: 5% auto; /* 上下居中 */
             padding: 20px; /* 内边距 */
             border: 1px solid #888; /* 边框 */
-            width: 80%; /* 宽度 */
+            width: 30%; /* 宽度调整为60% */
+            max-height: 80vh; /* 最大高度为视口高度的80% */
+            overflow-y: auto; /* 内容超出时可滚动 */
         }
 
         .close {
@@ -250,6 +252,9 @@
         #productForm .submit[type="button"]:hover {
             background-color: #218838;
         }
+        .input-height {
+            height: 40px; /* 假设输入框的高度是 34px */
+        }
     </style>
 </head>
 <body>
@@ -304,7 +309,13 @@
             <label for="brand">品牌:</label>
             <input type="text" id="brand" name="brand" value=""><br>
             <label for="production">产地:</label>
-            <input type="text" id="production" name="production" value=""><br>
+            <select name="production" id="" class="production input-height">
+                {volist name='cityList' id='cityList'}
+                <option value="{$cityList.city_name}">{$cityList.city_name} </option>
+                {/volist}
+            </select>
+<!--            <input type="text" id="production" name="production" value="">-->
+            <br>
             <label for="num">数量:</label>
             <input type="text" id="num" name="num" value=""><br>
             <label for="unit">单位:</label>
