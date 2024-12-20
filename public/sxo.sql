@@ -11,7 +11,7 @@
  Target Server Version : 100432 (10.4.32-MariaDB)
  File Encoding         : 65001
 
- Date: 17/12/2024 14:59:08
+ Date: 21/12/2024 00:10:33
 */
 
 SET NAMES utf8mb4;
@@ -4121,7 +4121,7 @@ CREATE TABLE `product`  (
   `flier` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '封面',
   `add_date` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 433 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 434 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of product
@@ -4544,8 +4544,9 @@ INSERT INTO `product` VALUES (427, '华为Mate70 XT', '华为Mate70RS XRT', 'PLU
 INSERT INTO `product` VALUES (428, 'Mate x6', '华为Mate70X6', 'PLU-1123123', '华为', '北京市', '999999', '个', 'topic/20241202\\ef874435f45a178d3d75d2025ac3d210.jpg', '2024-12-02 14:45:37');
 INSERT INTO `product` VALUES (429, 'Mate x6', '华为Mate70X6', 'PLU-1123123', '华为', '北京市', '999999', '个', 'topic/20241202\\ef874435f45a178d3d75d2025ac3d210.jpg', '2024-12-02 19:25:58');
 INSERT INTO `product` VALUES (430, 'MAC', 'iphone', 'MAC', 'iphone', '北京市', '123', '件', 'topic/20241202\\ef874435f45a178d3d75d2025ac3d210.jpg', '2024-12-02 19:09:27');
-INSERT INTO `product` VALUES (431, 'MAC MINI', 'MAC', 'M4', 'iphone', '北京市', '123123', '件', 'topic/20241202\\ef874435f45a178d3d75d2025ac3d210.jpg', '2024-12-02 19:22:04');
-INSERT INTO `product` VALUES (432, 'TEST', 'TEST', 'TEST', 'TEST', '北京市', '3123', '个', 'topic/20241217\\bb79739a4aa017e145438184a794dc6b.jpg', '2024-12-17 14:18:09');
+INSERT INTO `product` VALUES (431, 'MAC MINI', 'MAC', 'M4', 'iphone', '北京市', '123000', '件', 'topic/20241202\\ef874435f45a178d3d75d2025ac3d210.jpg', '2024-12-02 19:22:04');
+INSERT INTO `product` VALUES (432, 'TEST', 'TEST', 'TEST', 'TEST', '天津市', '3123', '个', 'topic/20241218\\61e66804a984f321e669d0e1626b23cc.png', '2024-12-18 20:42:13');
+INSERT INTO `product` VALUES (433, '测试专用', '测试专用', '测试专用', '测试专用', '北京市', '123455', '个', 'topic/20241218\\6f05ba9bdeebfa336458f82065c5d17b.jpg', '2024-12-18 20:45:02');
 
 -- ----------------------------
 -- Table structure for unit
@@ -4572,8 +4573,8 @@ INSERT INTO `unit` VALUES (4, '台', '2024-12-17 10:50:39');
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user`  (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用户名',
-  `pwd` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '密码',
+  `name` char(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用户名',
+  `pwd` char(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '密码',
   `state` int UNSIGNED NULL DEFAULT 1 COMMENT '状态：1为正常，0为禁止登录',
   `date` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`id`) USING BTREE
@@ -4582,22 +4583,22 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 'admin', '96e79218965eb72c92a549dd5a330112', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (2, '张三', '1', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (3, '张麻子', '1', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (4, '汤师爷', '70873e8580c9900986939611618d7b1e', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (5, '县长夫人', '1', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (6, '是武智冲', '70873e8580c9900986939611618d7b1e', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (7, '胡万', '70873e8580c9900986939611618d7b1e', 1, '2024-12-02 15:39:46');
-INSERT INTO `user` VALUES (8, '老六', '1', 1, '2024-12-02 15:39:45');
-INSERT INTO `user` VALUES (9, '花姐', '96e79218965eb72c92a549dd5a330112', 1, '2024-11-29 14:20:41');
-INSERT INTO `user` VALUES (10, '老三', '70873e8580c9900986939611618d7b1e', 0, '2024-12-14 16:28:14');
-INSERT INTO `user` VALUES (11, '老二', '70873e8580c9900986939611618d7b1e', 0, '2024-12-14 16:28:14');
-INSERT INTO `user` VALUES (12, '老四', '1', 0, '2024-12-14 16:28:13');
-INSERT INTO `user` VALUES (13, '老五', 'e3ceb5881a0a1fdaad01296d7554868d', 0, '2024-12-14 16:28:12');
-INSERT INTO `user` VALUES (14, '胡千', '96e79218965eb72c92a549dd5a330112', 1, '2024-12-14 16:28:11');
-INSERT INTO `user` VALUES (15, '跑腿1', 'e3ceb5881a0a1fdaad01296d7554868d', 1, '2024-12-14 16:28:10');
-INSERT INTO `user` VALUES (16, '老汤22', '70873e8580c9900986939611618d7b1e', 1, '2024-12-02 19:26:50');
+INSERT INTO `user` VALUES (1, 'admin', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 1, '2024-11-29 14:20:41');
+INSERT INTO `user` VALUES (2, '张三', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 1, '2024-11-29 14:20:41');
+INSERT INTO `user` VALUES (3, '张麻子', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 1, '2024-11-29 14:20:41');
+INSERT INTO `user` VALUES (4, '汤师爷', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 1, '2024-11-29 14:20:41');
+INSERT INTO `user` VALUES (5, '县长夫人', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 1, '2024-11-29 14:20:41');
+INSERT INTO `user` VALUES (6, '是武智冲', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 1, '2024-11-29 14:20:41');
+INSERT INTO `user` VALUES (7, '胡万', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 0, '2024-12-17 23:25:25');
+INSERT INTO `user` VALUES (8, '老六', '$2y$10$y267zQT9PNI0LsGwdU7r8upWrVSNt8P7I.XMW9tDdQdM5xZeZGstS', 1, '2024-12-17 23:25:40');
+INSERT INTO `user` VALUES (9, '花姐', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 1, '2024-11-29 14:20:41');
+INSERT INTO `user` VALUES (10, '老三', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 0, '2024-12-14 16:28:14');
+INSERT INTO `user` VALUES (11, '老二', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 0, '2024-12-14 16:28:14');
+INSERT INTO `user` VALUES (12, '老四', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 0, '2024-12-14 16:28:13');
+INSERT INTO `user` VALUES (13, '老五', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 1, '2024-12-18 15:41:14');
+INSERT INTO `user` VALUES (14, '胡千', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 1, '2024-12-14 16:28:11');
+INSERT INTO `user` VALUES (15, '跑腿1', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 1, '2024-12-14 16:28:10');
+INSERT INTO `user` VALUES (16, '老汤', '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi', 1, '2024-12-02 19:26:50');
 
 -- ----------------------------
 -- Table structure for user_info
@@ -4622,7 +4623,7 @@ CREATE TABLE `user_info`  (
 -- ----------------------------
 -- Records of user_info
 -- ----------------------------
-INSERT INTO `user_info` VALUES (1, '张牧之', '北京荣耀有限公司', 1, '13311110000', '23', 1, '110123199810233981', '仓库管理部', '2024-12-17 10:34:16', '1231243@qq.com', '管理');
+INSERT INTO `user_info` VALUES (1, '张牧之', '北京荣耀有限公司', 1, '13311110000', '1', 1, '110123199810233981', '仓库管理部', '2024-12-20 23:40:41', '1231243@qq.com', '管理');
 INSERT INTO `user_info` VALUES (2, '汤师爷', '北京荣耀有限公司', 4, '13311110000', '1', 1, '110123199810233981', '仓库管理部', '2024-12-14 17:41:28', '123123@qq.com', '管理');
 
 -- ----------------------------
