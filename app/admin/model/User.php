@@ -31,11 +31,26 @@ class User extends Model
         // 根据用户名查询数据库中的用户信息
         $user = $this->where('name', $name)->find();
 
-        if ($user && password_verify($pwd, $user['pwd']))
-        {
-            return $user;
+        if ($user) {
+            // 将用户输入的密码和存储的哈希写入日志以进行调试
+            Log::debug("输入Password: " . $pwd);
+            Log::debug("计算 Hash: " . $user['pwd']);
+
+            if (password_verify($pwd, $user['pwd'])) {
+                return $user;
+            } else {
+                Log::debug("Password verification failed.");
+                return null;
+            }
+        } else {
+            // 将用户输入的密码和存储的哈希写入日志以进行调试
+            Log::debug("输入Password: " . $pwd);
+            Log::debug("计算 Hash: " . $user);
+            Log::debug("User not found.");
+            return null;
         }
     }
+
 
     /**
      * 根据用户ID查找用户信息
@@ -119,15 +134,15 @@ class User extends Model
         try {
             if (empty($data))
             {
-                $pwd = '1234567890';
+                $pwd = '111111111';
             }
             else
             {
                 $pwd  = $data['phone'];
             }
-            $pwd = password_hash($pwd, PASSWORD_DEFAULT);
+            $hashedPassword = password_hash($pwd, PASSWORD_BCRYPT);
             return Db::name($this->table)->where('id', $id)->update([
-                'pwd'      => $pwd,
+                'pwd'      => $hashedPassword,
             ]);
 
         } catch (DbException $e) {

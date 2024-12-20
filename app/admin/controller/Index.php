@@ -347,14 +347,15 @@ class Index extends comm
                 }
 
                 // 密码处理
-                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+                //$hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
                 // 获取用户模型实例
                 $userModel = $this->userModel();
 
                 // 验证用户身份
-                $userdata = $userModel->getUser($username, $hashedPassword);
-                if ($userdata) {
+                $userdata = $userModel->getUser($username, $password);
+                if ($userdata)
+                {
                     // 创建产品模型实例
                     $productionModel = new Product();
 
@@ -381,7 +382,16 @@ class Index extends comm
     // 获取用户模型实例的方法
     public function userModel(): userModel
     {
-        // 返回新的用户模型实例
         return new userModel();
+    }
+    public function test()
+    {
+        $pwd = '111111';
+        $newPwd = '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi';
+        if (password_verify($pwd, $newPwd)) {
+            echo '密码正确';
+        } else {
+            echo '密码错误';
+        }
     }
 }
