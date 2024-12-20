@@ -5,6 +5,9 @@ namespace app\admin\controller;
 
 use app\BaseController;
 use think\captcha\facade\Captcha;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\DbException;
+use think\db\exception\ModelNotFoundException;
 use think\Request;
 use think\facade\View;
 use app\admin\model\User;
@@ -46,6 +49,9 @@ class Login extends BaseController
      *
      * @param Request $request 用户登录请求对象，包含用户名和密码
      * @return Json 返回一个JSON对象，包含登录状态和消息
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
     public function loginDo(Request $request): Json
     {

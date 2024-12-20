@@ -6,7 +6,7 @@ use app\BaseController;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-class Email extends BaseController
+class Email extends comm
 {
     /**
      * 发送电子邮件

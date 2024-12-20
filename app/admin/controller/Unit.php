@@ -7,7 +7,7 @@ use app\admin\model\Unit as UnitModel;
 use think\Request;
 use think\facade\View;
 
-class Unit extends BaseController
+class Unit extends comm
 {
     public function unitPage(): string
     {

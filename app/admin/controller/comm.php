@@ -9,6 +9,11 @@ use think\response\Redirect;
 
 class comm extends BaseController
 {
+    /**
+     * 构造函数，初始化用户验证
+     *
+     * @param App $app 应用实例，用于访问应用级别的服务和配置
+     */
     public function __construct(App $app)
     {
         $this->app = $app;
@@ -20,6 +25,12 @@ class comm extends BaseController
             $this->redirectToLogin();
         }
     }
+
+    /**
+     * 检查用户是否已登录
+     *
+     * @return bool 如果用户已登录，返回true；否则返回false
+     */
     protected function isUserLoggedIn(): bool
     {
         try {
@@ -31,15 +42,17 @@ class comm extends BaseController
             return false;
         }
     }
+
+
+
+    /**
+     * 重定向用户到登录页面
+     *
+     * @return Redirect 生成重定向到登录页面的响应
+     */
     protected function redirectToLogin(): Redirect
     {
-        // 获取服务器IP和应用名称，用于构建后续的URL
-        $serverIp  = $_SERVER['SERVER_ADDR'];
-        $appName   = env('APP_NAME');
-
-        // 构建测试URL，此处简化了实际的URL构建过程
-        $url = 'http://'.$serverIp.'/'.$appName.'/public/index.php/admin/Login/login';
-
+        $url = url('admin/Login/login');
         return redirect($url);
     }
 }

@@ -9,7 +9,7 @@ use think\facade\Session;
 use think\facade\View;
 use app\admin\model\Website as WebsiteModel;
 
-class Website extends BaseController
+class Website extends comm
 {
     public function websiteInfo(): \think\response\Json|string
     {

@@ -17,7 +17,7 @@ use think\Request;
 use think\response\Json;
 
 
-class User extends BaseController
+class User extends comm
 {
     /**
      * 首页方法，返回渲染后的首页视图

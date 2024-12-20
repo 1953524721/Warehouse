@@ -11,7 +11,7 @@ use think\facade\Session;
 use think\facade\View;
 use think\response\Json;
 
-class Userinfo extends BaseController
+class Userinfo extends comm
 {
     public function updateUser(Request $request): \think\response\Json
     {
