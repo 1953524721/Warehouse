@@ -15,7 +15,7 @@ namespace think;
 require __DIR__ . '/../vendor/autoload.php';
 
 $date = date('Y-m-d H:i:s');
-if ($date>='2024-12-30 13:13:35')
+if ($date>='2025-12-30 13:13:35')
 {
     echo '<h1>程序已过期，请联系管理员</h1>';
 }

@@ -26,6 +26,7 @@ class User extends comm
      */
     public function index(): string
     {
+        $browse = $this->getLog();
         $appName = env("APP_NAME");
         return View::fetch("index",[
             'appName' => $appName,
@@ -37,6 +38,9 @@ class User extends comm
      *
      * @param Request $request 请求对象，用于判断是否为Ajax请求并获取分页参数
      * @return Json 返回用户信息的JSON格式数据
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
     public function userPageAll(Request $request): Json
     {
@@ -198,7 +202,7 @@ class User extends comm
     }
     public function addUser(): string
     {
-
+        $browse = $this->getLog();
         $appName = env("APP_NAME");
         return View::fetch("add",[
             'appName' => $appName,

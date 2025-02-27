@@ -13,6 +13,7 @@ class Website extends comm
 {
     public function websiteInfo(): \think\response\Json|string
     {
+        $browse = $this->getLog();
         try {
             if (!$this->isUserLoggedIn())
             {
@@ -70,6 +71,7 @@ class Website extends comm
     }
     public function infos(): string
     {
+        $browse = $this->getLog();
         // 获取数据库版本信息
         $dbVersion = Db::query("SELECT VERSION() AS version");
         $version = $dbVersion[0]['version'];
@@ -111,6 +113,4 @@ class Website extends comm
 
         return View::fetch('infos');
     }
-
-
 }

@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/font-waesome.css">
+    <link rel="stylesheet" href="/{$appName}/public/static/font-waesome.css">
     <title>{$appName}管理页面</title>
     <style>
         body {
@@ -63,6 +66,14 @@
             padding: 20px;
             margin-top: 50px; /* 调整内容区域的顶部边距以避免被置顶导航遮挡 */
         }
+        #service-content {
+            display: grid;
+            place-items: center; /* 水平和垂直居中 */
+            height: 30vh; /* 使高度占满整个视口 */
+            margin-top: 50px; /* 调整顶部边距以避免被置顶导航遮挡 */
+        }
+
+
 
         #welcome-right {
             font-size: 18px;
@@ -114,10 +125,50 @@
             width: 100%;
             padding: 0 20px;
         }
-
-        #service-content {
-            margin-top: 50px; /* 添加这行代码 */
+        .ajax-link::before {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-right: 8px;
         }
+
+        .user-info::before {
+            content: '\f007'; /* fa-user 图标 */
+        }
+
+        .add-user::before {
+            content: '\f234'; /* fa-user-plus 图标 */
+        }
+
+        .user-query::before {
+            content: '\f002'; /* fa-search 图标 */
+        }
+
+        .add-product::before {
+            content: '\f067'; /* fa-cart-plus 图标 */
+        }
+
+        .view-product::before {
+            content: '\f07a'; /* fa-list 图标 */
+        }
+
+        .unit-maintenance::before {
+            content: '\f0ae'; /* fa-cubes 图标 */
+        }
+
+        .icp-maintenance::before {
+            content: '\f0ac'; /* fa-info-circle 图标 */
+        }
+
+        .visit-log::before {
+            content: '\f0c0'; /* fa-chart-bar 图标 */
+        }
+
+        .website-info::before {
+            content: '\f0ac'; /* fa-info-circle 图标 */
+        }
+
+
+
     </style>
 </head>
 <body>
@@ -128,49 +179,64 @@
             <button id="logout-button">退出</button>
         </div>
 </div>
-<div id="sidebar">
-    <ul>
-        <li>
-            <a href="javascript:void(0)">用户管理</a>
-            <ul class="sub-menu">
-                <li>
-                    <a class="ajax-link" href="{:url('Userinfo/getUser')}">我的信息</a>
-                    <a class="ajax-link" href="{:url('User/addUser')}">添加用户</a>
-                    <a class="ajax-link" href="{:url('User/index')}">用户查询</a>
-                </li>
-            </ul>
-        </li>
-    </ul>
-    <ul>
-        <li>
-            <a href="javascript:void(0)">商品管理</a>
-            <ul class="sub-menu">
-                <li>
-                    <a class="ajax-link" href="{:url('Index/add')}">添加商品</a>
-                    <a class="ajax-link" href="{:url('Index/show')}">查看商品</a>
-                </li>
-            </ul>
-        </li>
-    </ul>
-    <ul>
-        <li>
-            <a href="javascript:void(0)">网站管理</a>
-            <ul class="sub-menu">
-                <li>
-                    <a class="ajax-link" href="{:url('Unit/unitPage')}">库存单位维护</a>
-                    <a class="ajax-link" href="{:url('Website/websiteInfo')}">ICP维护</a>
-                    <a class="ajax-link" href="{:url('Website/infos')}">网站信息</a>
-                </li>
-            </ul>
-        </li>
-    </ul>
-</div>
+    <div id="sidebar">
+        <ul>
+            <li>
+                <a href="javascript:void(0)">用户管理 <span class="arrow"></span> </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a class="ajax-link user-info" href="{:url('Userinfo/getUser')}">我的信息</a>
+                        <a class="ajax-link add-user" href="{:url('User/addUser')}">添加用户</a>
+                        <a class="ajax-link user-query" href="{:url('User/index')}">用户查询</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <a href="javascript:void(0)">商品管理 </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a class="ajax-link add-product" href="{:url('Index/add')}">添加商品</a>
+                        <a class="ajax-link view-product" href="{:url('Index/show')}">查看商品</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <a href="javascript:void(0)">网站管理  </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a class="ajax-link unit-maintenance" href="{:url('Unit/unitPage')}">库存单位维护</a>
+                        <a class="ajax-link icp-maintenance" href="{:url('Website/websiteInfo')}">ICP维护</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <a href="javascript:void(0)">网站统计 </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a class="ajax-link visit-log" href="{:url('Browse/showBrowse')}">访问日志</a>
+                        <a class="ajax-link website-info" href="{:url('Website/infos')}">网站信息</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+
+
+
 <div id="content"></div>
 <div id="service-content"></div>
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
-<!--<script src="/static/jquery-3.7.1.js"></script>-->
+<script src="/static/jquery-3.7.1.js"></script>
 <script>
 $(document).ready(function() {
+
     // 缓存 DOM 元素
     const $sidebarLinks = $('#sidebar > ul > li > a');
     const $sidebarSubMenu = $('.sub-menu');
@@ -198,11 +264,14 @@ $(document).ready(function() {
     // 展开和折叠子菜单
     $sidebarLinks.click(function(e) {
         const subMenu = $(this).next('.sub-menu');
+        const arrow = $(this).find('.arrow');
 
         if (subMenu.is(':visible')) {
             subMenu.slideUp();
+            arrow.css('transform', 'rotate(90deg)'); // 向左
         } else {
             subMenu.slideDown();
+            arrow.css('transform', 'rotate(180deg)'); // 向下
         }
     });
 
@@ -303,13 +372,13 @@ $(document).ready(function() {
     $('#logout-button').click(function() {
         console.log('退出按钮被点击');
         $.ajax({
-            url: '/{$appName}/public/index.php/admin/User/logout',
+            url: '{:url("admin/User/logout")}',
             type: 'POST',
             dataType: 'json',
             success: function(response) {
                 if (response.status === 'success') {
                     // 退出成功，重定向到登录页面
-                    window.location.href = '/{$appName}/public/index.php/admin/login/login';
+                    window.location.href = "{:url('admin/login/login')}";
                 } else {
                     // 退出失败，显示错误信息
                     alert(response.message);
@@ -317,10 +386,9 @@ $(document).ready(function() {
             }
         })
         // 这里可以添加退出逻辑，例如重定向到登录页面
-        window.location.href = "/{$appName}/public/index.php/admin/login/login";
+        window.location.href = "{:url('admin/login/login')}";
     });
 });
-
 
     </script>
 </body>

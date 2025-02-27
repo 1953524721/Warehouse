@@ -37,6 +37,7 @@ class Userinfo extends comm
     }
     public function getUser(): string
     {
+        $browse = $this->getLog();
         $cityModel     = new cityModel();
         $cityList      = $cityModel->getCityParentId('0');
         $cityList      = json_encode($cityList);

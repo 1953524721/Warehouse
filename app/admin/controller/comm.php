@@ -5,6 +5,7 @@ namespace app\admin\controller;
 use app\BaseController;
 use think\App;
 use think\facade\Session;
+use think\Request;
 use think\response\Redirect;
 
 class comm extends BaseController
@@ -12,16 +13,14 @@ class comm extends BaseController
     /**
      * 构造函数，初始化用户验证
      *
-     * @param App $app 应用实例，用于访问应用级别的服务和配置
      */
-    public function __construct(App $app)
+    public function __construct()
     {
-        $this->app = $app;
-        parent::__construct($this->app);
+
+        parent::__construct(app());
 
         // 检查用户是否已登录，未登录则重定向到登录页面
-        if (!$this->isUserLoggedIn())
-        {
+        if (!$this->isUserLoggedIn()) {
             $this->redirectToLogin();
         }
     }
@@ -55,4 +54,6 @@ class comm extends BaseController
         $url = url('admin/Login/login');
         return redirect($url);
     }
+
+
 }

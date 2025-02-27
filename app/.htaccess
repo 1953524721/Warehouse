@@ -1,12 +1,1 @@
-<IfModule mod_rewrite.c>
-  Options +FollowSymlinks -Multiviews
-  RewriteEngine On
-
-  # 检查当前日期是否大于 20241231
-  RewriteCond %{TIME_YEAR}%{TIME_MON}%{TIME_DAY} >20241230
-  RewriteRule ^ - [F,L]
-
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteRule ^(.*)$ index.php/$1 [QSA,PT,L]
-</IfModule>
+deny from all

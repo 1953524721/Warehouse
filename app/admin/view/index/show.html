@@ -406,12 +406,14 @@
 </head>
 <body>
 <div id="app">
+
     <input type="hidden" name="__token__" value="{:token()}" />
+    <input type="hidden" name="appName" value="{$appName}" />
     <div>
-        <input type="text" id="searchInput" placeholder="输入名称搜索">
-        <select name="production" id="" class="productions">
+        <label for="searchInput"></label><input type="text" id="searchInput" placeholder="输入名称搜索">
+        <select name="production" id="production" class="productions">
             {volist name='cityList' id='city'}
-            <option value="{$city.city_name}">{$city.city_name} </option>
+                <option value="{$city.city_name}">{$city.city_name} </option>
             {/volist}
         </select>
         <input type="button" value="搜索" id="searchButton"  class="searchButton">
@@ -510,7 +512,6 @@
 
 
 
-<script src="/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
     $.ajaxSetup({
         beforeSend: function(xhr) {
@@ -524,53 +525,122 @@
     });
 
     $(document).ready(function() {
-
         let currentPage = 1;
         const pageSize = 10; // 每页显示的记录数
         let totalPages = 1; // 总页数
+        let currentSearch = ''; // 用于存储当前的搜索条件
+        let currentProductions = ''; // 用于存储当前的生产地条件
 
-        function fetchData(page) {
+        // 初始化加载第一页数据
+        fetchData(currentPage);
+
+        // 搜索按钮点击事件
+        $('.searchButton').click(function () {
+            currentSearch = $('#searchInput').val();
+            currentProductions = $('.productions').val();
+
+            if (currentSearch.length === 0) {
+                fetchData(currentPage);
+            } else {
+                fetchData(currentPage, currentSearch, currentProductions);
+            }
+        });
+
+        // 首页按钮点击事件
+        $('.one').click(function() {
+            currentPage = 1;
+            fetchData(currentPage, currentSearch, currentProductions);
+        });
+
+        // 上一页按钮点击事件
+        $('.up').click(function() {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchData(currentPage, currentSearch, currentProductions);
+            }
+        });
+
+        // 下一页按钮点击事件
+        $('.down').click(function() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                fetchData(currentPage, currentSearch, currentProductions);
+            }
+        });
+
+        // 尾页按钮点击事件
+        $('.last').click(function() {
+            currentPage = totalPages;
+            fetchData(currentPage, currentSearch, currentProductions);
+        });
+
+        // 获取数据并填充到表格中
+        function fetchData(page, search = '', productions = '') {
             $.ajax({
-                url: 'pageAll', // 替换为你的API端点
-                method: 'GET',
+                url: 'searchItem', // 使用 searchItem 作为统一的搜索和分页接口
+                method: 'POST',
                 data: {
                     page: page,
-                    pageSize: pageSize
+                    pageSize: pageSize,
+                    search: search,
+                    productions: productions
                 },
                 dataType: 'json',
                 success: function(response) {
-                    console.log('Response:', response);
-                    // 清空当前表格内容
+                    console.log('Fetch Data Response:', response); // 打印整个响应对象以进行调试
                     $('#data-table').empty();
+                    const appName = $('input[name="appName"]').val();
 
-                    // 遍历数据并生成表格行
-                    response.data.forEach(function(item) {
-                        //console.log('Item ID:', item.id, typeof item.id); // 调试信息
-                        $('#data-table').append(`                        <tr>
-                            <td>${item.id}</td>
-                            <td>${item.names}</td>
-                            <td>${item.describe}</td>
-                            <td>${item.models}</td>
-                            <td>${item.brand}</td>
-                            <td>${item.production}</td>
-                            <td>${item.num}</td>
-<!--                            <td>${item.unit}</td>-->
-                            <td>
-<!--                                <img src="/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">-->
-                                <img src="/{$appName}/public/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">
-                            </td>
-                            <td>${item.add_date}</td>
-                            <td>
-                                <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
-                                <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
-                                <input type="button" value="出库" class="outstock-btn" data-id="${item.id}">
-                            </td>
+                    const total = response.total;
+
+                    if (total === 0) {
+                        // 如果 total 为 0，显示一行“未查询到数据”
+                        $('#data-table').empty().append(`
+                        <tr>
+                            <td colspan="10" style="text-align: center;">未查询到数据</td>
                         </tr>
                     `);
-                    });
+                    } else {
+                        response.data.forEach(function(item) {
+                            console.log('Item ID:', item.id, typeof item.id); // 调试信息
+                            let imgSrc;
+                            if (response.servers === 'A') {
+                                imgSrc = `/${appName}/public/storage/${item.flier}`;
+                            } else {
+                                imgSrc = `/storage/${item.flier}`;
+                            }
+                            $('#data-table').append(`
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.names}</td>
+                                <td>${item.describe}</td>
+                                <td>${item.models}</td>
+                                <td>${item.brand}</td>
+                                <td>${item.production}</td>
+                                <td>${item.num}</td>
+                                <!-- 简略图 -->
+                                <td>
+                                    <img src="${imgSrc}" alt="简略图" style="width: 50px; height: 50px;">
+                                </td>
+                                <td>${item.add_date}</td>
+                                <td>
+                                    <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
+                                    <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
+                                    <input type="button" value="出库" class="outstock-btn" data-id="${item.id}">
+                                </td>
+                            </tr>
+                        `);
+                        });
+                    }
 
                     // 更新总页数
-                    totalPages = Math.ceil(response.total / pageSize);
+                    totalPages = Math.ceil(total / pageSize);
+
+                    // 重新绑定事件
+                    rebindEditEvent();
+                    rebindDeleteEvent();
+                    rebindOutstockEvent();
+                    rebindPaginationEvents();
                 },
                 error: function(xhr, status, error) {
                     console.error('Error fetching data:', error);
@@ -578,71 +648,175 @@
             });
         }
 
-        // 初始化加载第一页数据
-        fetchData(currentPage);
+        // 重新绑定分页按钮事件
+        function rebindPaginationEvents() {
+            $('.one').off('click').click(function() {
+                currentPage = 1;
+                fetchData(currentPage, currentSearch, currentProductions);
+            });
 
-        // 绑定分页按钮事件
-        $('.one').click(function() {
-            currentPage = 1;
-            fetchData(currentPage);
-        });
-
-        $('.up').click(function() {
-            if (currentPage > 1) {
-                currentPage--;
-                fetchData(currentPage);
-            }
-        });
-
-        $('.down').click(function() {
-            if (currentPage < totalPages) {
-                currentPage++;
-                fetchData(currentPage);
-            }
-        });
-
-        $('.last').click(function() {
-            currentPage = totalPages;
-            fetchData(currentPage);
-        });
-
-        // 绑定修改按钮事件
-        $(document).on('click', '.edit-btn', function() {
-            const id = $(this).data('id'); // 获取按钮上的ID
-            console.log('Editing item with ID:', id, typeof id); // 调试信息
-
-            // 显示模态对话框
-            $('#myModal').show();
-
-            $('.error-message').text("");
-
-            // 获取数据并填充到表单中
-            $.ajax({
-                url: 'getItem', // 替换为你的API端点
-                method: 'GET',
-                data: {
-                    id: id
-                },
-                dataType: 'json',
-                success: function(response) {
-                    console.log('Response:', response);
-                    $('#id').val(response.id);
-                    $('#names').val(response.names);
-                    $('#describe').val(response.describe);
-                    $('#models').val(response.models);
-                    $('#brand').val(response.brand);
-                    $('#production').val(response.production);
-                    $('#num').val(response.num);
-                    $('#unit').val(response.unit);
-                    $('#flier-preview').attr('src', `/{$appName}/public/storage/${response.flier}`);
-                    $('#flier-preview').show();
-                    $('#flier').val(''); // 清空文件输入字段
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching data:', error);
+            $('.up').off('click').click(function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    fetchData(currentPage, currentSearch, currentProductions);
                 }
             });
-        });
+
+            $('.down').off('click').click(function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    fetchData(currentPage, currentSearch, currentProductions);
+                }
+            });
+
+            $('.last').off('click').click(function() {
+                currentPage = totalPages;
+                fetchData(currentPage, currentSearch, currentProductions);
+            });
+        }
+
+        // 使用命名空间来绑定事件
+        function rebindEditEvent() {
+            $(document).off('click.edit', '.edit-btn').on('click.edit', '.edit-btn', function() {
+                const id = $(this).data('id'); // 获取按钮上的ID
+                console.log('Editing item with ID:', id, typeof id); // 调试信息
+
+                // 显示模态对话框
+                $('#myModal').show();
+
+                $('.error-message').text("");
+
+                // 获取数据并填充到表单中
+                $.ajax({
+                    url: 'getItem', // 替换为你的API端点
+                    method: 'GET',
+                    data: {
+                        id: id
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Response:', response);
+                        $('#id').val(response.id);
+                        $('#names').val(response.names);
+                        $('#describe').val(response.describe);
+                        $('#models').val(response.models);
+                        $('#brand').val(response.brand);
+                        $('#production').val(response.production);
+                        $('#num').val(response.num);
+                        $('#unit').val(response.unit);
+
+                        // 使用 jQuery 进行 servers 判断
+                        var flierPath = (response.servers === 'A') ? `/${appName}/public/storage/${response.flier}` : `/storage/${response.flier}`;
+
+                        $('#flier-preview').attr('src', flierPath);
+                        $('#flier-preview').show();
+                        $('#flier').val(''); // 清空文件输入字段
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching data:', error);
+                    }
+                });
+            });
+        }
+
+        // 绑定删除按钮事件
+        function rebindDeleteEvent() {
+            $(document).off('click.delete', '.delete-btn').on('click.delete', '.delete-btn', function() {
+                const id = $(this).data('id'); // 获取按钮上的ID
+                console.log('Deleting item with ID:', id, typeof id); // 调试信息
+
+                // 弹出确认对话框
+                if (confirm('确定要删除此商品吗？')) {
+                    // 发送删除请求
+                    $.ajax({
+                        url: 'deleteItem', // 替换为你的API端点
+                        method: 'POST',
+                        data: {
+                            id: id
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log('Item deleted successfully:', response);
+                            $(`.delete-btn[data-id="${id}"]`).closest('tr').remove();
+                            fetchData(currentPage, currentSearch, currentProductions); // 刷新当前页面数据
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error deleting item:', error);
+                        }
+                    });
+                }
+            });
+        }
+
+        // 绑定出库按钮事件
+        function rebindOutstockEvent() {
+            $(document).off('click.outstock', '.outstock-btn').on('click.outstock', '.outstock-btn', function() {
+                const id = $(this).data('id'); // 获取按钮上的ID
+                console.log('Outstocking item with ID:', id, typeof id); // 调试信息
+
+                // 显示出库模态对话框
+                $('#outstockModal').show();
+
+                // 清空之前的错误消息
+                $('#outstockModal .error-message').text('');
+
+                // 获取当前商品的数量
+                const currentQuantity = parseFloat($(this).closest('tr').find('td:eq(6)').text());
+                console.log('Current Quantity:', currentQuantity);
+
+                // 绑定出库表单提交事件
+                $('#outstockModal .outstock-submit').off('click').on('click', function() {
+                    const outstockQuantity = $('#outstockQuantity').val().trim();
+                    console.log('Outstock Quantity:', outstockQuantity);
+
+                    // 验证输入是否为纯数字
+                    if (!/^\d+$/.test(outstockQuantity)) {
+                        $('#outstockModal .error-message').text('出库数量必须为纯数字');
+                        return;
+                    }
+
+                    // 将输入转换为数字
+                    const quantity = parseInt(outstockQuantity, 10);
+
+                    // 验证输入数量是否不大于当前数量
+                    if (quantity > currentQuantity) {
+                        $('#outstockModal .error-message').text('出库数量不能大于当前库存数量');
+                        return;
+                    }
+
+                    // 如果验证通过，发送出库请求
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: 'outstockItem', // 替换为你的出库API端点
+                        method: 'POST',
+                        data: {
+                            id: id,
+                            quantity: quantity,
+                            username: $('#outstockUsername').val(),
+                            password: $('#outstockPassword').val()
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log('Outstock successful:', response);
+                            if (response.status === 'success') {
+                                // 关闭模态对话框
+                                $('#outstockModal').hide();
+                                // 刷新当前页面数据
+                                fetchData(currentPage, currentSearch, currentProductions);
+                            } else {
+                                $('#outstockModal .error-message').text(response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error outstocking item:', error);
+                            $('#outstockModal .error-message').text('出库失败，请重试');
+                        }
+                    });
+                });
+            });
+        }
 
         // 绑定关闭按钮事件
         $('.close').click(function() {
@@ -651,31 +825,9 @@
             $('#flier').val(''); // 清空文件输入字段
         });
 
-        // 绑定删除按钮事件
-        $(document).on('click', '.delete-btn', function() {
-            const id = $(this).data('id'); // 获取按钮上的ID
-            console.log('Deleting item with ID:', id, typeof id); // 调试信息
-
-            // 弹出确认对话框
-            if (confirm('确定要删除此商品吗？')) {
-                // 发送删除请求
-                $.ajax({
-                    url: 'deleteItem', // 替换为你的API端点
-                    method: 'POST',
-                    data: {
-                        id: id
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log('Item deleted successfully:', response);
-                        $(`.delete-btn[data-id="${id}"]`).closest('tr').remove();
-                        fetchData(currentPage); // 刷新当前页面数据
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error deleting item:', error);
-                    }
-                });
-            }
+        // 绑定出库模态对话框关闭按钮事件
+        $('#outstockModal .close').click(function() {
+            $('#outstockModal').hide();
         });
 
         // 绑定表单提交事件
@@ -703,7 +855,7 @@
                         // 等待3秒后关闭模态对话框并刷新当前页面数据
                         setTimeout(function() {
                             $('#myModal').hide(); // 关闭模态对话框
-                            fetchData(currentPage); // 刷新当前页面数据
+                            fetchData(currentPage, currentSearch, currentProductions); // 刷新当前页面数据
                         }, 3000); // 3000毫秒 = 3秒
 
                     } else {
@@ -718,165 +870,8 @@
                 }
             });
         });
-
-        $('.searchButton').click(function () {
-
-            const search      = $('#searchInput').val();
-            const productions = $('.productions').val();
-            if (search.length === 0) {
-                return false;
-            }
-
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                url: 'searchItem',
-                type: 'post',
-                data: {
-                    search: search,
-                    productions: productions
-                },
-                dataType: 'json',
-                success: function (response) {
-                    console.log(response); // 打印整个响应对象以进行调试
-
-                    if (!response || !response.data || !Array.isArray(response.data)) {
-                        console.error('Invalid response format or missing data:', response);
-                        return;
-                    }
-                    $('#data-table').empty();
-                    const total = response.total;
-
-                    if (total === 0) {
-                        // 如果 total 为 0，显示一行“未查询到数据”
-                            $('#data-table').empty().append(`             <tr>
-                            <td colspan="10" style="text-align: center;">未查询到数据</td>
-                        </tr>
-                    `);
-                            }
-
-                        response.data.forEach(function(item) {
-                        console.log('Item ID:', item.id, typeof item.id); // 调试信息
-                        $('#data-table').append(`
-                            <tr>
-                                <td>${item.id}</td>
-                                <td>${item.names}</td>
-                                <td>${item.describe}</td>
-                                <td>${item.models}</td>
-                                <td>${item.brand}</td>
-                                <td>${item.production}</td>
-                                <td>${item.num}</td>
-                                <td>
-                                    <img src="/{$appName}/public/storage/${item.flier}" alt="简略图" style="width: 50px; height: 50px;">
-                                </td>
-                                <td>${item.add_date}</td>
-                                <td>
-                                    <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
-                                    <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
-                                    <input type="button" value="出库" class="outstock-btn" data-id="${item.id}">
-                                </td>
-                            </tr>
-                        `);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error fetching data:', error);
-                }
-
-            });
-        });
-
-        // 绑定出库按钮事件
-        $(document).on('click', '.outstock-btn', function() {
-            const id = $(this).data('id'); // 获取按钮上的ID
-            console.log('Outstocking item with ID:', id, typeof id); // 调试信息
-
-            // 显示出库模态对话框
-            $('#outstockModal').show();
-
-            $('.error-message').text("");
-
-            // 设置商品ID
-            $('#outstockId').val(id);
-        });
-
-        // 绑定出库按钮事件
-        $(document).on('click', '.outstock-btn', function() {
-            const id = $(this).data('id'); // 获取按钮上的ID
-            console.log('Outstocking item with ID:', id, typeof id); // 调试信息
-
-            // 显示出库模态对话框
-            $('#outstockModal').show();
-
-            // 清空之前的错误消息
-            $('#outstockModal .error-message').text('');
-
-            // 获取当前商品的数量
-            const currentQuantity = parseFloat($(this).closest('tr').find('td:eq(6)').text());
-            console.log('Current Quantity:', currentQuantity);
-
-            // 绑定出库表单提交事件
-            $('#outstockModal .outstock-submit').off('click').on('click', function() {
-                const outstockQuantity = $('#outstockQuantity').val().trim();
-                console.log('Outstock Quantity:', outstockQuantity);
-
-                // 验证输入是否为纯数字
-                if (!/^\d+$/.test(outstockQuantity)) {
-                    $('#outstockModal .error-message').text('出库数量必须为纯数字');
-                    return;
-                }
-
-                // 将输入转换为数字
-                const quantity = parseInt(outstockQuantity, 10);
-
-                // 验证输入数量是否不大于当前数量
-                if (quantity > currentQuantity) {
-                    $('#outstockModal .error-message').text('出库数量不能大于当前库存数量');
-                    return;
-                }
-
-                // 如果验证通过，发送出库请求
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    url: 'outstockItem', // 替换为你的出库API端点
-                    method: 'POST',
-                    data: {
-                        id: id,
-                        quantity: quantity,
-                        username: $('#outstockUsername').val(),
-                        password: $('#outstockPassword').val()
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log('Outstock successful:', response);
-                        if (response.status === 'success')
-                        {
-                            // 关闭模态对话框
-                            $('#outstockModal').hide();
-                            // 刷新当前页面数据
-                            fetchData(currentPage);
-                        }else
-                        {
-                            $('#outstockModal .error-message').text(response.message);
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error outstocking item:', error);
-                        $('#outstockModal .error-message').text('出库失败，请重试');
-                    }
-                });
-            });
-        });
-
-        // 绑定关闭按钮事件
-        $('#outstockModal .close').click(function() {
-            $('#outstockModal').hide();
-        });
     });
+
 </script>
 </body>
 </html>

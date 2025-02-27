@@ -113,7 +113,6 @@
             }
         }
 
-
         .button {
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -133,6 +132,11 @@
             background-color: #e06c74;
         }
 
+        .button:disabled {
+            background-color: #ccc; /* 灰色背景 */
+            cursor: not-allowed; /* 禁用鼠标指针 */
+        }
+
         .foot {
             width: 100%;
             height: 100px;
@@ -147,30 +151,38 @@
             /* background-color: rgba(255, 255, 255, 0.5); */
             //box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
         }
-
-
     </style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
     <div class="login-pages">
         <div class="login-pages-left">
+        {if condition="$servers == 'A'"}
             <img src="/{$appName}/public/static/images/1.png" alt="123456789" class="login-pages-left-login">
+        {else /}
+            <img src="/static/images/1.png" alt="123456789" class="login-pages-left-login">
+        {/if}
         </div>
         <div class="right">
             <div class="login">
                 <h1>登录</h1>
                 <p>
-                    <input type="text" placeholder="请输入用户名" class="userName" name="name">
+                    <label>
+                        <input type="text" placeholder="请输入用户名" class="userName" name="name">
+                    </label>
                 </p>
                 <p>
-                    <input type="password" placeholder="请输入密码" class="userPwd" name="password">
+                    <label>
+                        <input type="password" placeholder="请输入密码" class="userPwd" name="password">
+                    </label>
                 </p>
                 <p>
                     {:captcha_img()}
                 </p>
                 <p>
-                    <input type="text" placeholder="请输入验证码" class="captcha" name="captcha">
+                    <label>
+                        <input type="text" placeholder="请输入验证码" class="captcha" name="captcha">
+                    </label>
                 </p>
                 <p>
                     <input type="button" value="登录" class="button">
@@ -182,105 +194,102 @@
         </div>
     </div>
 </div>
-<div class="foot">{$icp.value}</div>
-</body>
+<div class="foot"><a href="https://beian.miit.gov.cn/" style="color: inherit; text-decoration: none;">{$icp.value}</a></div>
+
 <script src="/static/jquery-3.7.1.js"></script>
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
 <script type="text/javascript">
     // 设置全局AJAX选项
-$.ajaxSetup({
-    beforeSend: function(xhr) {
-        // 获取CSRF令牌
-        const csrfToken = $('meta[name="csrf-token"]').attr('content');
-        // 如果CSRF令牌存在，则将其添加到请求头中
-        if (csrfToken) {
-            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-        }
-    }
-});
-
-// 为按钮点击事件添加处理函数
-$('.button').click(function () {
-    // 获取用户名和密码输入框的值
-    const userName = $('.userName').val();
-    const userPwd  = $('.userPwd').val();
-    const captcha  = $('.captcha').val();
-
-    // 检查用户名和密码是否为空
-    if (userName.length===0||userPwd.length===0||captcha.length===0)
-    {
-        // 如果用户名或密码为空，显示错误消息
-        showDanmu("有数据没填");
-    }
-    else
-    {
-        // 调用登录函数
-        performLogin(userName, userPwd,captcha);
-    }
-
-});
-
-/**
- * 执行登录操作
- * @param {string} userName - 用户名
- * @param {string} userPwd - 用户密码
- * @param captcha
- */
-function performLogin(userName, userPwd,captcha) {
-    // 发起登录请求
-    $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        url: 'loginDo',
-        data: {
-            name: userName,
-            pwd: userPwd,
-            captcha:captcha
-        },
-        type: 'post',
-        dataType: 'json',
-        success: function (res) {
-            // 根据响应结果进行处理
-            if (res.status === 'success') {
-                // 登录成功，弹出提示信息并跳转到新页面
-                showDanmu(res.message);
-                setTimeout(function() {
-                    window.location.href = "{:url('admin/Index/index')}";
-                }, 2000); // 2000毫秒 = 2秒
-
-            } else {
-                // 登录失败，将响应结果输出到控制台
-                console.log(res);
-                //显示错误提示
-                showDanmu(res.message);
-                setTimeout(function() {
-                    location.reload(); // 刷新页面
-                }, 2000); // 2000毫秒 = 2秒
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            // 获取CSRF令牌
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            // 如果CSRF令牌存在，则将其添加到请求头中
+            if (csrfToken) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            // 请求失败，输出错误信息并弹出提示信息
-            console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
-            alert('请求失败，请稍后再试。');
         }
     });
-}
 
-/**
- * 显示弹幕
- * @param {string} message - 弹幕内容
- */
-function showDanmu(message) {
-    const danmuContainer = $('.error-message');
-    const danmuElement = $('<span class="danmu">' + message + '</span>');
-    danmuContainer.append(danmuElement);
+    // 为按钮点击事件添加处理函数
+    $('.button').click(function () {
+        // 获取用户名和密码输入框的值
+        const userName = $('.userName').val();
+        const userPwd  = $('.userPwd').val();
+        const captcha  = $('.captcha').val();
 
-    // 移除已播放完的弹幕
-    setTimeout(() => {
-        danmuElement.remove();
-    }, 5000); // 与动画时间一致
-}
+        // 检查用户名和密码是否为空
+        if (userName.length===0||userPwd.length===0||captcha.length===0)
+        {
+            // 如果用户名或密码为空，显示错误消息
+            showDanmu("有数据没填");
+        }
+        else
+        {
+            // 禁用按钮以防止重复点击
+            $('.button').prop('disabled', true);
+            // 调用登录函数
+            performLogin(userName, userPwd, captcha);
+        }
+    });
 
+    /**
+     * 执行登录操作
+     * @param {string} userName - 用户名
+     * @param {string} userPwd - 用户密码
+     * @param captcha
+     */
+    function performLogin(userName, userPwd, captcha) {
+        // 发起登录请求
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: 'loginDo',
+            data: {
+                name: userName,
+                pwd: userPwd,
+                captcha: captcha
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (res) {
+                // 根据响应结果进行处理
+                if (res.status === 'success') {
+                    // 登录成功，弹出提示信息并跳转到新页面
+                    $('.error-message').text(res.message);
+                    setTimeout(function() {
+                        window.location.href = "{:url('admin/Index/index')}";
+                    }, 1000); // 1000毫秒 = 1秒
+                } else {
+                    // 登录失败，将响应结果输出到控制台
+                    console.log(res);
+                    // 显示错误提示
+                    $('.error-message').text(res.message);
+                    // 启用按钮以便用户可以再次尝试
+                    $('.button').prop('disabled', false);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // 请求失败，输出错误信息并弹出提示信息
+                console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
+                alert('请求失败，请稍后再试。');
+                // 启用按钮以便用户可以再次尝试
+                $('.button').prop('disabled', false);
+            }
+        });
+    }
+
+    // 显示弹幕消息
+    function showDanmu(message) {
+        const danmu = document.createElement('span');
+        danmu.className = 'danmu';
+        danmu.textContent = message;
+        $('.error-message').append(danmu);
+        setTimeout(function() {
+            danmu.remove();
+        }, 3000); // 3000毫秒 = 3秒
+    }
 </script>
+</body>
 </html>

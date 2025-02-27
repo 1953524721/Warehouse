@@ -2,21 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>网站信息</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #007BFF;
+        }
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            border: 1px solid black;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
         }
         th {
             text-align: left;
-            padding: 8px;
+            padding: 12px;
             background-color: #f2f2f2;
+            font-weight: bold;
         }
         td {
-            border-bottom: 1px solid black;
-            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            padding: 12px;
         }
         tr:last-child td {
             border-bottom: none; /* 去掉最后一行的底部边框 */
@@ -24,12 +44,19 @@
         .second-table {
             margin-top: 20px; /* 调整这个值以改变间距 */
         }
-
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
-    <h1>网站信息</h1>
-    <div class="clearfix">
+    <div class="container">
+        <h1>网站信息</h1>
         <table>
             <tr>
                 <th colspan="2">基础信息</th>
@@ -71,9 +98,9 @@
         </table>
     </div>
 
+    <script src="/static/jquery-3.7.1.js"></script>
+    <script type="text/javascript">
+        // 你可以在这里添加JavaScript代码
+    </script>
 </body>
-<script src="/static/jquery-3.7.1.js"></script>
-<script type="text/javascript">
-
-</script>
 </html>

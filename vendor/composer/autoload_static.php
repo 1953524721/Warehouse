@@ -4,11 +4,13 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitcb7e648eaa5241fd870442b447ffb9a2
+class ComposerStaticInit118552ef2b3077b276422e248ece3c62
 {
     public static $files = array (
         '9b552a3cc426e3287cc811caefa3cf53' => __DIR__ . '/..' . '/topthink/think-helper/src/helper.php',
+        '7448f3465e10b5f033e4babb31eb0b06' => __DIR__ . '/..' . '/topthink/think-orm/src/helper.php',
         '35fab96057f1bf5e7aba31a8a6d5fdde' => __DIR__ . '/..' . '/topthink/think-orm/stubs/load_stubs.php',
+        '15ec93fa4ce4b2d53816a1a5f2c514e2' => __DIR__ . '/..' . '/topthink/think-validate/src/helper.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         '1cfd2761b63b0a29ed23657ea394cb2d' => __DIR__ . '/..' . '/topthink/think-captcha/src/helper.php',
@@ -47,6 +49,18 @@ class ComposerStaticInitcb7e648eaa5241fd870442b447ffb9a2
             'League\\Flysystem\\Cached\\' => 24,
             'League\\Flysystem\\' => 17,
         ),
+        'E' => 
+        array (
+            'Endroid\\QrCode\\' => 15,
+        ),
+        'D' => 
+        array (
+            'DASPRiD\\Enum\\' => 13,
+        ),
+        'B' => 
+        array (
+            'BaconQrCode\\' => 12,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -69,10 +83,12 @@ class ComposerStaticInitcb7e648eaa5241fd870442b447ffb9a2
         'think\\' => 
         array (
             0 => __DIR__ . '/..' . '/topthink/framework/src/think',
-            1 => __DIR__ . '/..' . '/topthink/think-helper/src',
-            2 => __DIR__ . '/..' . '/topthink/think-orm/src',
-            3 => __DIR__ . '/..' . '/topthink/think-filesystem/src',
-            4 => __DIR__ . '/..' . '/topthink/think-template/src',
+            1 => __DIR__ . '/..' . '/topthink/think-container/src',
+            2 => __DIR__ . '/..' . '/topthink/think-filesystem/src',
+            3 => __DIR__ . '/..' . '/topthink/think-helper/src',
+            4 => __DIR__ . '/..' . '/topthink/think-orm/src',
+            5 => __DIR__ . '/..' . '/topthink/think-template/src',
+            6 => __DIR__ . '/..' . '/topthink/think-validate/src',
         ),
         'app\\' => 
         array (
@@ -122,6 +138,18 @@ class ComposerStaticInitcb7e648eaa5241fd870442b447ffb9a2
         array (
             0 => __DIR__ . '/..' . '/league/flysystem/src',
         ),
+        'Endroid\\QrCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/endroid/qr-code/src',
+        ),
+        'DASPRiD\\Enum\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/dasprid/enum/src',
+        ),
+        'BaconQrCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
+        ),
     );
 
     public static $fallbackDirsPsr0 = array (
@@ -135,10 +163,10 @@ class ComposerStaticInitcb7e648eaa5241fd870442b447ffb9a2
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitcb7e648eaa5241fd870442b447ffb9a2::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitcb7e648eaa5241fd870442b447ffb9a2::$prefixDirsPsr4;
-            $loader->fallbackDirsPsr0 = ComposerStaticInitcb7e648eaa5241fd870442b447ffb9a2::$fallbackDirsPsr0;
-            $loader->classMap = ComposerStaticInitcb7e648eaa5241fd870442b447ffb9a2::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit118552ef2b3077b276422e248ece3c62::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit118552ef2b3077b276422e248ece3c62::$prefixDirsPsr4;
+            $loader->fallbackDirsPsr0 = ComposerStaticInit118552ef2b3077b276422e248ece3c62::$fallbackDirsPsr0;
+            $loader->classMap = ComposerStaticInit118552ef2b3077b276422e248ece3c62::$classMap;
 
         }, null, ClassLoader::class);
     }

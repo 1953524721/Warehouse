@@ -41,7 +41,7 @@ class Unit extends Model
             return $e->getMessage();
         }
     }
-    public function getUnitByName($name)
+    public function getUnitByName($name): array|Db|Model|null
     {
         $name = htmlspecialchars($name);
         return Db::table($this->table)->where('unit_name', $name)->find();
@@ -56,13 +56,16 @@ class Unit extends Model
             return $e->getMessage();
         }
     }
-    public function addUnit($name)
+    public function addUnit($name): bool|string
     {
         $name = htmlspecialchars($name);
+        $date = date("Y-m-d H:i:s");
         try {
             Db::name($this->table)->insert([
                 'unit_name' => $name,
+                'date' =>$date
             ]);
+            return true;
         } catch (DbException $e) {
             Log::error("添加产品信息时发生错误: " . $e->getMessage());
             return $e->getMessage();

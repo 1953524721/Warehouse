@@ -14,13 +14,10 @@ use app\admin\model\User;
 use think\response\Json;
 use think\facade\Session;
 use app\admin\model\Website;
+use app\admin\controller\Index as IndexController;
 
 class Login extends BaseController
 {
-    public function index(): string
-    {
-        return '您好！这是一个[admin]示例应用';
-    }
     /**
      * 登录功能的视图展示方法
      *
@@ -31,12 +28,16 @@ class Login extends BaseController
      */
     public function login(): string
     {
+        $browse = $this->getLog();
         $siteModel = new Website();
+        $IndexController = new IndexController(app());
+        $servers   = $IndexController->servers();
         $icp = $siteModel->getWebsite();
         $appName = env("APP_NAME");
         return View::fetch("login",[
             'appName' => $appName,
-            'icp' => $icp
+            'icp' => $icp,
+            'servers' => $servers,
         ]);
     }
 
@@ -88,5 +89,12 @@ class Login extends BaseController
             // 返回登录成功的JSON响应，包括成功消息和测试URL
             return json(['status' => 'success', 'message' => '登录成功,即将跳转']);
         }
+    }
+
+    public function test()
+    {
+        $IndexController = new IndexController(app());
+        $servers   = $IndexController->servers();
+        print_r($servers);
     }
 }

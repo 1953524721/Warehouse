@@ -47,6 +47,8 @@ class Index extends comm
      */
     public function add(): string
     {
+        $browse = $this->getLog();
+
         $cityModel = new  city();
         $cityList = $cityModel->getCityParentId('0');
 
@@ -140,6 +142,7 @@ class Index extends comm
      */
     public function show(): string|Redirect
     {
+        $browse = $this->getLog();
         // 检查用户是否已登录
         if ($this->isUserLoggedIn())
         {
@@ -162,69 +165,60 @@ class Index extends comm
             return $this->redirectToLogin();
         }
     }
+
+    /**
+     * 搜索商品项
+     *
+     * 该方法用于处理商品搜索请求，根据用户提供的搜索参数，返回相应的商品列表和总数
+     * 同时返回服务器信息
+     *
+     * @param Request $request 用户请求对象，包含用户提交的搜索参数
+     * @return Json 返回包含搜索结果、商品总数和服务器信息的JSON响应
+     */
     public function searchItem(Request $request): Json
     {
+        // 获取请求参数中的页码，默认为第1页
         $page         = $request->param('page', 1);
+        // 获取请求参数中的每页条数，默认为10条
         $pageSize     = $request->param('pageSize', 10);
-        $name         = $request->param('search');
-        $productions  = $request->param('productions');
+        // 获取请求参数中的搜索关键词，默认为空字符串
+        $name         = $request->param('search','');
+        // 获取请求参数中的生产者信息，默认为空字符串
+        $productions  = $request->param('productions','');
+
+        // 实例化商品模型，用于后续的商品数据查询
         $productionModel = new product();
-        $list  = $productionModel->getProductsName($page, $pageSize, $name , $productions);
-        $total = $productionModel->getProductsCount($name, $productions);
+
+        // 调用商品模型的方法获取符合搜索条件的商品列表
+        $list  = $productionModel->getProductsALL($page, $pageSize, $name , $productions);
+
+        // 调用商品模型的方法获取商品总数
+        $total = $productionModel->getProductsCount($page, $pageSize, $name , $productions);
+
+        // 获取服务器信息
+        $servers = $this->servers();
+
+        // 构建响应数组，包含商品列表、商品总数和服务器信息
         $response = [
             'data'  => $list,
-            'total' => $total
+            'total' => $total,
+            'servers' => $servers,
         ];
-         return json($response);
+
+        // 返回包含搜索结果的JSON响应
+        return json($response);
     }
 
 
-    public function pageAll(Request $request)
-    {
-        // 验证请求中的token
-        try {
-            $check = $request->checkToken('__token__');
-            if (false === $check) {
-                // 如果token验证失败，返回错误信息
-                return json(['status' => 'error', 'message' => 'token验证失败']);
-            }
-
-            // 如果是Ajax请求
-            if ($request->isAjax()) {
-                // 获取分页参数并验证
-                $page     = $request->param('page', 1);
-                $pageSize = $request->param('pageSize', 10);
-
-                // 确保分页参数为正整数
-                if (!is_numeric($page) || !is_numeric($pageSize) || $page < 1 || $pageSize < 1) {
-                    return json(['status' => 'error', 'message' => '分页参数无效']);
-                }
-
-                // 创建产品模型实例
-                $productionModel = new Product();
-
-                // 获取分页产品列表
-                $list = $productionModel->getProductsALL((int)$page, (int)$pageSize);
-
-                // 获取总记录数
-                $total = $productionModel->getTotalProducts();
-
-                // 构建响应数据
-                $response = [
-                    'data'  => $list,
-                    'total' => $total
-                ];
-
-                // 返回JSON响应
-                return json($response);
-            }
-        } catch (\Exception $e) {
-            // 捕获异常并返回错误信息
-            return json(['status' => 'error', 'message' => '系统异常: ' . $e->getMessage()]);
-        }
-    }
-
-// 删除产品的方法，接收请求并处理删除操作
+    /**
+     * 删除产品项
+     *
+     * 本函数负责处理产品项的删除请求，首先验证请求中的token以确保请求的合法性，
+     * 然后根据请求中提供的产品ID删除对应的产品信息
+     *
+     * @param Request $request 用户请求对象，包含删除请求的详细信息，如token和产品ID
+     * @return Json 返回一个JSON对象，包含删除操作的状态和消息
+     */
     public function deleteItem(Request $request): Json
     {
         // 验证请求中的token
@@ -268,10 +262,19 @@ class Index extends comm
         $productionModel = new product();
         // 获取产品数据
         $data = $productionModel->findProduct($id);
+        $data['servers'] = $this->servers();
         // 返回产品数据
         return json($data);
     }
-// 更新产品信息的方法，接收请求并处理更新操作
+    /**
+     * 更新商品信息
+     *
+     * 该方法用于处理商品信息的更新请求。它首先验证请求中的token，然后获取商品信息和上传文件，
+     * 并调用产品模型的更新方法来更新商品数据。根据更新结果或文件上传情况，返回相应的JSON响应。
+     *
+     * @param Request $request 用户请求对象，包含用户提交的商品信息和文件
+     * @return Json 返回更新结果的JSON响应
+     */
     public function updateItem(Request $request): Json
     {
         // 验证请求中的token
@@ -281,6 +284,7 @@ class Index extends comm
             // 如果token验证失败，返回错误信息
             return json(['status' => 'error', 'message' => 'token验证失败']);
         }
+
         // 获取表单数据
         $names      = $request->post('names');
         $id         = $request->post('id');
@@ -384,14 +388,15 @@ class Index extends comm
     {
         return new userModel();
     }
-    public function test()
+    public function servers(): string
     {
-        $pwd = '111111';
-        $newPwd = '$2y$10$TqQYF62T5pbu0UyOlIBkNeGXRdayV9p4bVJmK1xu1ucOIb0wKOhYi';
-        if (password_verify($pwd, $newPwd)) {
-            echo '密码正确';
+        if (str_contains($_SERVER['SERVER_SOFTWARE'], 'Apache'))
+        {
+            return 'A';
         } else {
-            echo '密码错误';
+            return 'N';
         }
     }
+
+
 }
