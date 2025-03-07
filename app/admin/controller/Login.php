@@ -89,9 +89,14 @@ class Login extends BaseController
             // 返回登录成功的JSON响应，包括成功消息和测试URL
             return json(['status' => 'success', 'message' => '登录成功,即将跳转']);
         }
+        else
+        {
+            // 如果用户信息不匹配，返回登录失败的JSON响应，包括错误消息
+            return json(['status' => 'error', 'message' => '用户名或密码错误']);
+        }
     }
 
-    public function test()
+    public function test(): void
     {
         $IndexController = new IndexController(app());
         $servers   = $IndexController->servers();

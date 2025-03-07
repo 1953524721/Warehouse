@@ -2,21 +2,20 @@
 
 namespace app\admin\controller;
 
-use app\admin\model\product;
+// 导入必要的模型和异常处理类
 use app\admin\model\UserInfo;
-use app\BaseController;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
-use think\facade\Log;
 use think\facade\Session;
 use think\facade\View;
 use app\admin\model\User as Useres;
-use think\Paginator;
 use think\Request;
 use think\response\Json;
 
-
+/**
+ * 用户控制器类，负责处理与用户相关的请求
+ */
 class User extends comm
 {
     /**
@@ -62,6 +61,8 @@ class User extends comm
                 'total' => $total
             ];
             return json($response);
+        } else {
+            return json(['status' => 'error', 'message' => '请求方式错误']);
         }
     }
 
@@ -169,6 +170,8 @@ class User extends comm
             } else {
                 return json(['status' => 'error', 'message' => '密码重置失败']);
             }
+        } else {
+            return json(['status' => 'error', 'message' => '请求方式错误']);
         }
     }
 
@@ -199,7 +202,16 @@ class User extends comm
                 return json(['status' => 'error', 'message' => '状态修改失败']);
             }
         }
+        else {
+            return json(['status' => 'error', 'message' => '请求方式错误']);
+        }
     }
+
+    /**
+     * 显示添加用户页面
+     *
+     * @return string 渲染后的视图字符串
+     */
     public function addUser(): string
     {
         $browse = $this->getLog();
@@ -208,7 +220,14 @@ class User extends comm
             'appName' => $appName,
         ]);
     }
-    public function addUserPost(Request $request)
+
+    /**
+     * 处理添加用户表单提交
+     *
+     * @param Request $request 请求对象，用于获取用户ID和新状态参数
+     * @return Json 返回添加结果的JSON格式数据
+     */
+    public function addUserPost(Request $request): Json
     {
         $check = $request->checkToken();
         if (false === $check)
@@ -233,18 +252,29 @@ class User extends comm
                 return json(['status' => 'error', 'message' => '添加失败']);
             }
         }
+        else {
+            return json(['status' => 'error', 'message' => '请求方式错误']);
+        }
     }
+
+    /**
+     * 用户注销方法
+     *
+     * @return Json 返回注销结果的JSON格式数据
+     */
     public function logout(): Json
     {
         Session::delete('user');
         return  json(['status' => 'success', 'message' => '注销成功']);
     }
 
-
-
-
-
-    public function searchItem(Request $request)
+    /**
+     * 搜索指定用户名的用户信息
+     *
+     * @param Request $request 请求对象，用于获取搜索关键词及分页参数
+     * @return Json 返回搜索结果的JSON格式数据
+     */
+    public function searchItem(Request $request): Json
     {
         if ($request->isAjax())
         {
@@ -260,7 +290,16 @@ class User extends comm
             ];
             return json($response);
         }
+        else{
+            return json(['status' => 'error', 'message' => '请求方式错误']);
+        }
     }
+
+    /**
+     * 测试方法，用于获取用户信息
+     *
+     * @param Request $request 请求对象
+     */
     public function test(Request $request): void
     {
         $userInfoModel = new UserInfo();

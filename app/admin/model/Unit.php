@@ -55,6 +55,7 @@ class Unit extends Model
             Log::error("删除产品信息时发生错误: " . $e->getMessage());
             return $e->getMessage();
         }
+        return 1;
     }
     public function addUnit($name): bool|string
     {

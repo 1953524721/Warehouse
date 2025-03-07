@@ -24,11 +24,11 @@ class Index extends comm
         // 根据用户是否登录，返回相应的响应
         if ($this->isUserLoggedIn())
         {
-            //return '您好！这是一个[index]示例应用';
             $appName = env("APP_NAME");
             $serverIp  = $_SERVER['SERVER_ADDR'];
             // 获取用户信息，用于在页面中显示
             $user = Session::get('user')['name'];
+            Log::write('页面加载成功~'.'success');
             return View::fetch("index",[
                 'user' => $user,
                 'appName' => $appName,
@@ -68,10 +68,9 @@ class Index extends comm
         }
         $unitModel = new \app\admin\model\Unit();
         $unitList = $unitModel->selectAll();
-        $response = [
+        return [
             'units' => $unitList
         ];
-        return $response;
     }
     /**
      * 处理产品添加请求
@@ -236,11 +235,13 @@ class Index extends comm
         $result = $productionModel->destroy($id);
         if ($result)
         {
+            Log::debug("删除成功:",$id);
             // 如果删除成功，返回成功信息
             return json(['status' => 'success', 'message' => '删除成功']);
         }
         else
         {
+            Log::debug("删除失败:",$id);
             // 如果删除失败，返回错误信息
             return json(['status' => 'error', 'message' => '删除失败']);
         }
@@ -263,6 +264,7 @@ class Index extends comm
         // 获取产品数据
         $data = $productionModel->findProduct($id);
         $data['servers'] = $this->servers();
+        Log::debug("获取成功:" . $data);
         // 返回产品数据
         return json($data);
     }
@@ -309,8 +311,10 @@ class Index extends comm
                 $data = $productionModel->updateProduct($id, $names, $describe, $models, $brand, $production, $num, $unit, $saveName, $date);
                 // 返回更新结果
                 if ($data) {
+                    Log::debug("更新成功:" . $id);
                     return json(['status' => 'success', 'message' => '更新成功']);
                 } else {
+                    Log::debug("更新失败:" . $id);
                     return json(['status' => 'error', 'message' => '更新失败']);
                 }
             } else {
@@ -365,7 +369,7 @@ class Index extends comm
 
                     // 执行出库操作
                     $data = $productionModel->outstockProduct($id, $quantity);
-
+                    Log::debug("出库成功:".$id);
                     // 返回出库结果
                     return json($data);
                 } else {
@@ -397,6 +401,4 @@ class Index extends comm
             return 'N';
         }
     }
-
-
 }

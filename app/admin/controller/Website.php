@@ -9,8 +9,16 @@ use think\facade\Session;
 use think\facade\View;
 use app\admin\model\Website as WebsiteModel;
 
+/**
+ * 网站信息控制器
+ */
 class Website extends comm
 {
+    /**
+     * 获取网站信息
+     *
+     * @return \think\response\Json|string 返回网站信息的视图或错误信息的JSON响应
+     */
     public function websiteInfo(): \think\response\Json|string
     {
         $browse = $this->getLog();
@@ -31,28 +39,58 @@ class Website extends comm
             return json(['status' => 'error', 'message' => $exception->getMessage()]);
         }
     }
-    public function saveWebsite(Request $request)
+
+    /**
+     * 保存网站信息
+     *
+     * @param Request $request 用户请求对象
+     * @return \think\response\Json 返回保存结果的JSON响应
+     */
+    public function saveWebsite(Request $request): \think\response\Json
     {
-        $check = $request->checkToken('__token__');
-        if (false === $check )
-        {
+        // 检查 CSRF token
+        if (false === $request->checkToken('__token__')) {
             return json(['status' => 'error', 'message' => 'token验证失败']);
         }
-        if ($request -> isAjax())
-        {
-            $name  = $request -> param('name');
-            $value = $request -> param('value');
+
+        // 检查是否为 AJAX 请求
+        if (!$request->isAjax()) {
+            return json(['status' => 'error', 'message' => '仅支持 AJAX 请求']);
+        }
+
+        // 获取并验证请求参数
+        $name = $request->param('name');
+        $value = $request->param('value');
+
+        if (empty($name) || empty($value)) {
+            return json(['status' => 'error', 'message' => '参数不能为空']);
+        }
+
+        // 使用正则表达式或其他方式进一步验证 name 和 value 的格式
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $name)) {
+            return json(['status' => 'error', 'message' => '名称格式不正确']);
+        }
+
+        try {
+            // 使用事务确保数据一致性
+            (new \think\Db)->startTrans();
             $websiteModel = new WebsiteModel();
-            $data = $websiteModel->updateWebsite($name,$value);
-            if ($data)
-            {
+            $data = $websiteModel->updateWebsite($name, $value);
+
+            if ($data) {
+                (new \think\Db)->commit();
                 return json(['status' => 'success', 'message' => '保存成功']);
-            }else{
+            } else {
+                (new \think\Db)->rollback();
                 return json(['status' => 'error', 'message' => '保存失败']);
             }
-
+        } catch (\Exception $e) {
+            (new \think\Db)->rollback();
+            return json(['status' => 'error', 'message' => '服务器内部错误: ' . $e->getMessage()]);
         }
     }
+
+
     /**
      * 检查用户是否已登录
      *
@@ -69,6 +107,14 @@ class Website extends comm
             return false;
         }
     }
+
+    /**
+     * 显示网站基础信息
+     *
+     * 该方法收集并显示数据库版本、操作系统信息、服务器类型、数据库字符集、Web服务器类型和PHP版本等信息
+     *
+     * @return string 返回包含网站基础信息的视图
+     */
     public function infos(): string
     {
         $browse = $this->getLog();
