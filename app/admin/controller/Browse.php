@@ -68,7 +68,7 @@ class Browse extends comm
     {
         $browser = $this->getBrowser();
         $version = $this->getBrowserVer();
-        Log::write('浏览信息获取成功',$browser . $version);
+        Log::write('\033[32m浏览信息获取成功\033[0m',$browser . $version);
         return $browser === 'unknown' && $version === 'unknown' ? 'unknown' : $browser . $version;
     }
 

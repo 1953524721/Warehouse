@@ -26,7 +26,7 @@ class User extends Model
      * @throws DataNotFoundException
      * @throws ModelNotFoundException
      */
-    function getUser(string $name, string $pwd): mixed
+    public function getUser(string $name, string $pwd): mixed
     {
         // 根据用户名查询数据库中的用户信息
         $user = $this->where('name', $name)->find();
@@ -50,6 +50,7 @@ class User extends Model
             return null;
         }
     }
+
 
 
     /**
@@ -207,7 +208,7 @@ class User extends Model
                 'date'    => $date
             ]);
         } catch (DbException $e) {
-            Log::error("添加用户信息时发生错误: " . $e->getMessage());
+            Log::error("\033[31m添加用户信息时发生错误: \033[0m" . $e->getMessage());
             return $e->getMessage();
         }
     }

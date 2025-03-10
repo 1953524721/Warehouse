@@ -28,7 +28,7 @@ class Index extends comm
             $serverIp  = $_SERVER['SERVER_ADDR'];
             // 获取用户信息，用于在页面中显示
             $user = Session::get('user')['name'];
-            Log::write('页面加载成功~'.'success');
+            Log::write('\033[32m页面加载成功~'.'success\033[0m');
             return View::fetch("index",[
                 'user' => $user,
                 'appName' => $appName,
