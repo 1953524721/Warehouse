@@ -226,5 +226,14 @@ class User extends Model
             ->where('name', 'like', '%' . $name . '%')
             ->count();
     }
+    public function getUserCount(): int
+    {
+        try {
+            return $this->count();
+        } catch (DbException $e) {
+            Log::error("获取用户总数时发生错误: " . $e->getMessage());
+            return 0; // 或者根据需求返回其他值
+        }
+    }
 
 }

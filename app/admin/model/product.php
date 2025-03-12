@@ -182,4 +182,29 @@ class product extends Model
             return ['status' => 'error', 'message' => '更新库存时发生错误'];
         }
     }
+    public function sumProductNum(): float
+    {
+        try {
+            // 使用 Db 查询构建器计算 num 字段的总和
+            $totalNum = Db::table($this->table)->sum('num');
+
+            return $totalNum;
+        } catch (DbException $e) {
+            Log::error("计算产品数量总和时发生错误: " . $e->getMessage());
+            throw new \RuntimeException("计算产品数量总和时发生错误", 0, $e);
+        }
+    }
+    public function getProductCount(): float
+    {
+        try {
+            return $this->count();
+        } catch (DbException $e) {
+            Log::error("计算产品数量总和时发生错误: " . $e->getMessage());
+            throw new \RuntimeException("计算产品数量总和时发生错误", 0, $e);
+        }
+    }
+
+
+
+
 }

@@ -105,5 +105,48 @@ abstract class BaseController
         $browse = new Browse();
         return $browse->createBrowse();
     }
+    // 阿拉伯数字转汉字
+    public function numberToChinese($num): string
+    {
+        $chineseNumbers = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+        $units = ['', '十', '百', '千'];
+        $bigUnits = ['', '万', '亿'];
+
+        $str = strval($num);
+        $len = strlen($str);
+        $result = '';
+
+        for ($i = 0; $i < $len; $i++)
+        {
+            $digit = intval($str[$i]);
+            $pos = $len - $i - 1;
+            $unit = $units[$pos % 4];
+            $bigUnit = $bigUnits[intval($pos / 4)];
+
+            // 处理零的合并
+            if ($digit === 0) {
+                if ($result !== '' && substr($result, -3) !== '零' && substr($result, -3) !== $bigUnit)
+                {
+                    $result .= '零';
+                }
+            } else
+            {
+                $result .= $chineseNumbers[$digit] . $unit;
+            }
+
+            // 添加万/亿单位
+            if ($pos % 4 === 0) {
+                $result = rtrim($result, '零') . $bigUnit;
+            }
+        }
+
+        // 处理特殊情况（如“一十”简化为“十”）
+        if (substr($result, 0, 6) === '一十')
+        {
+            $result = substr($result, 3);
+        }
+
+        return $result;
+    }
 
 }

@@ -3,6 +3,7 @@
 namespace app\admin\controller;
 
 use app\admin\model\city;
+use app\admin\model\outProductLog;
 use app\admin\model\product;
 use app\admin\model\User as userModel;
 use think\facade\Log;
@@ -327,7 +328,15 @@ class Index extends comm
             return json(['status' => 'error', 'message' => '没有文件上传']);
         }
     }
+
+
+
     // 出库产品的方法，处理出库操作
+
+    /**
+     * @param Request $request
+     * @return Json|void
+     */
     public function outstockItem(Request $request)
     {
         try {
@@ -369,7 +378,19 @@ class Index extends comm
 
                     // 执行出库操作
                     $data = $productionModel->outstockProduct($id, $quantity);
+
+                    //出库记录
+                    $outProductModel = new outProductLog();
+
+                    $outProduction = [
+                        'product_id' => $id,
+                        'num'        => $quantity,
+                        'authorizer' => $username,
+                        'date'       => date('Y-m-d H:i:s')
+                    ];
+                    $outProductModel->addOutProduct($outProduction);
                     Log::debug("出库成功:".$id);
+                    Log::debug("出库数量:".$quantity);
                     // 返回出库结果
                     return json($data);
                 } else {
@@ -385,6 +406,52 @@ class Index extends comm
             return json(['status' => 'error', 'message' => '系统错误: ' . $e->getMessage()]);
         }
     }
+
+
+    public function outBound()
+    {
+        $browse = $this->getLog();
+        // 检查用户是否已登录
+        if ($this->isUserLoggedIn())
+        {
+            return view('outBound');
+        }
+        else
+        {
+            // 如果用户未登录，则重定向到登录页面
+            return $this->redirectToLogin();
+        }
+    }
+    public function outBoundAll(Request $request): Json
+    {
+        $outProductModel = new outProductLog();
+        $page         = $request->post('page','1');
+        $pageSize     = $request->param('pageSize', 10);
+        $browse = $outProductModel->getProductAll($page, $pageSize);
+        $total  = $outProductModel->getProductAllCount();
+        $response = [
+            'data'  => $browse,
+            'total' => $total,
+        ];
+        return json($response);
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // 获取用户模型实例的方法

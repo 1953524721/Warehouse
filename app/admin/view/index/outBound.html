@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>出库记录</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #app {
+            width: 80%;
+            margin: 0 auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            width: 130px;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .page input[type="button"] {
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .page input[type="button"]:hover {
+            background-color: #0056b3;
+        }
+        .loader {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>出库记录</h1>
+    <div id="app">
+        <div class="loader" id="loader"></div>
+        <table>
+            <tr>
+                <th>序号</th>
+                <th>商品ID</th>
+                <th>授权人</th>
+                <th>出库数量</th>
+                <th>出库时间</th>
+            </tr>
+            <tbody id="data-table">
+            <!-- 数据将在这里动态插入 -->
+            </tbody>
+            <tr>
+                <td colspan="5" class="page">
+                    <input type="button" value="首页" class="one">
+                    <input type="button" value="上一页" class="up">
+                    <input type="button" value="下一页" class="down">
+                    <input type="button" value="尾页" class="last">
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+<script src="/static/jquery-3.7.1.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        let currentPage = 1;
+        const pageSize = 10; // 每页显示的记录数
+        let totalPages = 1; // 总页数
+
+        // 初始化加载第一页数据
+        fetchData(currentPage);
+
+        // 显示加载动画
+        function showLoader() {
+            $('#loader').show();
+        }
+
+        // 隐藏加载动画
+        function hideLoader() {
+            $('#loader').hide();
+        }
+
+        // 首页按钮点击事件
+        $('.one').click(function() {
+            console.log('首页按钮点击'); // 调试信息
+            currentPage = 1;
+            showLoader();
+            fetchData(currentPage);
+        });
+
+        // 上一页按钮点击事件
+        $('.up').click(function() {
+            console.log('上一页按钮点击'); // 调试信息
+            if (currentPage > 1) {
+                currentPage--;
+                showLoader();
+                fetchData(currentPage);
+            }
+        });
+
+        // 下一页按钮点击事件
+        $('.down').click(function() {
+            console.log('下一页按钮点击'); // 调试信息
+            if (currentPage < totalPages) {
+                currentPage++;
+                showLoader();
+                fetchData(currentPage);
+            }
+        });
+
+        // 尾页按钮点击事件
+        $('.last').click(function() {
+            console.log('尾页按钮点击'); // 调试信息
+            currentPage = totalPages;
+            showLoader();
+            fetchData(currentPage);
+        });
+
+        // 获取数据并填充到表格中
+        function fetchData(page) {
+            $.ajax({
+                url: "{:url('Index/outBoundAll')}", // 使用 searchItem 作为统一的搜索和分页接口
+                method: 'POST',
+                data: {
+                    page: page,
+                    pageSize: pageSize,
+                },
+                dataType: 'json',
+                beforeSend: function() {
+                    showLoader();
+                },
+                success: function(response) {
+                    console.log('Fetch Data Response:', response); // 打印整个响应对象以进行调试
+
+                    hideLoader();
+
+                    if (response && Array.isArray(response.data)) {
+                        $('#data-table').empty();
+                        response.data.forEach(function (item) {
+                            console.log('Item ID:', item.browse_id, typeof item.browse_id); // 调试信息
+                            $('#data-table').append(`
+                                <tr>
+                                    <td>${item.id}</td>
+                                    <td>${item.product_id}</td>
+                                    <td>${item.authorizer}</td>
+                                    <td>${item.num}</td>
+                                    <td>${item.date}</td>
+                                </tr>
+                            `);
+                        });
+
+                        // 更新总页数
+                        totalPages = Math.ceil(response.total / pageSize);
+
+                        // 重新绑定事件
+                        rebindPaginationEvents();
+                    } else {
+                        console.error('Response data is not an array:', response.data);
+                        $('#data-table').empty();
+                        $('#data-table').append('<tr><td colspan="5">没有数据</td></tr>');
+                        hideLoader();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                    $('#data-table').empty();
+                    $('#data-table').append('<tr><td colspan="5">加载数据失败</td></tr>');
+                    hideLoader();
+                }
+            });
+        }
+
+        // 重新绑定分页按钮事件
+        function rebindPaginationEvents() {
+            $('.one').off('click').click(function() {
+                console.log('重新绑定首页按钮点击'); // 调试信息
+                currentPage = 1;
+                showLoader();
+                fetchData(currentPage);
+            });
+
+            $('.up').off('click').click(function() {
+                console.log('重新绑定上一页按钮点击'); // 调试信息
+                if (currentPage > 1) {
+                    currentPage--;
+                    showLoader();
+                    fetchData(currentPage);
+                }
+            });
+
+            $('.down').off('click').click(function() {
+                console.log('重新绑定下一页按钮点击'); // 调试信息
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    showLoader();
+                    fetchData(currentPage);
+                }
+            });
+
+            $('.last').off('click').click(function() {
+                console.log('重新绑定尾页按钮点击'); // 调试信息
+                currentPage = totalPages;
+                showLoader();
+                fetchData(currentPage);
+            });
+        }
+    });
+</script>
+</html>
