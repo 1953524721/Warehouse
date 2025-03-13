@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/{$appName}/node_modules/element-theme-chalk/lib/index.css">
+    <style>
+        .el-table .warning-row {
+            background: oldlace;
+        }
+
+        .el-table .success-row {
+            background: #f0f9eb;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-table
+            :data="tableData"
+            stripe
+            height="500"
+            style="width: 100%">
+        <el-table-column
+                prop="id"
+                label="序号"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="name"
+                label="名称"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="describe"
+                label="简述"
+                width="250">
+        </el-table-column>
+        <el-table-column
+                prop="models"
+                label="型号"
+                width="250">
+        </el-table-column>
+        <el-table-column
+                prop="brand"
+                label="品牌"
+                width="250">
+        </el-table-column>
+        <el-table-column
+                prop="production"
+                label="产地"
+                width="250">
+        </el-table-column>
+        <el-table-column
+                prop="num"
+                label="数量"
+                width="250">
+        </el-table-column>
+        <el-table-column
+                prop="unit"
+                label="单位"
+                width="250">
+        </el-table-column>
+        <el-table-column
+                prop="flier"
+                label="简略图"
+                width="250">
+        </el-table-column>
+        <el-table-column
+                prop="date"
+                label="添加日期"
+                width="250">
+        </el-table-column>
+    </el-table>
+</div>
+</body>
+<script src="/{$appName}/node_modules/vue/dist/vue.min.js"></script>
+<script src="/{$appName}/node_modules/element-ui/lib/index.js"></script>
+<script>
+    const Main = {
+        data() {
+            return {
+                tableData: JSON.parse({$list})
+            }
+        }
+    };
+    const Ctor = Vue.extend(Main);
+    new Ctor().$mount('#app')
+</script>
+</html>

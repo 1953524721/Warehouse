@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加用户</title>
+    <meta name="csrf-token" content="{:token()}">
+    <style>
+        /* styles.css */
+        .reset, #addUserButton {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .reset:hover, #addUserButton:hover {
+            background-color: #45a049;
+        }
+
+        .reset {
+            background-color: #f44336; /* Red */
+        }
+
+        .reset:hover {
+            background-color: #d32f2f;
+        }
+
+        /* 美化输入框样式 */
+        .username, .password {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .username:focus, .password:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+<h1>添加用户</h1>
+    <div id="app">
+        <form  id="userForm">
+            <table>
+                <tr>
+                    <td>用户名：</td>
+                    <td><input type="text" placeholder="输入用户名" class="username" minlength="5"></td>
+                </tr>
+                <tr>
+                    <td>密码：</td>
+                    <td><input type="password" placeholder="输入密码" class="password" minlength="8" maxlength="16"></td>
+                </tr>
+                <tr>
+                    <td><input type="reset" value="重置" class="reset"></td>
+                    <td><input type="button" value="添加" id="addUserButton"></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span  class="error_info"></span>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
+<!--<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>-->
+<script src="/static/jquery-3.7.1.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#addUserButton').click(function() {
+            const username = $('.username').val();
+            const password = $('.password').val();
+
+            if (username === '' || password === '') {
+                $('.error_info').text('用户名或密码不能为空'); // 清空错误信息
+                return;
+            }
+
+            $('.error_info').text(''); // 清空错误信息
+
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: "{:url('admin/User/addUserPost')}", // 替换为你的API端点
+                type: 'POST',
+                data: { username: username, password: password },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('.username').val('');
+                        $('.password').val('');
+                        $('.error_info').text(response.message);
+                    } else {
+                        $('.error_info').text(response.message); // 显示错误信息
+                        setTimeout(function() {
+                            location.reload(); // 刷新页面
+                        }, 2000); // 2000毫秒 = 2秒
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('.error_info').text('请求出错：' + error); // 显示错误信息
+                }
+            });
+        });
+
+    });
+</script>
+</html>

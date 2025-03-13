@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{:token()}">
+    <title>ICP备案号维护</title>
+    <style>
+            /* 输入框样式 */
+    #values {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    /* 按钮样式 */
+    .button {
+        padding: 10px 20px;
+        background-color: #007bff; /* 蓝色背景 */
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .button:hover {
+        background-color: #0056b3; /* 悬停时的颜色 */
+    }
+
+    /* 信息提示样式 */
+    .info {
+        color: green;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    </style>
+</head>
+<body>
+    <h1>ICP备案号维护</h1>
+<div id="app">
+    <table>
+        <tr>
+            <td>{$website.name} :</td>
+            <td>
+                <input type="text" value="{$website.value}" id="values">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button class="button">保存</button>
+            </td>
+            <td>
+                <span class="info"></span>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+<script src="/static/jquery-3.7.1.js"></script>
+<script type="text/javascript">
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            // 获取CSRF令牌
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            // 如果CSRF令牌存在，则将其添加到请求头中
+            if (csrfToken) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            }
+        }
+    });
+    $(".button").click(function () {
+        const modal = $('#values').val();
+        if (modal.length===0)
+        {
+            $('.info').html("请输入ICP备案号");
+            return false;
+        }
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{:url('admin/Website/saveWebsite')}",
+            type: 'POST',
+            data: {
+                name: '{$website.name}',
+                value: modal
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    $('.info').html(res.message);
+                    // alert(res.msg);
+                } else {
+                    $('.info').html(res.message);
+                }
+            }
+        });
+    })
+</script>
+</html>

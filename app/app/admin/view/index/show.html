@@ -1,0 +1,877 @@
+<!-- show.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品页</title>
+    <meta name="csrf-token" content="{:token()}">
+    <style>
+        /* 现有的样式 */
+        table tr:nth-child(odd) {
+            background-color: #f2f2f2; /* 奇数行的背景颜色 */
+        }
+
+        table tr:nth-child(even) {
+            background-color: #ffffff; /* 偶数行的背景颜色 */
+        }
+
+        /* 固定表头 */
+        th {
+            position: sticky;
+            top: 0;
+            background-color: #66B2FF; /* 表头背景颜色 */
+            color: white; /* 表头文字颜色 */
+            z-index: 1; /* 确保表头在其他内容之上 */
+        }
+        .page ul {
+            list-style-type: none; /* 去掉默认的列表样式 */
+            padding: 0; /* 去掉默认的内边距 */
+            margin: 0; /* 去掉默认的外边距 */
+        }
+
+        .page li {
+            display: inline-block; /* 水平排列 */
+            margin-right: 10px; /* 右侧间距 */
+        }
+        td{
+            width: 140px;
+        }
+
+        /* 模态对话框样式 */
+        .modal {
+            display: none; /* 默认隐藏 */
+            position: fixed; /* 固定定位 */
+            z-index: 1; /* 放在最上层 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 宽度为100% */
+            height: 100%; /* 高度为100% */
+            overflow: auto; /* 溢出部分滚动 */
+            background-color: rgb(0,0,0); /* 背景颜色 */
+            background-color: rgba(0,0,0,0.4); /* 半透明背景 */
+            padding-top: 60px; /* 顶部内边距 */
+        }
+
+        .modal-content {
+            background-color: #fefefe; /* 内容背景颜色 */
+            margin: 5% auto; /* 上下居中 */
+            padding: 20px; /* 内边距 */
+            border: 1px solid #888; /* 边框 */
+            width: 30%; /* 宽度调整为60% */
+            max-height: 80vh; /* 最大高度为视口高度的80% */
+            overflow-y: auto; /* 内容超出时可滚动 */
+        }
+
+        .close {
+            color: #aaa; /* 关闭按钮颜色 */
+            float: right; /* 右对齐 */
+            font-size: 28px; /* 字体大小 */
+            font-weight: bold; /* 加粗 */
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black; /* 鼠标悬停时的颜色 */
+            text-decoration: none; /* 去掉下划线 */
+            cursor: pointer; /* 鼠标指针样式 */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        /* 搜索框样式 */
+        #searchInput {
+            width: 300px; /* 调整宽度 */
+            padding: 10px; /* 内边距 */
+            margin-right: 10px; /* 右边距 */
+            border: 2px solid #ccc; /* 边框 */
+            border-radius: 25px; /* 圆角 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 阴影 */
+            transition: border-color 0.3s ease; /* 过渡效果 */
+            outline: none; /* 去掉聚焦时的默认轮廓 */
+            font-size: 16px; /* 字体大小 */
+        }
+
+        /* 搜索框聚焦时的样式 */
+        #searchInput:focus {
+            border-color: #4CAF50; /* 聚焦时的边框颜色 */
+        }
+
+        /* 占位符样式 */
+        #searchInput::placeholder {
+            color: #999; /* 占位符颜色 */
+            opacity: 1; /* Firefox */
+        }
+
+        /* 搜索按钮样式 */
+        #searchButton {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* 搜索按钮悬停时的样式 */
+        #searchButton:hover {
+            background-color: #45a049;
+        }
+            /* 基础按钮样式 */
+        .edit-btn, .delete-btn, .outstock-btn {
+            padding: 8px 16px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* 修改按钮样式 */
+        .edit-btn {
+            background-color: #007bff; /* 蓝色 */
+        }
+
+        .edit-btn:hover {
+            background-color: #0056b3; /* 悬停时的蓝色 */
+        }
+
+        /* 删除按钮样式 */
+        .delete-btn {
+            background-color: #dc3545; /* 红色 */
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333; /* 悬停时的红色 */
+        }
+
+        /* 出库按钮样式 */
+        .outstock-btn {
+            background-color: #28a745; /* 绿色 */
+        }
+
+        .outstock-btn:hover {
+            background-color: #218838; /* 悬停时的绿色 */
+        }
+        /* 基础按钮样式 */
+        .one, .up, .down, .last {
+            padding: 8px 16px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* 首页按钮样式 */
+        .one {
+            background-color: #007bff; /* 蓝色 */
+        }
+
+        .one:hover {
+            background-color: #0056b3; /* 悬停时的蓝色 */
+        }
+
+        /* 上一页按钮样式 */
+        .up {
+            background-color: #6c757d; /* 灰色 */
+        }
+
+        .up:hover {
+            background-color: #545b62; /* 悬停时的灰色 */
+        }
+
+        /* 下一页按钮样式 */
+        .down {
+            background-color: #6c757d; /* 灰色 */
+        }
+
+        .down:hover {
+            background-color: #545b62; /* 悬停时的灰色 */
+        }
+
+        /* 尾页按钮样式 */
+        .last {
+            background-color: #007bff; /* 蓝色 */
+        }
+
+        .last:hover {
+            background-color: #0056b3; /* 悬停时的蓝色 */
+        }
+           .operation-buttons {
+           display: flex;
+           justify-content: space-between; /* 平均分布每个按钮 */
+       }
+
+       .operation-buttons input[type="button"] {
+           flex: 1; /* 让每个按钮占据相等的空间 */
+           margin: 2px; /* 保持按钮之间的最小间距 */
+       }
+        .action-column {
+            width: 220px; /* 根据需要调整宽度 */
+        }
+            /* 美化表单 */
+        #productForm {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 美化输入框 */
+        #productForm input[type="text"],
+        #productForm input[type="number"] {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        /* 美化提交按钮 */
+        #productForm .submit {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #productForm .submit[type="button"]:hover {
+            background-color: #218838;
+        }
+        .input-height {
+            height: 40px; /* 假设输入框的高度是 34px */
+        }
+        /* 出库模态对话框样式 */
+        #outstockModal {
+            display: none; /* 默认隐藏 */
+            position: fixed; /* 固定定位 */
+            z-index: 1; /* 放在最上层 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 宽度为100% */
+            height: 100%; /* 高度为100% */
+            overflow: auto; /* 溢出部分滚动 */
+            background-color: rgb(0,0,0); /* 背景颜色 */
+            background-color: rgba(0,0,0,0.4); /* 半透明背景 */
+            padding-top: 60px; /* 顶部内边距 */
+        }
+
+        #outstockModal .modal-content {
+            background-color: #fefefe; /* 内容背景颜色 */
+            margin: 5% auto; /* 上下居中 */
+            padding: 20px; /* 内边距 */
+            border: 1px solid #888; /* 边框 */
+            width: 30%; /* 宽度调整为60% */
+            max-height: 80vh; /* 最大高度为视口高度的80% */
+            overflow-y: auto; /* 内容超出时可滚动 */
+        }
+
+        #outstockModal .close {
+            color: #aaa; /* 关闭按钮颜色 */
+            float: right; /* 右对齐 */
+            font-size: 28px; /* 字体大小 */
+            font-weight: bold; /* 加粗 */
+        }
+
+        #outstockModal .close:hover,
+        #outstockModal .close:focus {
+            color: black; /* 鼠标悬停时的颜色 */
+            text-decoration: none; /* 去掉下划线 */
+            cursor: pointer; /* 鼠标指针样式 */
+        }
+        /* 模态对话框样式 */
+        .modal {
+            display: none; /* 默认隐藏 */
+            position: fixed; /* 固定定位 */
+            z-index: 1; /* 放在最上层 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 宽度为100% */
+            height: 100%; /* 高度为100% */
+            overflow: auto; /* 溢出部分滚动 */
+            background-color: rgb(0,0,0); /* 背景颜色 */
+            background-color: rgba(0,0,0,0.4); /* 半透明背景 */
+            padding-top: 60px; /* 顶部内边距 */
+            transition: opacity 0.3s ease; /* 过渡效果 */
+        }
+
+        .modal-content {
+            background-color: #fefefe; /* 内容背景颜色 */
+            margin: 5% auto; /* 上下居中 */
+            padding: 20px; /* 内边距 */
+            border: 1px solid #888; /* 边框 */
+            width: 30%; /* 宽度调整为30% */
+            max-height: 80vh; /* 最大高度为视口高度的80% */
+            overflow-y: auto; /* 内容超出时可滚动 */
+            border-radius: 8px; /* 圆角 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 阴影 */
+        }
+
+        .close {
+            color: #aaa; /* 关闭按钮颜色 */
+            float: right; /* 右对齐 */
+            font-size: 28px; /* 字体大小 */
+            font-weight: bold; /* 加粗 */
+            cursor: pointer; /* 鼠标指针样式 */
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black; /* 鼠标悬停时的颜色 */
+            text-decoration: none; /* 去掉下划线 */
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 15px; /* 底部间距 */
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px; /* 底部间距 */
+            font-weight: bold; /* 加粗 */
+        }
+
+        .form-group input[type="number"],
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: 100%; /* 宽度为100% */
+            padding: 10px; /* 内边距 */
+            border: 1px solid #ccc; /* 边框 */
+            border-radius: 4px; /* 圆角 */
+            box-sizing: border-box; /* 包括内边距和边框在内的宽度计算 */
+            font-size: 16px; /* 字体大小 */
+            transition: border-color 0.3s ease; /* 过渡效果 */
+        }
+
+        .form-group input[type="number"]:focus,
+        .form-group input[type="text"]:focus,
+        .form-group input[type="password"]:focus {
+            border-color: #4CAF50; /* 聚焦时的边框颜色 */
+        }
+
+        /* 提交按钮样式 */
+        .submit.outstock-submit {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%; /* 宽度为100% */
+        }
+
+        .submit.outstock-submit:hover {
+            background-color: #45a049;
+        }
+
+        /* 错误消息样式 */
+        .error-message {
+            color: red;
+            margin-top: 10px; /* 顶部间距 */
+        }
+        .productions {
+            width: 200px;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            appearance: none; /* 移除默认样式 */
+            -webkit-appearance: none; /* 移除 WebKit 浏览器的默认样式 */
+            -moz-appearance: none; /* 移除 Firefox 的默认样式 */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="#333" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 10px 10px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+<div id="app">
+
+    <input type="hidden" name="__token__" value="{:token()}" />
+    <input type="hidden" name="appName" value="{$appName}" />
+    <div>
+        <label for="searchInput"></label><input type="text" id="searchInput" placeholder="输入名称搜索">
+        <select name="production" id="production" class="productions">
+            {volist name='cityList' id='city'}
+                <option value="{$city.city_name}">{$city.city_name} </option>
+            {/volist}
+        </select>
+        <input type="button" value="搜索" id="searchButton"  class="searchButton">
+    </div>
+    <table>
+        <tr>
+            <th>序号</th>
+            <th>名称</th>
+            <th>简述</th>
+            <th>型号</th>
+            <th>品牌</th>
+            <th>产地</th>
+            <th>数量</th>
+<!--            <th>单位</th>-->
+            <th>简略图</th>
+            <th>操作日期</th>
+            <th class="action-column">操作</th>
+        </tr>
+
+        <tbody id="data-table">
+        <!-- 数据将在这里动态插入 -->
+        </tbody>
+
+        <tr>
+            <td colspan="11" class="page">
+                <input type="button" value="首页" class="one">
+                <input type="button" value="上一页" class="up">
+                <input type="button" value="下一页" class="down">
+                <input type="button" value="尾页" class="last">
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- 模态对话框 -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <form id="productForm" method="post" enctype="multipart/form-data">
+            <input type="hidden" id="id" name="id" value="">
+            <label for="names">名称:</label>
+            <input type="text" id="names" name="names" value=""><br>
+            <label for="describe">简述:</label>
+            <input type="text" id="describe" name="describe" value=""><br>
+            <label for="models">型号:</label>
+            <input type="text" id="models" name="models" value=""><br>
+            <label for="brand">品牌:</label>
+            <input type="text" id="brand" name="brand" value=""><br>
+            <label for="production">产地:</label>
+            <select name="production" id="" class="production input-height">
+                {volist name='cityList' id='cityList'}
+                <option value="{$cityList.city_name}">{$cityList.city_name} </option>
+                {/volist}
+            </select>
+<!--            <input type="text" id="production" name="production" value="">-->
+            <br>
+            <label for="num">数量:</label>
+            <input type="text" id="num" name="num" value=""><br>
+            <label for="unit">单位:</label>
+            <input type="text" id="unit" name="unit" value=""><br>
+            <label for="flier">简略图:</label>
+            <input type="file" id="flier" name="flier" value="">
+            <img id="flier-preview" src="" alt="简略图" style="width: 50px; height: 50px; display: none;">
+            <br>
+            <input type="button" value="提交" class="submit">
+            <span class="error-message"></span>
+        </form>
+    </div>
+</div>
+<!-- 出库模态对话框 -->
+<div id="outstockModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>出库操作</h2>
+        <form id="outstockForm">
+            <input type="hidden" id="outstockId" name="id" value="">
+            <div class="form-group">
+                <label for="outstockQuantity">出库数量:</label>
+                <input type="number" id="outstockQuantity" name="quantity" required>
+            </div>
+            <div class="form-group">
+                <label for="outstockUsername">授权用户名:</label>
+                <input type="text" id="outstockUsername" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="outstockPassword">密码:</label>
+                <input type="password" id="outstockPassword" name="password" required>
+            </div>
+            <input type="button" value="提交" class="submit outstock-submit">
+            <span class="error-message"></span>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+<script type="text/javascript">
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            // 获取CSRF令牌
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            // 如果CSRF令牌存在，则将其添加到请求头中
+            if (csrfToken) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            }
+        }
+    });
+
+    $(document).ready(function() {
+        let currentPage = 1;
+        const pageSize = 10; // 每页显示的记录数
+        let totalPages = 1; // 总页数
+        let currentSearch = ''; // 用于存储当前的搜索条件
+        let currentProductions = ''; // 用于存储当前的生产地条件
+
+        // 初始化加载第一页数据
+        fetchData(currentPage);
+
+        // 搜索按钮点击事件
+        $('.searchButton').click(function () {
+            currentSearch = $('#searchInput').val();
+            currentProductions = $('.productions').val();
+
+            if (currentSearch.length === 0) {
+                fetchData(currentPage);
+            } else {
+                fetchData(currentPage, currentSearch, currentProductions);
+            }
+        });
+
+        // 首页按钮点击事件
+        $('.one').click(function() {
+            currentPage = 1;
+            fetchData(currentPage, currentSearch, currentProductions);
+        });
+
+        // 上一页按钮点击事件
+        $('.up').click(function() {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchData(currentPage, currentSearch, currentProductions);
+            }
+        });
+
+        // 下一页按钮点击事件
+        $('.down').click(function() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                fetchData(currentPage, currentSearch, currentProductions);
+            }
+        });
+
+        // 尾页按钮点击事件
+        $('.last').click(function() {
+            currentPage = totalPages;
+            fetchData(currentPage, currentSearch, currentProductions);
+        });
+
+        // 获取数据并填充到表格中
+        function fetchData(page, search = '', productions = '') {
+            $.ajax({
+                url: 'searchItem', // 使用 searchItem 作为统一的搜索和分页接口
+                method: 'POST',
+                data: {
+                    page: page,
+                    pageSize: pageSize,
+                    search: search,
+                    productions: productions
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Fetch Data Response:', response); // 打印整个响应对象以进行调试
+                    $('#data-table').empty();
+                    const appName = $('input[name="appName"]').val();
+
+                    const total = response.total;
+
+                    if (total === 0) {
+                        // 如果 total 为 0，显示一行“未查询到数据”
+                        $('#data-table').empty().append(`
+                        <tr>
+                            <td colspan="10" style="text-align: center;">未查询到数据</td>
+                        </tr>
+                    `);
+                    } else {
+                        response.data.forEach(function(item) {
+                            console.log('Item ID:', item.id, typeof item.id); // 调试信息
+                            let imgSrc;
+                            if (response.servers === 'A') {
+                                imgSrc = `/${appName}/public/storage/${item.flier}`;
+                            } else {
+                                imgSrc = `/storage/${item.flier}`;
+                            }
+                            $('#data-table').append(`
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.names}</td>
+                                <td>${item.describe}</td>
+                                <td>${item.models}</td>
+                                <td>${item.brand}</td>
+                                <td>${item.production}</td>
+                                <td>${item.num}</td>
+                                <!-- 简略图 -->
+                                <td>
+                                    <img src="${imgSrc}" alt="简略图" style="width: 50px; height: 50px;">
+                                </td>
+                                <td>${item.add_date}</td>
+                                <td>
+                                    <input type="button" value="修改" class="edit-btn" data-id="${item.id}">
+                                    <input type="button" value="删除" class="delete-btn" data-id="${item.id}">
+                                    <input type="button" value="出库" class="outstock-btn" data-id="${item.id}">
+                                </td>
+                            </tr>
+                        `);
+                        });
+                    }
+
+                    // 更新总页数
+                    totalPages = Math.ceil(total / pageSize);
+
+                    // 重新绑定事件
+                    rebindEditEvent();
+                    rebindDeleteEvent();
+                    rebindOutstockEvent();
+                    rebindPaginationEvents();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        // 重新绑定分页按钮事件
+        function rebindPaginationEvents() {
+            $('.one').off('click').click(function() {
+                currentPage = 1;
+                fetchData(currentPage, currentSearch, currentProductions);
+            });
+
+            $('.up').off('click').click(function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    fetchData(currentPage, currentSearch, currentProductions);
+                }
+            });
+
+            $('.down').off('click').click(function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    fetchData(currentPage, currentSearch, currentProductions);
+                }
+            });
+
+            $('.last').off('click').click(function() {
+                currentPage = totalPages;
+                fetchData(currentPage, currentSearch, currentProductions);
+            });
+        }
+
+        // 使用命名空间来绑定事件
+        function rebindEditEvent() {
+            $(document).off('click.edit', '.edit-btn').on('click.edit', '.edit-btn', function() {
+                const id = $(this).data('id'); // 获取按钮上的ID
+                console.log('Editing item with ID:', id, typeof id); // 调试信息
+
+                // 显示模态对话框
+                $('#myModal').show();
+
+                $('.error-message').text("");
+
+                // 获取数据并填充到表单中
+                $.ajax({
+                    url: 'getItem', // 替换为你的API端点
+                    method: 'GET',
+                    data: {
+                        id: id
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Response:', response);
+                        $('#id').val(response.id);
+                        $('#names').val(response.names);
+                        $('#describe').val(response.describe);
+                        $('#models').val(response.models);
+                        $('#brand').val(response.brand);
+                        $('#production').val(response.production);
+                        $('#num').val(response.num);
+                        $('#unit').val(response.unit);
+
+                        // 使用 jQuery 进行 servers 判断
+                        var flierPath = (response.servers === 'A') ? `/${appName}/public/storage/${response.flier}` : `/storage/${response.flier}`;
+
+                        $('#flier-preview').attr('src', flierPath);
+                        $('#flier-preview').show();
+                        $('#flier').val(''); // 清空文件输入字段
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching data:', error);
+                    }
+                });
+            });
+        }
+
+        // 绑定删除按钮事件
+        function rebindDeleteEvent() {
+            $(document).off('click.delete', '.delete-btn').on('click.delete', '.delete-btn', function() {
+                const id = $(this).data('id'); // 获取按钮上的ID
+                console.log('Deleting item with ID:', id, typeof id); // 调试信息
+
+                // 弹出确认对话框
+                if (confirm('确定要删除此商品吗？')) {
+                    // 发送删除请求
+                    $.ajax({
+                        url: 'deleteItem', // 替换为你的API端点
+                        method: 'POST',
+                        data: {
+                            id: id
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log('Item deleted successfully:', response);
+                            $(`.delete-btn[data-id="${id}"]`).closest('tr').remove();
+                            fetchData(currentPage, currentSearch, currentProductions); // 刷新当前页面数据
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error deleting item:', error);
+                        }
+                    });
+                }
+            });
+        }
+
+        // 绑定出库按钮事件
+        function rebindOutstockEvent() {
+            $(document).off('click.outstock', '.outstock-btn').on('click.outstock', '.outstock-btn', function() {
+                const id = $(this).data('id'); // 获取按钮上的ID
+                console.log('Outstocking item with ID:', id, typeof id); // 调试信息
+
+                // 显示出库模态对话框
+                $('#outstockModal').show();
+
+                // 清空之前的错误消息
+                $('#outstockModal .error-message').text('');
+
+                // 获取当前商品的数量
+                const currentQuantity = parseFloat($(this).closest('tr').find('td:eq(6)').text());
+                console.log('Current Quantity:', currentQuantity);
+
+                // 绑定出库表单提交事件
+                $('#outstockModal .outstock-submit').off('click').on('click', function() {
+                    const outstockQuantity = $('#outstockQuantity').val().trim();
+                    console.log('Outstock Quantity:', outstockQuantity);
+
+                    // 验证输入是否为纯数字
+                    if (!/^\d+$/.test(outstockQuantity)) {
+                        $('#outstockModal .error-message').text('出库数量必须为纯数字');
+                        return;
+                    }
+
+                    // 将输入转换为数字
+                    const quantity = parseInt(outstockQuantity, 10);
+
+                    // 验证输入数量是否不大于当前数量
+                    if (quantity > currentQuantity) {
+                        $('#outstockModal .error-message').text('出库数量不能大于当前库存数量');
+                        return;
+                    }
+
+                    // 如果验证通过，发送出库请求
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: 'outstockItem', // 替换为你的出库API端点
+                        method: 'POST',
+                        data: {
+                            id: id,
+                            quantity: quantity,
+                            username: $('#outstockUsername').val(),
+                            password: $('#outstockPassword').val()
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log('Outstock successful:', response);
+                            if (response.status === 'success') {
+                                // 关闭模态对话框
+                                $('#outstockModal').hide();
+                                // 刷新当前页面数据
+                                fetchData(currentPage, currentSearch, currentProductions);
+                            } else {
+                                $('#outstockModal .error-message').text(response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error outstocking item:', error);
+                            $('#outstockModal .error-message').text('出库失败，请重试');
+                        }
+                    });
+                });
+            });
+        }
+
+        // 绑定关闭按钮事件
+        $('.close').click(function() {
+            $('#myModal').hide();
+            $('#flier-preview').hide();
+            $('#flier').val(''); // 清空文件输入字段
+        });
+
+        // 绑定出库模态对话框关闭按钮事件
+        $('#outstockModal .close').click(function() {
+            $('#outstockModal').hide();
+        });
+
+        // 绑定表单提交事件
+        $('.submit').click(function () {
+            console.log('Submit button clicked');
+            // 创建 FormData 对象
+            const formData = new FormData($('#productForm')[0]);
+            // 发起 AJAX 请求
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: 'updateItem',  // 你的后端接口地址
+                data: formData,
+                type: 'post',
+                processData: false,  // 不处理数据
+                contentType: false,  // 不设置内容类型
+                dataType: 'json',
+                success: function (res) {
+                    console.log(res);
+                    // 根据响应结果进行处理
+                    if (res.status === 'success') {
+                        // 操作成功，弹出提示信息并跳转到新页面
+                        $('.error-message').text(res.message);
+                        // 等待3秒后关闭模态对话框并刷新当前页面数据
+                        setTimeout(function() {
+                            $('#myModal').hide(); // 关闭模态对话框
+                            fetchData(currentPage, currentSearch, currentProductions); // 刷新当前页面数据
+                        }, 3000); // 3000毫秒 = 3秒
+
+                    } else {
+                        // 操作失败，显示错误提示
+                        $('.error-message').text(res.message);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    // 请求失败，输出错误信息并弹出提示信息
+                    console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
+                    alert('请求失败，请稍后再试。');
+                }
+            });
+        });
+    });
+
+</script>
+</body>
+</html>

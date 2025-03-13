@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/font-waesome.css">
+    <link rel="stylesheet" href="/{$appName}/public/static/font-waesome.css">
+    <title>{$appName}管理页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        #sidebar {
+            width: 250px;
+            background-color: #222D32;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            top: 50px; /* 将 top 值增加到 50px */
+            left: 0;
+            overflow-y: auto;
+        }
+
+        #sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #sidebar li {
+            position: relative;
+        }
+
+        #sidebar li a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: white;
+        }
+
+        #sidebar li a:hover {
+            background-color: #2C3B41;
+        }
+
+        #sidebar .sub-menu {
+            display: none;
+            background-color: #2C3B41;
+            padding-left: 20px;
+        }
+
+        #sidebar .sub-menu li a {
+            padding: 8px 15px;
+        }
+
+        #sidebar .sub-menu li a:hover {
+            background-color: #0C336B;
+        }
+
+        #content {
+            margin-left: 250px;
+            padding: 20px;
+            margin-top: 50px; /* 调整内容区域的顶部边距以避免被置顶导航遮挡 */
+        }
+        #service-content {
+            display: grid;
+            place-items: center; /* 水平和垂直居中 */
+            height: 30vh; /* 使高度占满整个视口 */
+            margin-top: 50px; /* 调整顶部边距以避免被置顶导航遮挡 */
+        }
+
+
+
+        #welcome-right {
+            font-size: 18px;
+            color: #333;
+            text-align: right;
+            margin-right: 50px; /* 向左移动 50px */
+            cursor: pointer; /* 添加鼠标指针样式 */
+            position: relative; /* 添加相对定位 */
+        }
+
+        #logout-container {
+            margin-top: 10px; /* 根据需要调整间距 */
+            display: none; /* 初始状态下隐藏 */
+            position: absolute; /* 绝对定位 */
+            top: 100%; /* 放置在 #welcome-right 的下方 */
+            right: 77px; /* 右对齐 */
+            background-color: white; /* 可选：添加背景色以便更明显 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 可选：添加阴影效果 */
+            z-index: 1001; /* 确保在其他内容之上 */
+            width: auto; /* 根据内容自动调整宽度 */
+            padding: 5px; /* 可选：添加内边距 */
+            border-radius: 5px; /* 可选：添加圆角 */
+        }
+
+
+        #logout-button {
+            padding: 5px 10px;
+            background-color: #ff4d4f;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #logout-button:hover {
+            background-color: #ff1919;
+        }
+
+        .top {
+            display: flex;
+            justify-content: flex-end; /* 使子元素靠右对齐 */
+            align-items: center; /* 垂直居中对齐 */
+            height: 50px;
+            background: linear-gradient(to left, #66B2FF, #0056b3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000; /* 确保置顶导航在其他内容之上 */
+            width: 100%;
+            padding: 0 20px;
+        }
+        .ajax-link::before {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-right: 8px;
+        }
+
+        .user-info::before {
+            content: '\f007'; /* fa-user 图标 */
+        }
+
+        .add-user::before {
+            content: '\f234'; /* fa-user-plus 图标 */
+        }
+
+        .user-query::before {
+            content: '\f002'; /* fa-search 图标 */
+        }
+
+        .add-product::before {
+            content: '\f067'; /* fa-cart-plus 图标 */
+        }
+
+        .view-product::before {
+            content: '\f07a'; /* fa-list 图标 */
+        }
+
+        .unit-maintenance::before {
+            content: '\f0ae'; /* fa-cubes 图标 */
+        }
+
+        .icp-maintenance::before {
+            content: '\f0ac'; /* fa-info-circle 图标 */
+        }
+
+        .visit-log::before {
+            content: '\f0c0'; /* fa-chart-bar 图标 */
+        }
+
+        .website-info::before {
+            content: '\f0ac'; /* fa-info-circle 图标 */
+        }
+
+
+
+    </style>
+</head>
+<body>
+<div class="top">
+        <!-- 置顶导航横条的内容 -->
+        <div id="welcome-right">欢迎: {$user}</div>
+        <div id="logout-container" style="display: none;">
+            <button id="logout-button">退出</button>
+        </div>
+</div>
+    <div id="sidebar">
+        <ul>
+            <li>
+                <a href="javascript:void(0)">管理台 <span class="arrow"></span> </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a class="ajax-link unit-maintenance" href="{:url('admin/index')}">基本数据</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <a href="javascript:void(0)">用户管理 <span class="arrow"></span> </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a class="ajax-link user-info" href="{:url('Userinfo/getUser')}">我的信息</a>
+                        <a class="ajax-link add-user" href="{:url('User/addUser')}">添加用户</a>
+                        <a class="ajax-link user-query" href="{:url('User/index')}">用户查询</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <a href="javascript:void(0)">商品管理 </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a class="ajax-link add-product" href="{:url('Index/add')}">添加商品</a>
+                        <a class="ajax-link view-product" href="{:url('Index/show')}">查看商品</a>
+                        <a class="ajax-link user-query" href="{:url('Index/outBound')}">出库记录</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <a href="javascript:void(0)">网站管理  </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a class="ajax-link unit-maintenance" href="{:url('Unit/unitPage')}">库存单位维护</a>
+                        <a class="ajax-link icp-maintenance" href="{:url('Website/websiteInfo')}">ICP维护</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <a href="javascript:void(0)">网站统计 </a>
+                <ul class="sub-menu">
+                    <li>
+                        <a class="ajax-link visit-log" href="{:url('Browse/showBrowse')}">访问日志</a>
+                        <a class="ajax-link website-info" href="{:url('Website/infos')}">网站信息</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+
+
+
+<div id="content"></div>
+<div id="service-content">
+    <h1>
+        欢迎
+    </h1>
+</div>
+<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
+<script src="/static/jquery-3.7.1.js"></script>
+<script>
+$(document).ready(function() {
+
+    // 缓存 DOM 元素
+    const $sidebarLinks = $('#sidebar > ul > li > a');
+    const $sidebarSubMenu = $('.sub-menu');
+    const $contentSections = $('#content section');
+    const $window = $(window);
+    const $welcomeRight = $('#welcome-right');
+    const $logoutContainer = $('#logout-container');
+
+    // 配置对象
+    const config = {
+        validUrlPattern: /^(https?:\/\/(chuanqify\.cn|localhost|127\.0\.0\.1)|\/)/
+    };
+
+    let hideLogoutTimeout;
+
+    const $userModal = $('#myModal');
+    $userModal.show();
+    $userModal.hide();
+    // 阻止默认行为并获取目标 URL
+    function preventDefaultAndGetHref(event) {
+        event.preventDefault();
+        return $(event.target).attr('href');
+    }
+
+    // 展开和折叠子菜单
+    $sidebarLinks.click(function(e) {
+        const subMenu = $(this).next('.sub-menu');
+        const arrow = $(this).find('.arrow');
+
+        if (subMenu.is(':visible')) {
+            subMenu.slideUp();
+            arrow.css('transform', 'rotate(90deg)'); // 向左
+        } else {
+            subMenu.slideDown();
+            arrow.css('transform', 'rotate(180deg)'); // 向下
+        }
+    });
+
+    // 导航栏链接点击事件
+    $('#sidebar ul li a').click(function(e) {
+        const href = preventDefaultAndGetHref(e);  // 获取目标 URL
+
+        if ($(this).hasClass('ajax-link')) {
+            // 处理 AJAX 链接
+            handleAjaxLink(href);
+        } else {
+            // 处理普通链接
+            handleRegularLink(href);
+        }
+    });
+
+    // 导航栏高亮当前活动项
+    $window.scroll(function() {
+        const scrollPosition = $window.scrollTop();
+
+        $contentSections.each(function() {
+            var sectionTop = $(this).offset().top;
+            var sectionBottom = sectionTop + $(this).outerHeight();
+
+            if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                var id = $(this).attr('id');
+                $('#sidebar ul li a').removeClass('active');
+                $('#sidebar ul li a[href="#' + id + '"]').addClass('active');
+            }
+        });
+    });
+
+    // 处理带有 ajax-link 类的链接点击事件
+    function handleAjaxLink(url) {
+        // 验证 URL 是否合法
+        if (!config.validUrlPattern.test(url)) {
+            console.error('无效的 URL:', url);
+            return;
+        }
+
+        // 使用 AJAX 请求页面内容
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function(response) {
+                // 直接将响应内容插入到 #service-content 中
+                $('#service-content').empty();
+                $('#service-content').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error('请求失败:', error);
+            }
+        });
+    }
+
+    // 处理普通链接点击事件
+    function handleRegularLink(target) {
+        const targetElement = $(target);
+
+        if (targetElement.length) {
+            const targetPosition = targetElement.offset().top;  // 获取目标元素的顶部位置
+
+            // 平滑滚动到目标位置
+            requestAnimationFrame(function() {
+                $('html, body').animate({
+                    scrollTop: targetPosition
+                }, 1000);
+            });
+        }
+    }
+
+    // 点击欢迎文字显示退出按钮
+    $welcomeRight.click(function() {
+        $logoutContainer.show(); // 显示退出按钮
+        clearTimeout(hideLogoutTimeout); // 清除之前的定时器
+    });
+
+    // 当鼠标离开欢迎文字时，设置定时器隐藏退出按钮
+    $welcomeRight.mouseleave(function() {
+        hideLogoutTimeout = setTimeout(() => {
+            $logoutContainer.hide(); // 隐藏退出按钮
+        }, 2000); // 2秒后隐藏
+    });
+
+    // 当鼠标进入退出按钮时，清除定时器
+    $logoutContainer.mouseenter(function() {
+        clearTimeout(hideLogoutTimeout); // 清除定时器
+    });
+
+    // 当鼠标离开退出按钮时，设置定时器隐藏退出按钮
+    $logoutContainer.mouseleave(function() {
+        hideLogoutTimeout = setTimeout(() => {
+            $logoutContainer.hide(); // 隐藏退出按钮
+        }, 2000); // 2秒后隐藏
+    });
+
+    // 点击退出按钮执行退出操作
+    $('#logout-button').click(function() {
+        console.log('退出按钮被点击');
+        $.ajax({
+            url: '{:url("admin/User/logout")}',
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    // 退出成功，重定向到登录页面
+                    window.location.href = "{:url('admin/login/login')}";
+                } else {
+                    // 退出失败，显示错误信息
+                    alert(response.message);
+               }
+            }
+        })
+        // 这里可以添加退出逻辑，例如重定向到登录页面
+        window.location.href = "{:url('admin/login/login')}";
+    });
+});
+
+    </script>
+</body>
+</html>

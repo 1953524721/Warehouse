@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{:token()}">
+    <title>添加商品</title>
+    <style>
+        /* 基本表单样式 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center; /* 使标题居中 */
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 0 auto; /* 使表单居中 */
+            max-width: 600px; /* 可选：设置表单的最大宽度 */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 10px;
+            vertical-align: middle; /* 使表格内的文字垂直居中 */
+            text-align: center; /* 使表格内的文字水平居中 */
+        }
+
+
+        /* 输入框样式 */
+        input[type="text"],
+        input[type="tel"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        input[type="file"]:focus,
+        select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* 按钮样式 */
+        input[type="button"],
+        input[type="reset"] {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="button"]:hover,
+        input[type="reset"]:hover {
+            background-color: #45a049;
+        }
+        .input-height {
+            height: 40px; /* 假设输入框的高度是 34px */
+        }
+        /* 错误信息样式 */
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<h1>添加商品</h1>
+    <form id="productForm">
+        <table>
+            <tr>
+                <td>商品名称:</td>
+                <td><input type="text" class="name" name="name"></td>
+            </tr>
+            <tr>
+                <td>商品描述:</td>
+                <td><input type="text" class="describe" name="describe"></td>
+            </tr>
+            <tr>
+                <td>商品型号:</td>
+                <td><input type="text" class="models" name="models"></td>
+            </tr>
+            <tr>
+                <td>品牌</td>
+                <td><input type="text" class="brand" name="brand"></td>
+            </tr>
+            <tr>
+                <td>生产地:</td>
+                <td>
+                    <select name="production" id="" class="production input-height">
+                        {volist name='cityList' id='cityList'}
+                        <option value="{$cityList.city_name}">{$cityList.city_name} </option>
+                        {/volist}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>数量:</td>
+                <td>
+                    <input type="tel" class="num" name="num">
+                </td>
+            </tr>
+            <tr>
+                <td>库存单位:</td>
+                <td>
+                    <select name="unit" class="unit" id="unitSelect">
+                        <!-- 数据将被动态插入到这里 -->
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>封面</td>
+                <td><input type="file" class="flier" name="flier"></td>
+            </tr>
+            <tr>
+                <td><input type="reset" value="重置"></td>
+                <td><input type="button" value="提交" class="submit"></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <span class="error-message"></span>
+                </td>
+            </tr>
+        </table>
+    </form>
+</body>
+<script src="/static/jquery-3.7.1.js"></script>
+<script type="text/javascript">
+    // 设置全局AJAX选项
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            // 获取CSRF令牌
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            // 如果CSRF令牌存在，则将其添加到请求头中
+            if (csrfToken) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            }
+        }
+    });
+
+    // 页面加载完成后，获取单位数据并填充到下拉框中
+    $(document).ready(function() {
+        $.ajax({
+            url: 'getUnits',  // 替换为你的后端接口地址
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                console.log(data);  // 打印数据以确认格式
+                const selectElement = $('#unitSelect');
+                console.log(selectElement);  // 打印选择器结果以确认是否正确选择元素
+
+                // 检查 data 是否包含 units 数组
+                if (Array.isArray(data.units)) {
+                    // 清空下拉框中的现有选项
+                    selectElement.empty();
+                    // 遍历数据并创建选项
+                    data.units.forEach(item => {
+                        const option = $('<option></option>').val(item.unit_name).text(item.unit_name);
+                        selectElement.append(option);
+                    });
+                } else {
+                    console.error('Data does not contain a units array:', data);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
+                alert('获取单位数据失败，请稍后再试。');
+            }
+        });
+    });
+
+        // 为按钮点击事件添加处理函数
+    $('.submit').click(function () {
+        console.log('Submit button clicked');
+
+        // 获取所有需要验证的输入字段
+        const name = $('.name').val().trim();
+        const describe = $('.describe').val().trim();
+        const models = $('.models').val().trim();
+        const brand = $('.brand').val().trim();
+        const num = $('.num').val().trim();
+        const unit = $('.unit').val().trim();
+        const production = $('.production').val().trim();
+
+        // 初始化错误信息
+        let errorMessage = '';
+
+        // 验证每个字段是否为空
+        if (!name) {
+            errorMessage += '商品名称不能为空。\n';
+        }
+        if (!describe) {
+            errorMessage += '商品描述不能为空。\n';
+        }
+        if (!models) {
+            errorMessage += '商品型号不能为空。\n';
+        }
+        if (!brand) {
+            errorMessage += '品牌不能为空。\n';
+        }
+        if (!num) {
+            errorMessage += '数量不能为空。\n';
+        }
+        if (!unit) {
+            errorMessage += '库存单位不能为空。\n';
+        }
+        if (!production) {
+            errorMessage += '产地单位不能为空。\n';
+        }
+
+        // 如果存在错误信息，则显示错误信息并阻止提交
+        if (errorMessage) {
+            $('.error-message').text(errorMessage); // 将错误信息填入 class="error-message" 的元素中
+            return; // 阻止表单提交
+        }
+
+        // 创建 FormData 对象
+        const formData = new FormData($('#productForm')[0]);
+
+        // 发起 AJAX 请求
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: 'addProduct',  // 你的后端接口地址
+            data: formData,
+            type: 'post',
+            processData: false,  // 不处理数据
+            contentType: false,  // 不设置内容类型
+            dataType: 'json',
+            success: function (res) {
+                console.log(res);
+                // 根据响应结果进行处理
+                if (res.status === 'success') {
+                    // 操作成功，弹出提示信息并跳转到新页面
+                    $('.error-message').text(res.message);
+                } else {
+                    // 操作失败，显示错误提示
+                    $('.error-message').text(res.message);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // 请求失败，输出错误信息并弹出提示信息
+                console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
+                alert('请求失败，请稍后再试。');
+            }
+        });
+    });
+
+
+</script>
+</html>

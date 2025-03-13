@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加库存单位</title>
+    <meta name="csrf-token" content="{:token()}">
+</head>
+<body>
+<div id="app">
+    <form  id="userForm">
+        <table>
+            <tr>
+                <td>用户名：</td>
+                <td><input type="text" placeholder="输入用户名" class="username"></td>
+            </tr>
+            <tr>
+                <td>密码：</td>
+                <td><input type="password" placeholder="输入密码" class="password"></td>
+            </tr>
+            <tr>
+                <td><input type="reset" value="重置" class="reset"></td>
+                <td><input type="button" value="添加" id="addUserButton"></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <span  class="error_info"></span>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+</body>
+<script src="/static/jquery-3.7.1.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#addUserButton').click(function() {
+            const username = $('.username').val();
+            const password = $('.password').val();
+
+            if (username === '' || password === '') {
+                $('.error_info').text('用户名或密码不能为空'); // 清空错误信息
+                return;
+            }
+
+            $('.error_info').text(''); // 清空错误信息
+
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: "{:url('admin/User/addUserPost')}", // 替换为你的API端点
+                type: 'POST',
+                data: { username: username, password: password },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('.username').val('');
+                        $('.password').val('');
+                        $('.error_info').text(response.message);
+                    } else {
+                        $('.error_info').text(response.message); // 显示错误信息
+                        setTimeout(function() {
+                            location.reload(); // 刷新页面
+                        }, 2000); // 2000毫秒 = 2秒
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('.error_info').text('请求出错：' + error); // 显示错误信息
+                }
+            });
+        });
+
+    });
+</script>
+</html>
