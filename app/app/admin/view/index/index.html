@@ -186,6 +186,7 @@
                 <ul class="sub-menu">
                     <li>
                         <a class="ajax-link unit-maintenance" href="{:url('admin/index')}">基本数据</a>
+<!--                        <a class="ajax-link unit-maintenance" href="{:url('admin/map')}">地图</a>-->
                     </li>
                 </ul>
             </li>
@@ -251,6 +252,20 @@
 <script src="/static/jquery-3.7.1.js"></script>
 <script>
 $(document).ready(function() {
+
+    $.ajax({
+        url: '{:url("admin/index")}',
+        method: 'GET',
+        success: function(response) {
+            // 直接将响应内容插入到 #service-content 中
+            $('#service-content').empty();
+            $('#service-content').html(response);
+        },
+        error: function(xhr, status, error) {
+            console.error('请求失败:', error);
+        }
+    });
+    $('.sub-menu').slideDown();
 
     // 缓存 DOM 元素
     const $sidebarLinks = $('#sidebar > ul > li > a');

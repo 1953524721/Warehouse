@@ -26,6 +26,7 @@ class Browse extends comm
         $browseName = $this->getBrowseInfo();
         $browseUrl  = (string)Route::buildUrl();
 
+
         $browse = [
             'browse_ip' => $browseIp,
             'browse_time' => $browseTime,
