@@ -2,6 +2,7 @@
 
 namespace app\admin\controller;
 
+use app\admin\model\baiduMapLog;
 use app\admin\model\product;
 use app\admin\model\Browse;
 use think\facade\Log;
@@ -90,8 +91,20 @@ class Admin extends comm
         curl_close($ch);
 
         $data = json_decode($response, true);
+        $date = date('Y-m-d H:i:s');
 
+        // 确保 $data 包含必要的字段
         if (isset($data['content']['point']['x']) && isset($data['content']['point']['y'])) {
+            $dataSet = [
+                'ip' => $ip,
+                'url' => $url,
+                'datas' => json_encode($data), // 将数组转换为 JSON 字符串
+                'date' => $date
+            ];
+
+            $log = new baiduMapLog();
+            $log->insertMapLog($dataSet);
+
             // 成功获取经纬度
             return [
                 'status' => 'success',
@@ -110,6 +123,7 @@ class Admin extends comm
             ];
         }
     }
+
 
     public function getClientIP() {
         $ip = '';
