@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{:token()}">
+    <title>Title</title>
+    <style>
+        .logoDiv {
+            position: relative;
+            top: 1px;
+            left: 7px;
+            width: 220%; /* 确保图片宽度适应容器 */
+            height: 100%; /* 确保图片高度适应容器 */
+            display: flex;
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 */
+        }
+        .logo {
+            width: 100%; /* 使图片宽度适应容器 */
+            height: auto; /* 保持图片的宽高比 */
+            display: block; /* 将图片设置为块级元素 */
+            margin-left: -47px; /* 向左移动20px */
+        }
+        .file-input {
+            display: none; /* 隐藏文件输入框 */
+        }
+        /* 模态对话框样式 */
+        .modal {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .file-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .file-label:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    LOGO修改
+</h1>
+<div id="app">
+    <div class="logoDiv">
+        {if $serverName=='A'}
+        <img src="/{$appName}/public/storage/{$logoImg}" alt="logo" class="logo">
+        {else /}
+        <img src="/{$logoImg}" alt="logo" class="logo">
+        {/if}
+    </div>
+    <label>
+        <input type="button" value="修改" id="uploadButton">
+    </label>
+</div>
+
+<!-- 模态对话框 -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <label class="file-label" for="fileInput">选择图片</label>
+        <input type="file" id="fileInput" name="logoImg" class="file-input" accept="image/*">
+        <br><br>
+        <input type="button" value="确认" id="confirmButton">
+    </div>
+</div>
+
+<script src="/static/jquery-3.7.1.js"></script>
+<script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
+<script>
+    $(document).ready(function() {
+        // 获取模态对话框
+        const modal = $('#myModal');
+        // 获取打开模态对话框的按钮
+        const btn = $('#uploadButton');
+        // 获取关闭模态对话框的按钮
+        const span = $('.close');
+
+        // 当用户点击按钮时，打开模态对话框
+        btn.click(function() {
+            modal.show();
+        });
+
+        // 当用户点击 (x) 时，关闭模态对话框
+        span.click(function() {
+            modal.hide();
+        });
+
+        // 当用户点击模态对话框外部时，关闭模态对话框
+        $(window).click(function(event) {
+            if ($(event.target).is(modal)) {
+                modal.hide();
+            }
+        });
+
+        // 处理文件选择
+        $('#fileInput').change(function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('.logoDiv img').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 确认按钮点击事件
+        $('#confirmButton').click(function() {
+            const file = $('#fileInput')[0].files[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append('logoImg', file);
+
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{:url('Website/saveLogo')}", // 替换为实际的上传接口地址
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // 禁用数据处理
+                    contentType: false, // 禁用内容类型设置
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            modal.hide();
+                            window.location.reload();
+                        } else if (response.status === 'error') {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('上传失败: ' + error);
+                    }
+                });
+            } else {
+                alert('请选择文件');
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

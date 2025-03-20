@@ -31,6 +31,7 @@ class Login extends BaseController
         $browse = $this->getLog();
         $siteModel = new Website();
         $IndexController = new IndexController(app());
+        $logoImg = $siteModel->getLogo();
         $servers   = $IndexController->servers();
         $icp = $siteModel->getWebsite();
         $appName = env("APP_NAME");
@@ -38,6 +39,7 @@ class Login extends BaseController
             'appName' => $appName,
             'icp' => $icp,
             'servers' => $servers,
+            'logoImg' => $logoImg['value'],
         ]);
     }
 
