@@ -165,6 +165,7 @@ class Website extends comm
     }
     public function selectLogo(): string
     {
+        $browse = $this->getLog();
         $model = new WebsiteModel();
         $logoImg = $model->getLogo();
 //        print_r($logoImg['value']);
