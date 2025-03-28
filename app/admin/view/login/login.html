@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{:token()}">
     <title>管理登录</title>
@@ -20,123 +19,78 @@
         .app {
             flex: 1;
             display: flex;
-            justify-content: center; /* 水平居中 */
-            align-items: center;
+            justify-content: center;  /* 水平居中 */
+            align-items: center; /* 垂直居中 */
         }
         .login-pages {
-            border: 1px solid #000; /* 可选，用于展示容器边界 */
+            border: 1px solid #000;
             box-shadow: 0 2px 4px rgba(0, 140, 255, 0.3);
             background-color: #fbfdff;
             width: 1080px;
             height: 480px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            align-items: stretch; /* 子元素高度拉伸 */
             padding: 20px;
         }
+        .login-pages-left {
+            width: 50%; /* 左侧容器占50%宽度 */
+            height: 100%;
+            position: relative;
+        }
+        .login-pages-left-login {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 关键：图片填满容器并保持比例 */
+            display: block;
+            margin: 0;
+        }
         .right {
-            width: 519px;
-            height: auto; /* 修改为auto */
+            width: 50%; /* 右侧表单占50%宽度 */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
-        .login-pages-left {
-            position: relative;
-            top: 1px;
-            left: 7px;
-            width: 100%; /* 确保图片宽度适应容器 */
-            height: 100%; /* 确保图片高度适应容器 */
-            display: flex;
-            justify-content: center; /* 水平居中 */
-            align-items: center; /* 垂直居中 */
+        .login {
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
         }
         input {
             border: 1px solid #ccc;
             border-radius: 5px;
             box-shadow: none;
             width: 280px;
-            height: 27px; /* 修改高度为27px */
+            height: 27px;
             padding: 10px;
             font-size: 16px;
             color: #333;
             margin-bottom: 15px;
             transition: border-color 0.3s;
         }
-
         input:focus {
             border-color: #007bff;
             outline: none;
         }
-        ::placeholder {
-            color: #999;
-            opacity: 1; /* Firefox */
-        }
-        :-ms-input-placeholder { /* Internet Explorer 10-11 */
-            color: #999;
-        }
-        ::-ms-input-placeholder { /* Microsoft Edge */
-            color: #999;
-        }
-        .login-pages-left-login {
-            width: 83%; /* 使图片宽度适应容器 */
-            height: auto; /* 保持图片的宽高比 */
-            display: block; /* 将图片设置为块级元素 */
-            margin-left: -177px; /* 向左移动20px */
-        }
-        .login {
-            width: 100%;
-            max-width: 300px;
-            text-align: center;
-            margin: -30px 0 0 -139px;
-        }
-        .error-message {
-            color: red;
-            margin-top: 10px;
-            height: 100px; /* 设置固定高度 */
-        }
-
-        .error-message .danmu {
-            position: absolute;
-            right: 0;
-            white-space: nowrap; /* 防止换行 */
-            animation: danmuAnimation 5s linear infinite; /* 应用动画 */
-        }
-
-        @keyframes danmuAnimation {
-            from {
-                transform: translateX(100%);
-            }
-            to {
-                transform: translateX(-100%);
-            }
-        }
-
         .button {
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             background-color: #ff7b83;
             border: none;
             color: white;
-            width: 320px; /* 设置宽度为280px */
-            height: 43px; /* 设置高度为27px */
-            padding: 10px; /* 设置内边距为10px */
-            font-size: 16px; /* 设置字体大小为16px */
+            width: 320px;
+            height: 43px;
+            padding: 10px;
+            font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-top: 10px; /* 添加一些间距 */
+            margin-top: 10px;
         }
-
-        .button:hover {
-            background-color: #e06c74;
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            height: 30px; /* 固定高度 */
         }
-
-        .button:disabled {
-            background-color: #ccc; /* 灰色背景 */
-            cursor: not-allowed; /* 禁用鼠标指针 */
-        }
-
         .foot {
             width: 100%;
             height: 100px;
@@ -145,44 +99,37 @@
             position: fixed;
             bottom: 0;
             left: 0;
-            z-index: 1000; /* 确保页脚在最上层 */
-            background-color: transparent; /* 设置背景颜色为透明 */
-            /* 或者使用 rgba 设置背景颜色和透明度 */
-            /* background-color: rgba(255, 255, 255, 0.5); */
-            //box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            background-color: transparent;
         }
     </style>
 </head>
 <body>
 <div class="app" id="app">
     <div class="login-pages">
+        <!-- 左侧图片容器 -->
         <div class="login-pages-left">
-        {if condition="$servers == 'A'"}
-            <img src="/{$appName}/public/static/images/1.png" alt="123456789" class="login-pages-left-login">
-        {else /}
-            <img src="/static/images/1.png" alt="123456789" class="login-pages-left-login">
-        {/if}
+            {if condition="$servers == 'A'"}
+                <img src="/{$appName}/public/storage/{$logoImg}" alt="logo" class="login-pages-left-login">
+            {else /}
+                <img src="/storage/{$logoImg}" alt="logo" class="login-pages-left-login">
+            {/if}
         </div>
+        <!-- 右侧表单 -->
         <div class="right">
             <div class="login">
                 <h1>登录</h1>
                 <p>
-                    <label>
-                        <input type="text" placeholder="请输入用户名" class="userName" name="name">
-                    </label>
+                    <input type="text" placeholder="请输入用户名" class="userName" name="name">
                 </p>
                 <p>
-                    <label>
-                        <input type="password" placeholder="请输入密码" class="userPwd" name="password">
-                    </label>
+                    <input type="password" placeholder="请输入密码" class="userPwd" name="password">
                 </p>
                 <p>
                     {:captcha_img()}
                 </p>
                 <p>
-                    <label>
-                        <input type="text" placeholder="请输入验证码" class="captcha" name="captcha">
-                    </label>
+                    <input type="text" placeholder="请输入验证码" class="captcha" name="captcha">
                 </p>
                 <p>
                     <input type="button" value="登录" class="button">
@@ -194,57 +141,37 @@
         </div>
     </div>
 </div>
-<div class="foot"><a href="https://beian.miit.gov.cn/" style="color: inherit; text-decoration: none;">{$icp.value}</a></div>
+<div class="foot"><a href="https://beian.miit.gov.cn/" style="color: inherit; text-decoration: none;">{$icp['value']}</a></div>
 
 <script src="/static/jquery-3.7.1.js"></script>
 <script src="/{$appName}/public/static/jquery-3.7.1.js"></script>
-<script type="text/javascript">
+<script>
     // 设置全局AJAX选项
     $.ajaxSetup({
         beforeSend: function(xhr) {
-            // 获取CSRF令牌
             const csrfToken = $('meta[name="csrf-token"]').attr('content');
-            // 如果CSRF令牌存在，则将其添加到请求头中
             if (csrfToken) {
                 xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             }
         }
     });
 
-    // 为按钮点击事件添加处理函数
+    // 登录按钮点击事件
     $('.button').click(function () {
-        // 获取用户名和密码输入框的值
         const userName = $('.userName').val();
-        const userPwd  = $('.userPwd').val();
-        const captcha  = $('.captcha').val();
+        const userPwd = $('.userPwd').val();
+        const captcha = $('.captcha').val();
 
-        // 检查用户名和密码是否为空
-        if (userName.length===0||userPwd.length===0||captcha.length===0)
-        {
-            // 如果用户名或密码为空，显示错误消息
+        if (!userName || !userPwd || !captcha) {
             showDanmu("有数据没填");
-        }
-        else
-        {
-            // 禁用按钮以防止重复点击
+        } else {
             $('.button').prop('disabled', true);
-            // 调用登录函数
             performLogin(userName, userPwd, captcha);
         }
     });
 
-    /**
-     * 执行登录操作
-     * @param {string} userName - 用户名
-     * @param {string} userPwd - 用户密码
-     * @param captcha
-     */
     function performLogin(userName, userPwd, captcha) {
-        // 发起登录请求
         $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
             url: 'loginDo',
             data: {
                 name: userName,
@@ -254,41 +181,31 @@
             type: 'post',
             dataType: 'json',
             success: function (res) {
-                // 根据响应结果进行处理
                 if (res.status === 'success') {
-                    // 登录成功，弹出提示信息并跳转到新页面
                     $('.error-message').text(res.message);
-                    setTimeout(function() {
+                    setTimeout(() => {
                         window.location.href = "{:url('admin/Index/index')}";
-                    }, 1000); // 1000毫秒 = 1秒
+                    }, 1000);
                 } else {
-                    // 登录失败，将响应结果输出到控制台
-                    console.log(res);
-                    // 显示错误提示
                     $('.error-message').text(res.message);
-                    // 启用按钮以便用户可以再次尝试
                     $('.button').prop('disabled', false);
                 }
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                // 请求失败，输出错误信息并弹出提示信息
-                console.error('AJAX Error: ' + textStatus + ' - ' + errorThrown);
+            error: function () {
                 alert('请求失败，请稍后再试。');
-                // 启用按钮以便用户可以再次尝试
                 $('.button').prop('disabled', false);
             }
         });
     }
 
-    // 显示弹幕消息
+    // 弹幕提示
     function showDanmu(message) {
-        const danmu = document.createElement('span');
-        danmu.className = 'danmu';
-        danmu.textContent = message;
+        const danmu = $('<span>', {
+            class: 'danmu',
+            text: message
+        });
         $('.error-message').append(danmu);
-        setTimeout(function() {
-            danmu.remove();
-        }, 3000); // 3000毫秒 = 3秒
+        setTimeout(() => danmu.remove(), 3000);
     }
 </script>
 </body>

@@ -2,12 +2,16 @@
 
 namespace app\admin\controller;
 
+use app\admin\model\product;
 use app\BaseController;
 use app\Request;
 use think\facade\Db;
+use think\facade\Filesystem;
+use think\facade\Log;
 use think\facade\Session;
 use think\facade\View;
 use app\admin\model\Website as WebsiteModel;
+use app\admin\controller\Index as IndexController;
 
 /**
  * 网站信息控制器
@@ -25,7 +29,7 @@ class Website extends comm
         try {
             if (!$this->isUserLoggedIn())
             {
-                return json(['status' => 'error', 'message' => "未知异常"]);
+                return json(['status' => 'error', 'message' => "未知异常,请通知管理员",'date'=>date('YYYYmd H:i:s')]);
             }
             $websiteModel  = new WebsiteModel();
             $website       = $websiteModel->getWebsite();
@@ -49,9 +53,9 @@ class Website extends comm
     public function saveWebsite(Request $request): \think\response\Json
     {
         // 检查 CSRF token
-        if (false === $request->checkToken('__token__')) {
-            return json(['status' => 'error', 'message' => 'token验证失败']);
-        }
+//        if (false === $request->checkToken('__token__')) {
+//            return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!']);
+//        }
 
         // 检查是否为 AJAX 请求
         if (!$request->isAjax()) {
@@ -159,4 +163,73 @@ class Website extends comm
 
         return View::fetch('infos');
     }
+    public function selectLogo(): string
+    {
+        $browse = $this->getLog();
+        $model = new WebsiteModel();
+        $logoImg = $model->getLogo();
+//        print_r($logoImg['value']);
+        $appName = env("APP_NAME");
+        $server = new IndexController();
+        $serverName = $server->servers();
+
+
+        // 将信息传递给视图
+        View::assign('logoImg', $logoImg['value']);
+        View::assign('appName', $appName);
+        View::assign('serverName', $serverName);
+        return View::fetch('logo');
+    }
+    public function saveLogo(Request $request): \think\response\Json
+    {
+        // 检查 CSRF token
+//        if (false === $request->checkToken('__token__')) {
+//            return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!']);
+//        }
+
+        // 检查是否为 AJAX 请求
+        if (!$request->isAjax()) {
+            return json(['status' => 'error', 'message' => '仅支持 AJAX 请求']);
+        }
+        $name = 'LOGO';
+        $file = $request->file('logoImg');
+
+        if ($file && $file->isValid()) {
+            // 确保目录存在且可写
+            $uploadPath = public_path('storage/topic/logo');
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+            if (!is_writable($uploadPath)) {
+                return json(['status' => 'error', 'message' => '目录无写入权限']);
+            }
+
+            // 使用 public 磁盘保存文件
+            try {
+                $saveName = \think\facade\Filesystem::disk('public') // 显式指定磁盘
+                    ->putFile('topic/logo', $file); // 相对路径
+            } catch (\Exception $e) {
+                Log::error('文件上传失败: ' . $e->getMessage());
+                return json(['status' => 'error', 'message' => '文件上传失败']);
+            }
+
+            // 更新数据库
+            $saveModel = new WebsiteModel();
+            $data = $saveModel->updateWebsite($name, $saveName);
+
+            if ($data) {
+                return json(['status' => 'success', 'message' => '更新成功', 'path' => $saveName]);
+            } else {
+                return json(['status' => 'error', 'message' => '数据库更新失败']);
+            }
+        } else {
+            return json(['status' => 'error', 'message' => '无效的文件']);
+        }
+    }
+
+
+
+
+
+
 }

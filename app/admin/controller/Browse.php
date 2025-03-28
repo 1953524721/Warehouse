@@ -26,6 +26,7 @@ class Browse extends comm
         $browseName = $this->getBrowseInfo();
         $browseUrl  = (string)Route::buildUrl();
 
+
         $browse = [
             'browse_ip' => $browseIp,
             'browse_time' => $browseTime,
@@ -163,11 +164,11 @@ class Browse extends comm
     {
         $page         = $request->post('page','1');
         $pageSize     = $request->param('pageSize', 10);
-        $browse = $this->newBrowseModel()->getBrowseInfoAll($page, $pageSize);
-        $total  = $this->newBrowseModel()->getBrowseInfoCount();
-        $response = [
-            'data'  => $browse,
-            'total' => $total,
+        $browse       = $this->newBrowseModel()->getBrowseInfoAll($page, $pageSize);
+        $total        = $this->newBrowseModel()->getBrowseInfoCount();
+        $response     = [
+            'data'    => $browse,
+            'total'   => $total,
         ];
         return json($response);
     }

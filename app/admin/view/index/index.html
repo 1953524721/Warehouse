@@ -129,43 +129,29 @@
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
             margin-right: 8px;
+            transition: all 0.3s ease;
         }
 
-        .user-info::before {
-            content: '\f007'; /* fa-user 图标 */
+        .unit-maintenance::before { content: '\f0ae'; color: #ff7b83; }
+        .user-info::before        { content: '\f007'; color: #20c997; }
+        .add-user::before         { content: '\f234'; color: #007bff; }
+        .view-product::before     { content: '\f07a'; color: #6c757d; }
+        .add-product::before      { content: '\f067'; color: #ffc107; }
+        .icp-maintenance::before  { content: '\f0ac'; color: #17a2b8; }
+        .visit-log::before        { content: '\f0c0'; color: #e83e8c; }
+        .website-info::before     { content: '\f0ad'; color: #28a745; }
+        .outbound-record::before  { content: '\f015'; color: #dc3545; }
+        .map::before              { content: '\f279'; color: #6f42c1; }
+        .settings::before         { content: '\f13e'; color: #0d6efd; }
+        .security::before         { content: '\f084'; color: #286ccd; }
+        .report::before           { content: '\f2ed'; color: #6c757d; }
+
+        /* 悬停效果 */
+        .ajax-link:hover::before {
+            transform: scale(1.2); /* 图标放大 */
+            color: #fff;           /* 白色高亮 */
         }
 
-        .add-user::before {
-            content: '\f234'; /* fa-user-plus 图标 */
-        }
-
-        .user-query::before {
-            content: '\f002'; /* fa-search 图标 */
-        }
-
-        .add-product::before {
-            content: '\f067'; /* fa-cart-plus 图标 */
-        }
-
-        .view-product::before {
-            content: '\f07a'; /* fa-list 图标 */
-        }
-
-        .unit-maintenance::before {
-            content: '\f0ae'; /* fa-cubes 图标 */
-        }
-
-        .icp-maintenance::before {
-            content: '\f0ac'; /* fa-info-circle 图标 */
-        }
-
-        .visit-log::before {
-            content: '\f0c0'; /* fa-chart-bar 图标 */
-        }
-
-        .website-info::before {
-            content: '\f0ac'; /* fa-info-circle 图标 */
-        }
 
 
 
@@ -186,6 +172,7 @@
                 <ul class="sub-menu">
                     <li>
                         <a class="ajax-link unit-maintenance" href="{:url('admin/index')}">基本数据</a>
+<!--                        <a class="ajax-link unit-maintenance" href="{:url('admin/map')}">地图</a>-->
                     </li>
                 </ul>
             </li>
@@ -197,7 +184,7 @@
                     <li>
                         <a class="ajax-link user-info" href="{:url('Userinfo/getUser')}">我的信息</a>
                         <a class="ajax-link add-user" href="{:url('User/addUser')}">添加用户</a>
-                        <a class="ajax-link user-query" href="{:url('User/index')}">用户查询</a>
+                        <a class="ajax-link security" href="{:url('User/index')}">用户查询</a>
                     </li>
                 </ul>
             </li>
@@ -209,18 +196,19 @@
                     <li>
                         <a class="ajax-link add-product" href="{:url('Index/add')}">添加商品</a>
                         <a class="ajax-link view-product" href="{:url('Index/show')}">查看商品</a>
-                        <a class="ajax-link user-query" href="{:url('Index/outBound')}">出库记录</a>
+                        <a class="ajax-link outbound-record" href="{:url('Index/outBound')}">出库记录</a>
                     </li>
                 </ul>
             </li>
         </ul>
         <ul>
             <li>
-                <a href="javascript:void(0)">网站管理  </a>
+                <a href="javascript:void(0)">系统设置  </a>
                 <ul class="sub-menu">
                     <li>
                         <a class="ajax-link unit-maintenance" href="{:url('Unit/unitPage')}">库存单位维护</a>
                         <a class="ajax-link icp-maintenance" href="{:url('Website/websiteInfo')}">ICP维护</a>
+                        <a class="ajax-link map" href="{:url('Website/selectLogo')}">首页LOGO维护</a>
                     </li>
                 </ul>
             </li>
@@ -251,6 +239,20 @@
 <script src="/static/jquery-3.7.1.js"></script>
 <script>
 $(document).ready(function() {
+
+    $.ajax({
+        url: '{:url("admin/index")}',
+        method: 'GET',
+        success: function(response) {
+            // 直接将响应内容插入到 #service-content 中
+            $('#service-content').empty();
+            $('#service-content').html(response);
+        },
+        error: function(xhr, status, error) {
+            console.error('请求失败:', error);
+        }
+    });
+    $('.sub-menu').slideDown();
 
     // 缓存 DOM 元素
     const $sidebarLinks = $('#sidebar > ul > li > a');

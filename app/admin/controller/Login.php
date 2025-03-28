@@ -31,6 +31,7 @@ class Login extends BaseController
         $browse = $this->getLog();
         $siteModel = new Website();
         $IndexController = new IndexController(app());
+        $logoImg = $siteModel->getLogo();
         $servers   = $IndexController->servers();
         $icp = $siteModel->getWebsite();
         $appName = env("APP_NAME");
@@ -38,6 +39,7 @@ class Login extends BaseController
             'appName' => $appName,
             'icp' => $icp,
             'servers' => $servers,
+            'logoImg' => $logoImg['value'],
         ]);
     }
 
@@ -59,7 +61,7 @@ class Login extends BaseController
         $check = $request->checkToken('__token__');
         if (false === $check)
         {
-            return json(['status' => 'error', 'message' => 'token验证失败']);
+            return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!']);
         }
         $captcha  =   $request->post('captcha');
         if (!captcha_check($captcha))
@@ -96,10 +98,4 @@ class Login extends BaseController
         }
     }
 
-    public function test(): void
-    {
-        $IndexController = new IndexController(app());
-        $servers   = $IndexController->servers();
-        print_r($servers);
-    }
 }

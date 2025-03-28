@@ -5,6 +5,7 @@ namespace app\admin\controller;
 use app\BaseController;
 use app\admin\model\Unit as UnitModel;
 use think\facade\Log;
+use think\facade\Session;
 use think\Request;
 use think\facade\View;
 
@@ -45,10 +46,10 @@ class Unit extends BaseController
     public function unitPageAll(Request $request): \think\response\Json
     {
         // 验证token
-        $check = $request->checkToken('__token__');
-        if (false === $check) {
-            return json(['status' => 'error', 'message' => 'token验证失败']);
-        }
+//        $check = $request->checkToken('__token__');
+//        if (false === $check) {
+//            return json(['status' => 'error', 'message' => 'token验证失败']);
+//        }
         // 判断是否为Ajax请求
         if ($request->isAjax()) {
             // 获取分页参数
@@ -79,10 +80,10 @@ class Unit extends BaseController
     public function updateUnit(Request $request): \think\response\Json
     {
         // 验证token
-        $check = $request->checkToken('__token__');
-        if (false === $check) {
-            return json(['status' => 'error', 'message' => 'token验证失败']);
-        }
+//        $check = $request->checkToken('__token__');
+//        if (false === $check) {
+//            return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!']);
+//        }
         // 获取请求参数
         $id = $request->param('id');
         $unit_name = $request->param('unit_name');
@@ -113,11 +114,17 @@ class Unit extends BaseController
      */
     public function deleteUnit(): \think\response\Json
     {
-        // 验证token
-        $check = $this->request->checkToken('__token__');
-        if (false === $check) {
-            return json(['status' => 'error', 'message' => 'token验证失败']);
+        $user = Session::get('user');
+        if ($user['id'] != '1')
+        {
+            return json(['status' => 'error', 'message' => '权限不足']);
         }
+
+        // 验证token
+//        $check = $this->request->checkToken('__token__');
+//        if (false === $check) {
+//            return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!']);
+//        }
         // 判断是否为Ajax请求
         if ($this->request->isAjax()) {
             // 获取请求参数
@@ -142,10 +149,10 @@ class Unit extends BaseController
     public function addUnit()
     {
         // 验证token
-        $check = $this->request->checkToken('__token__');
-        if (false === $check) {
-            return json(['status' => 'error', 'message' => 'token验证失败']);
-        }
+//        $check = $this->request->checkToken('__token__');
+//        if (false === $check) {
+//            return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!']);
+//        }
         // 判断是否为Ajax请求
         if ($this->request->isAjax()) {
             // 获取请求参数

@@ -62,11 +62,11 @@ class Index extends comm
     }
     public function getUnits(Request $request): array|Json
     {
-        $check = $request->checkToken('__token__');
-        if (false === $check)
-        {
-            return json(['status' => 'error', 'message' => 'token验证失败']);
-        }
+//        $check = $request->checkToken('__token__');
+//        if (false === $check)
+//        {
+//            return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!']);
+//        }
         $unitModel = new \app\admin\model\Unit();
         $unitList = $unitModel->selectAll();
         return [
@@ -84,48 +84,50 @@ class Index extends comm
      */
     public function addProduct(Request $request): Json
     {
-        $check = $request->checkToken('__token__');
-        if (false === $check) {
-            return json(['status' => 'error', 'message' => 'token验证失败']);
-        } else {
-            // 获取表单数据
-            $names      = $request->post('name');
-            $describe   = $request->post('describe');
-            $models     = $request->post('models');
-            $brand      = $request->post('brand');
-            $num        = $request->post('num');
-            $production = $request->post('production');
-            $unit       = $request->post('unit');
-            $date       = date('Y-m-d H:i:s');
+//        $check = $request->checkToken('__token__');
+//        if (false === $check) {
+//            return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!']);
+//        } else {
 
-            // 获取上传的文件
-            $file = $request->file('flier');
 
-            // 如果文件上传成功，进行保存并调用模型方法保存产品信息
-            if ($file) {
-                $saveName = \think\facade\Filesystem::disk('public')->putFile('topic', $file);
-                $productionModel = new product();
-                $data = $productionModel->createProduct($names, $describe, $models, $brand, $production, $num, $unit, $saveName, $date);
+        // 获取表单数据
+        $names      = $request->post('name');
+        $describe   = $request->post('describe');
+        $models     = $request->post('models');
+        $brand      = $request->post('brand');
+        $num        = $request->post('num');
+        $production = $request->post('production');
+        $unit       = $request->post('unit');
+        $date       = date('Y-m-d H:i:s');
 
-                // 根据产品保存结果，返回相应的JSON响应
-                if (!$data) {
-                    return json(['status' => 'error', 'message' => '添加失败']);
-                } else {
-                    return json(['status' => 'success', 'message' => '添加成功', 'data' => $data]);
-                }
+        // 获取上传的文件
+        $file       = $request->file('flier');
+
+        // 如果文件上传成功，进行保存并调用模型方法保存产品信息
+        if ($file) {
+            $saveName = \think\facade\Filesystem::disk('public')->putFile('topic', $file);
+            $productionModel = new product();
+            $data = $productionModel->createProduct($names, $describe, $models, $brand, $production, $num, $unit, $saveName, $date);
+
+            // 根据产品保存结果，返回相应的JSON响应
+            if (!$data) {
+                return json(['status' => 'error', 'message' => '添加失败']);
             } else {
-                // 如果没有文件上传，仍然需要返回一个Json对象
-                $productionModel = new product();
-                $data = $productionModel->createProduct($names, $describe, $models, $brand, $production, $num, $unit, null, $date);
+                return json(['status' => 'success', 'message' => '添加成功', 'data' => $data]);
+            }
+        } else {
+            // 如果没有文件上传，仍然需要返回一个Json对象
+            $productionModel = new product();
+            $data = $productionModel->createProduct($names, $describe, $models, $brand, $production, $num, $unit, null, $date);
 
-                // 根据产品保存结果，返回相应的JSON响应
-                if (!$data) {
-                    return json(['status' => 'error', 'message' => '添加失败']);
-                } else {
-                    return json(['status' => 'success', 'message' => '添加成功', 'data' => $data]);
-                }
+            // 根据产品保存结果，返回相应的JSON响应
+            if (!$data) {
+                return json(['status' => 'error', 'message' => '添加失败']);
+            } else {
+                return json(['status' => 'success', 'message' => '添加成功', 'data' => $data]);
             }
         }
+//    }
     }
 
 
@@ -221,12 +223,17 @@ class Index extends comm
      */
     public function deleteItem(Request $request): Json
     {
+        $user = Session::get('user');
+        if ($user['id'] != '1')
+        {
+            return json(['status' => 'error', 'message' => '权限不足']);
+        }
         // 验证请求中的token
         $check = $request->checkToken();
         if (false === $check)
         {
             // 如果token验证失败，返回错误信息
-            return json(['status' => 'error', 'message' => 'token验证失败']);
+            return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!']);
         }
         // 获取要删除的产品ID
         $id = $request->param('id');
@@ -256,7 +263,7 @@ class Index extends comm
         if (false === $check)
         {
             // 如果token验证失败，返回错误信息
-            return json(['status' => 'error', 'message' => 'token验证失败']);
+            return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!,']);
         }
         // 获取要查询的产品ID
         $id = $request->param('id');
@@ -285,7 +292,7 @@ class Index extends comm
         if (false === $check)
         {
             // 如果token验证失败，返回错误信息
-            return json(['status' => 'error', 'message' => 'token验证失败']);
+            return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!']);
         }
 
         // 获取表单数据
@@ -345,7 +352,7 @@ class Index extends comm
                 $check = $request->checkToken('__token__');
                 if (false === $check) {
                     // 如果token验证失败，返回错误信息
-                    return json(['status' => 'error', 'message' => 'token验证失败']);
+                    return json(['status' => 'error', 'message' => 'token验证失败,请刷新页面重试!']);
                 }
 
                 // 获取出库参数

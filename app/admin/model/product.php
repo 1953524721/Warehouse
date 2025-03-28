@@ -88,7 +88,7 @@ class product extends Model
                 'add_date'   => $input['add_date']
             ]);
 
-            return $result !== false;
+            return $result != false;
         } catch (DbException $e) {
             Log::error("更新产品信息时发生错误: " . $e->getMessage());
             throw new \RuntimeException("更新产品信息时发生错误", 0, $e);

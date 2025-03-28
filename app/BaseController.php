@@ -74,7 +74,7 @@ abstract class BaseController
      * @return array|string|true
      * @throws ValidateException
      */
-    protected function validate(array $data, string|array $validate, array $message = [], bool $batch = false)
+    protected function validate(array $data, string|array $validate, array $message = [], bool $batch = false): bool|array|string
     {
         if (is_array($validate)) {
             $v = new Validate();
@@ -108,45 +108,30 @@ abstract class BaseController
     // 阿拉伯数字转汉字
     public function numberToChinese($num): string
     {
-        $chineseNumbers = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
-        $units = ['', '十', '百', '千'];
-        $bigUnits = ['', '万', '亿'];
-
-        $str = strval($num);
-        $len = strlen($str);
+        // 定义单位
+        $units = ['', '万', '亿'];
         $result = '';
 
-        for ($i = 0; $i < $len; $i++)
-        {
-            $digit = intval($str[$i]);
-            $pos = $len - $i - 1;
-            $unit = $units[$pos % 4];
-            $bigUnit = $bigUnits[intval($pos / 4)];
+        // 将数字分割为每4位一组
+        $numStr = strval($num);
+        $length = strlen($numStr);
+        $groupCount = ceil($length / 4); // 计算分组数量
 
-            // 处理零的合并
-            if ($digit === 0) {
-                if ($result !== '' && substr($result, -3) !== '零' && substr($result, -3) !== $bigUnit)
-                {
-                    $result .= '零';
-                }
-            } else
-            {
-                $result .= $chineseNumbers[$digit] . $unit;
+        // 遍历每一组
+        for ($i = 0; $i < $groupCount; $i++) {
+            $start = max($length - ($i + 1) * 4, 0); // 计算起始位置
+            $end = $length - $i * 4; // 计算结束位置
+            $group = substr($numStr, $start, $end - $start); // 截取当前组
+            $group = intval($group); // 转换为整数
+
+            // 如果当前组不为0，则添加到结果中
+            if ($group !== 0) {
+                $result = $group . $units[$i] . $result;
             }
-
-            // 添加万/亿单位
-            if ($pos % 4 === 0) {
-                $result = rtrim($result, '零') . $bigUnit;
-            }
-        }
-
-        // 处理特殊情况（如“一十”简化为“十”）
-        if (substr($result, 0, 6) === '一十')
-        {
-            $result = substr($result, 3);
         }
 
         return $result;
     }
+
 
 }
